@@ -25,7 +25,7 @@ SpriteBatch::SpriteBatch(ID3D11Device* device, const wchar_t* filename,size_t ma
 
     //頂点バッファオブジェクト生成
     D3D11_BUFFER_DESC bufferDesc{};
-    bufferDesc.ByteWidth = sizeof(Vertex) * maxVertices;
+    bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * maxVertices);
     bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -96,12 +96,33 @@ SpriteBatch::SpriteBatch(ID3D11Device* device, const wchar_t* filename,size_t ma
     texture2d->GetDesc(&texture2dDesc);
 }
 
-void SpriteBatch::Begin(ID3D11DeviceContext* immediateContext)
+void SpriteBatch::Begin(ID3D11DeviceContext* immediateContext,
+    ID3D11PixelShader* replacedPixelShader, ID3D11ShaderResourceView* replacedShaderResourceView)
 {
+    //シェーダーとテクスチャの差し替えを可能にしている(UNIT10)
     vertices.clear();
     immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
-    immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
-    immediateContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());;
+    replacedPixelShader ? immediateContext->PSSetShader(replacedPixelShader, nullptr, 0) : immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
+
+    if (replacedShaderResourceView)
+    {
+        //ここ理解出来てない
+        HRESULT hr{ S_OK };
+        Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+        replacedShaderResourceView->GetResource(resource.GetAddressOf());
+
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
+        hr = resource->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+        texture2d->GetDesc(&texture2dDesc);
+
+        immediateContext->PSSetShaderResources(0, 1, &replacedShaderResourceView);
+    }
+    else
+    {
+        immediateContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());;
+    }
 }
 
 void SpriteBatch::End(ID3D11DeviceContext* immediateContext)
@@ -128,6 +149,16 @@ void SpriteBatch::End(ID3D11DeviceContext* immediateContext)
     immediateContext->IASetInputLayout(inputLayout.Get());
 
     immediateContext->Draw(static_cast<UINT>(vertexCount), 0);
+
+    //差し替えたテクスチャを元に戻している(UNIT10)
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    shaderResourceView.Get()->GetResource(resource.GetAddressOf());
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
+    hr = resource->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+    texture2d->GetDesc(&texture2dDesc);
 }
 
 SpriteBatch::~SpriteBatch()

@@ -47,9 +47,11 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 	HRESULT hr{ S_OK };
 
-	UINT createFactoryFlags{ 0 };
+	UINT createFactoryFlags{};
 #ifdef _DEBUG
 	createFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+#else
+
 #endif // _DEBUG
 	Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory6;
 	hr = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(dxgiFactory6.GetAddressOf()));
@@ -61,6 +63,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	UINT createDeviceFlags{ 0 };
 #ifdef _DEBUG
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#else
+	createDeviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif // _DEBUG
 
 	/*D3D_FEATURE_LEVEL featureLevels[]
@@ -161,6 +165,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
+	sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
 
 	spritesBatches[0] = std::make_unique<SpriteBatch>(device.Get(), L"./Resources/player-sprites.png", 2048);
 }
@@ -318,7 +323,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//ブレンディングステートオブジェクトセット
 	immediateContext->OMSetBlendState(blendStates[0].Get(), nullptr, 0xFFFFFFFF);
 
-	/*sprites[0].get()->Render(immediateContext.Get(),
+	sprites[0].get()->Render(immediateContext.Get(),
 		0.0f,0.0f,1280.0f,720.0f,
 		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
 		0);
@@ -327,11 +332,11 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		700.0f, 200.0f, 200.0f, 200.0f,
 		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
 		45,
-		0, 0, 140.0f, 240.0f);*/
+		0, 0, 140.0f, 240.0f);
 
 	float x{ 0 };
 	float y{ 0 };
-#if 1
+#if 0
 	for (size_t i = 0; i < 1092; i++)
 	{
 		sprites[1]->Render(immediateContext.Get(),
@@ -345,7 +350,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		}
 	}
 #else
-	spritesBatches[0]->Begin(immediateContext.Get());
+	spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
 	for (size_t i = 0; i < 1092; i++)
 	{
 		spritesBatches[0]->Render(immediateContext.Get(),
@@ -361,6 +366,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	spritesBatches[0]->End(immediateContext.Get());
 #endif
 
+	sprites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
 
 #ifdef USE_IMGUI
 	ImGui::Render();

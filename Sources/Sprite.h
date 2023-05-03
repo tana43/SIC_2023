@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <directxmath.h>
 #include <wrl.h>
+#include <sstream>
 
 class Sprite
 {
@@ -30,9 +31,13 @@ public:
         float sx,float sy,float sw, float sh
     );
 
+    void Textout(ID3D11DeviceContext* immediateContext, 
+        std::string s,
+        float x, float y, float w, float h, 
+        float r, float g, float b, float a
+    );
+    
     void DrawDebug();
-    
-    
 
 private:
     struct Vertex

@@ -33,7 +33,8 @@ public:
 
     void DrawDebug();
 
-    void Begin(ID3D11DeviceContext* immediateContext);
+    void Begin(ID3D11DeviceContext* immediateContext,
+        ID3D11PixelShader* replacedPixelShader,ID3D11ShaderResourceView* replacedShaderResourceView);
     void End(ID3D11DeviceContext* immediateContext);
 
 private:

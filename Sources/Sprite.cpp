@@ -1,7 +1,6 @@
 #include "Sprite.h"
 #include "Texture.h"
 #include "misc.h"
-#include <sstream>
 #include <WICTextureLoader.h>
 
 #ifdef  USE_IMGUI
@@ -196,6 +195,19 @@ void Sprite::Render(ID3D11DeviceContext* immediateContext, float dx, float dy, f
 
     //プリミティブの描画
     immediateContext->Draw(4, 0);
+}
+
+void Sprite::Textout(ID3D11DeviceContext* immediateContext, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
+{
+    float sw = static_cast<float>(texture2dDesc.Width / 16);
+    float sh = static_cast<float>(texture2dDesc.Height / 16);
+    float carriage = 0;
+    for (const char c : s)
+    {
+        Render(immediateContext, x + carriage, y, w, h, r, g, b, a, 0,
+            sw * (c & 0x0F), sh * (c >> 4), sw, sh);
+        carriage += w;
+    }
 }
 
 void Sprite::DrawDebug()
