@@ -58,6 +58,9 @@
     <ClCompile Include="Sources\GeometricPrimitive.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Shader.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Framework.h">
@@ -103,6 +106,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\GeometricPrimitive.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Shader.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -203,6 +203,7 @@
     <ClCompile Include="Sources\Framework.cpp" />
     <ClCompile Include="Sources\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\Shader.cpp" />
     <ClCompile Include="Sources\Sprite.cpp" />
     <ClCompile Include="Sources\SpriteBatch.cpp" />
     <ClCompile Include="Sources\Texture.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="Sources\GeometricPrimitive.h" />
     <ClInclude Include="Sources\high_resolution_timer.h" />
     <ClInclude Include="Sources\misc.h" />
+    <ClInclude Include="Sources\Shader.h" />
     <ClInclude Include="Sources\Sprite.h" />
     <ClInclude Include="Sources\SpriteBatch.h" />
     <ClInclude Include="Sources\Texture.h" />
