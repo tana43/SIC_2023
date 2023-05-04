@@ -57,14 +57,12 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	hr = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(dxgiFactory6.GetAddressOf()));
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	//アダプター最適化（GPUに対応）
+	//アダプター最適化（搭載GPUに対応）
 	acquireHighPerformanceAdapter(dxgiFactory6.Get(), adapter.GetAddressOf());
 
 	UINT createDeviceFlags{ 0 };
 #ifdef _DEBUG
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#else
-	createDeviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif // _DEBUG
 
 	/*D3D_FEATURE_LEVEL featureLevels[]

@@ -55,6 +55,9 @@
     <ClCompile Include="Sources\Texture.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\GeometricPrimitive.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Framework.h">
@@ -99,9 +102,15 @@
     <ClInclude Include="Sources\Texture.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\GeometricPrimitive.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\GeometricPrimitive.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -110,6 +119,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\SpritePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GeometricPrimitivePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GeometricPrimitiveVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
