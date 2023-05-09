@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>.\External\DirectXTK-main\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,9 +131,9 @@
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput>%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>Resources\Shader\%(Filename).cso</ObjectFileOutput>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
-      <AssemblerOutputFile>%(Filename).cod</AssemblerOutputFile>
+      <AssemblerOutputFile>Resources\Shader\%(Filename).cod</AssemblerOutputFile>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

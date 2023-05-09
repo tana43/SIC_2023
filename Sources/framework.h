@@ -14,6 +14,7 @@
 
 #include "Sprite.h"
 #include "SpriteBatch.h"
+#include "GeometricPrimitive.h"
 
 #ifdef USE_IMGUI
 #include "../External/imgui/imgui.h"
@@ -44,6 +45,14 @@ public:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+
+	struct  SceneConstants
+	{
+		DirectX::XMFLOAT4X4 viewProjection;	//ビュープロジェクション交換行列
+		DirectX::XMFLOAT4 lightDirection;	//ライトの向き
+	};
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffers[8];
+
 	void CreateSwapChain(IDXGIFactory6* dxgiFactory6);
 
 
@@ -194,6 +203,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
+	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 };

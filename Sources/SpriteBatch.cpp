@@ -39,7 +39,7 @@ SpriteBatch::SpriteBatch(ID3D11Device* device, const wchar_t* filename,size_t ma
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     //頂点シェーダーオブジェクト生成
-    const char* csoName{ "SpriteVS.cso" };
+    const char* csoName{ "../Resources/Shader/SpriteVS.cso" };
 
     FILE* fp{};
     fopen_s(&fp, csoName, "rb");
@@ -68,7 +68,7 @@ SpriteBatch::SpriteBatch(ID3D11Device* device, const wchar_t* filename,size_t ma
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     //ピクセルシェーダーオブジェクト生成
-    csoName = "SpritePS.cso";
+    csoName = "../Resources/Shader/SpritePS.cso";
 
     fopen_s(&fp, csoName, "rb");
     _ASSERT_EXPR_A(fp, "CSO file not found");

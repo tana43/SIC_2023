@@ -115,7 +115,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 		//深度ステンシルステートオブジェクトの生成
 	{
-	//深度テスト：オン、深度ライト：オン
+		//深度テスト：オン、深度ライト：オン
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
 		depthStencilDesc.DepthEnable = TRUE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -157,9 +157,19 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		hr = device->CreateBlendState(&blendDesc, blendStates[0].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-
 	}
+
+	D3D11_BUFFER_DESC bufferDesc{};
+	bufferDesc.ByteWidth = sizeof(SceneConstants);
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDesc.CPUAccessFlags = 0;
+	bufferDesc.MiscFlags = 0;
+	bufferDesc.StructureByteStride = 0;
+	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+	geometricPrimitive[0] = std::make_unique<GeometricPrimitive>(device.Get());
 
 	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
@@ -170,6 +180,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 bool Framework::initialize()
 {
+
 	return true;
 }
 
@@ -321,6 +332,27 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//ブレンディングステートオブジェクトセット
 	immediateContext->OMSetBlendState(blendStates[0].Get(), nullptr, 0xFFFFFFFF);
 
+	//ビュー・プロジェクション交換行列を計算
+	D3D11_VIEWPORT viewport;
+	UINT numViewports{ 1 };
+	immediateContext->RSGetViewports(&numViewports, &viewport);
+
+	float aspectRaito{ viewport.Width / viewport.Height };
+	DirectX::XMMATRIX P{ DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(30),aspectRaito,0.1f,100.0f) };
+
+	DirectX::XMVECTOR eye{ DirectX::XMVectorSet(0.0f,0.0f,-10.0f,1.0f) };
+	DirectX::XMVECTOR focus{ DirectX::XMVectorSet(0.0f,0.0f,0.0f,1.0f) };
+	DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f) };
+	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };
+
+	//定数バッファにセット
+	SceneConstants data{};
+	DirectX::XMStoreFloat4x4(&data.viewProjection, V * P);
+	data.lightDirection = { 0,0,1,0 };
+	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
+	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	
+
 	sprites[0].get()->Render(immediateContext.Get(),
 		0.0f,0.0f,1280.0f,720.0f,
 		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
@@ -348,7 +380,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		}
 	}
 #else
-	spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
+	/*spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
 	for (size_t i = 0; i < 1092; i++)
 	{
 		spritesBatches[0]->Render(immediateContext.Get(),
@@ -361,10 +393,19 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 			y += 24;
 		}
 	}
-	spritesBatches[0]->End(immediateContext.Get());
+	spritesBatches[0]->End(immediateContext.Get());*/
 #endif
 
 	sprites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
+
+	DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(1,1,1) };
+	DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0,0,0) };
+	DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0,0,0) };
+
+	DirectX::XMFLOAT4X4 world;
+	DirectX::XMStoreFloat4x4(&world, S* R* T);
+
+	geometricPrimitive[0]->Render(immediateContext.Get(), world, { 0.5f,0.8f,0.2f,1.0f });
 
 #ifdef USE_IMGUI
 	ImGui::Render();
