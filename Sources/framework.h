@@ -210,5 +210,6 @@ private:
 	DirectX::XMFLOAT3 cameraPos{ 0.0f, 0.0f, -10.0f};
 	DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
+	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 };
 

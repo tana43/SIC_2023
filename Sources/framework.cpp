@@ -300,19 +300,21 @@ void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 
 
 #ifdef USE_IMGUI
-	
 	ImGui::Begin("ImGUI");
-	if (ImGui::TreeNode("Camera"))
+	if (ImGui::CollapsingHeader("Camera"))
 	{
-		ImGui::DragFloat3("Pos", &cameraPos.x,0.1f);
-		ImGui::DragFloat3("Angle", &cameraAngle.x,0.01f);
-		ImGui::TreePop();
+		ImGui::DragFloat3("pos", &cameraPos.x,0.1f);
+		ImGui::DragFloat3("angle", &cameraAngle.x,0.01f);
 	}
-	if (ImGui::TreeNode("SpriteColor"))
+	if (ImGui::CollapsingHeader("SpriteColor"))
 	{
-		ImGui::ColorPicker4("Color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
-		ImGui::TreePop();
+		ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
 	}
+	if (ImGui::CollapsingHeader("Light"))
+	{
+		ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
+	}
+
 
 	geometricPrimitive[0]->DrawDebug();
 
@@ -367,7 +369,9 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//定数バッファにセット
 	SceneConstants data{};
 	DirectX::XMStoreFloat4x4(&data.viewProjection, V * P);
-	data.lightDirection = { 0,0,1,0 };
+	DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
+	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
+	data.lightDirection = { front.x,front.y,front.z,0 };
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
