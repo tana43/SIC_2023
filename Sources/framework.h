@@ -189,7 +189,7 @@ private:
 	}
 
 	BOOL fullscreenMode{ FALSE };
-	BOOL vsync{ FALSE };//êÇíºìØä˙
+	BOOL vsync{ TRUE };//êÇíºìØä˙
 	BOOL tearingSupported{ FALSE };
 
 	RECT windowedRect;
@@ -206,5 +206,9 @@ private:
 	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
+
+	DirectX::XMFLOAT3 cameraPos{ 0.0f, 0.0f, -10.0f};
+	DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
+	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 };
 

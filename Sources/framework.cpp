@@ -302,11 +302,20 @@ void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 #ifdef USE_IMGUI
 	
 	ImGui::Begin("ImGUI");
-	if (ImGui::TreeNode("WindowSize"))
+	if (ImGui::TreeNode("Camera"))
 	{
+		ImGui::DragFloat3("Pos", &cameraPos.x,0.1f);
+		ImGui::DragFloat3("Angle", &cameraAngle.x,0.01f);
 		ImGui::TreePop();
 	}
-	ImGui::ColorPicker4("Color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
+	if (ImGui::TreeNode("SpriteColor"))
+	{
+		ImGui::ColorPicker4("Color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
+		ImGui::TreePop();
+	}
+
+	geometricPrimitive[0]->DrawDebug();
+
 	ImGui::End();
 
 	
@@ -340,8 +349,18 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	float aspectRaito{ viewport.Width / viewport.Height };
 	DirectX::XMMATRIX P{ DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(30),aspectRaito,0.1f,100.0f) };
 
-	DirectX::XMVECTOR eye{ DirectX::XMVectorSet(0.0f,0.0f,-10.0f,1.0f) };
-	DirectX::XMVECTOR focus{ DirectX::XMVectorSet(0.0f,0.0f,0.0f,1.0f) };
+	DirectX::XMMATRIX Transform =DirectX::XMMatrixRotationRollPitchYaw(cameraAngle.x, cameraAngle.y, cameraAngle.z);
+	DirectX::XMVECTOR Front = Transform.r[2];
+	DirectX::XMFLOAT3 front;
+	DirectX::XMStoreFloat3(&front, Front);
+	cameraFocus = {
+		cameraPos.x + front.x * 10,
+		cameraPos.y + front.y * 10,
+		cameraPos.z + front.z * 10
+	};
+
+	DirectX::XMVECTOR eye{ DirectX::XMVectorSet(cameraPos.x,cameraPos.y,cameraPos.z,1.0f) };
+	DirectX::XMVECTOR focus{ DirectX::XMVectorSet(cameraFocus.x,cameraFocus.y,cameraFocus.z,1.0f) };
 	DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f) };
 	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };
 
@@ -353,59 +372,52 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
 
-	sprites[0].get()->Render(immediateContext.Get(),
-		0.0f,0.0f,1280.0f,720.0f,
-		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-		0);
+//	sprites[0].get()->Render(immediateContext.Get(),
+//		0.0f,0.0f,1280.0f,720.0f,
+//		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
+//		0);
+//
+//	sprites[1].get()->Render(immediateContext.Get(),
+//		700.0f, 200.0f, 200.0f, 200.0f,
+//		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
+//		45,
+//		0, 0, 140.0f, 240.0f);
+//
+//	float x{ 0 };
+//	float y{ 0 };
+//#if 0
+//	for (size_t i = 0; i < 1092; i++)
+//	{
+//		sprites[1]->Render(immediateContext.Get(),
+//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
+//				1, 1, 1, 1, 0, 140*0, 240 * 0,140,240);
+//		x += 32;
+//		if (x > 1280 - 64)
+//		{
+//			x = 0;
+//			y += 24;
+//		}
+//	}
+//#else
+//	spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
+//	for (size_t i = 0; i < 1092; i++)
+//	{
+//		spritesBatches[0]->Render(immediateContext.Get(),
+//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
+//			1, 1, 1, 1, 0, 140 *0, 240 * 0,140,240);
+//		x += 32;
+//		if (x > 1280 - 64)
+//		{
+//			x = 0;
+//			y += 24;
+//		}
+//	}
+//	spritesBatches[0]->End(immediateContext.Get());
+//#endif
 
-	sprites[1].get()->Render(immediateContext.Get(),
-		700.0f, 200.0f, 200.0f, 200.0f,
-		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-		45,
-		0, 0, 140.0f, 240.0f);
+	/*prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);*/
 
-	float x{ 0 };
-	float y{ 0 };
-#if 0
-	for (size_t i = 0; i < 1092; i++)
-	{
-		sprites[1]->Render(immediateContext.Get(),
-			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
-				1, 1, 1, 1, 0, 140*0, 240 * 0,140,240);
-		x += 32;
-		if (x > 1280 - 64)
-		{
-			x = 0;
-			y += 24;
-		}
-	}
-#else
-	/*spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
-	for (size_t i = 0; i < 1092; i++)
-	{
-		spritesBatches[0]->Render(immediateContext.Get(),
-			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
-			1, 1, 1, 1, 0, 140 *0, 240 * 0,140,240);
-		x += 32;
-		if (x > 1280 - 64)
-		{
-			x = 0;
-			y += 24;
-		}
-	}
-	spritesBatches[0]->End(immediateContext.Get());*/
-#endif
-
-	sprites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
-
-	DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(1,1,1) };
-	DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(0,0,0) };
-	DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(0,0,0) };
-
-	DirectX::XMFLOAT4X4 world;
-	DirectX::XMStoreFloat4x4(&world, S* R* T);
-
-	geometricPrimitive[0]->Render(immediateContext.Get(), world, { 0.5f,0.8f,0.2f,1.0f });
+	geometricPrimitive[0]->Render(immediateContext.Get());
 
 #ifdef USE_IMGUI
 	ImGui::Render();

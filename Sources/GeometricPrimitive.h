@@ -3,6 +3,10 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 
+#ifdef USE_IMGUI
+#include "../External/imgui/imgui.h"
+#endif
+
 class GeometricPrimitive
 {
 public:
@@ -30,12 +34,18 @@ public:
     GeometricPrimitive(ID3D11Device* device);
     virtual ~GeometricPrimitive() = default;
 
-    void Render(ID3D11DeviceContext* immediateContext,
-        const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor);
+    void Render(ID3D11DeviceContext* immediateContext);
+
+    void DrawDebug();
 
 protected:
 
     void CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount,
         uint32_t* indices, size_t indexCount);
+
+    DirectX::XMFLOAT3 position{0,0,0};
+    DirectX::XMFLOAT3 angle{0,0,0};
+    DirectX::XMFLOAT3 scale{1,1,1};
+    DirectX::XMFLOAT4 color{ 0.5f,0.8f,0.2f,1.0f };
 };
 
