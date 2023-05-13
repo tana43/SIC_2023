@@ -115,7 +115,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 		//深度ステンシルステートオブジェクトの生成
 	{
-		//深度テスト：オン、深度ライト：オン
+		//深度テスト：オン,深度ライト：オン
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
 		depthStencilDesc.DepthEnable = TRUE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -123,19 +123,19 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[0].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-		//深度テスト：オフ、深度ライト：オン
+		//深度テスト：オフ,深度ライト：オン
 		depthStencilDesc.DepthEnable = FALSE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[1].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-		//深度テスト：オン、深度ライト：オフ
+		//深度テスト：オン,深度ライト：オフ
 		depthStencilDesc.DepthEnable = TRUE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[2].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-		//深度テスト：オフ、深度ライト：オフ
+		//深度テスト：オフ,深度ライト：オフ
 		depthStencilDesc.DepthEnable = FALSE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[3].GetAddressOf());
@@ -283,11 +283,15 @@ void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	immediateContext->RSSetViewports(1, &viewport);
+
+	D3D11_RASTERIZER_DESC rasterizerDesc{};
 }
 
 void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 {
 #ifdef USE_IMGUI
+	//static変数は一度しか初期化されないので、ラムダの中身を一度だけ呼ぶようにしている
+	static bool CallOnce = [&]() { SetImguiStyle(); return true; }();
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -300,19 +304,23 @@ void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 
 
 #ifdef USE_IMGUI
+
 	ImGui::Begin("ImGUI");
-	if (ImGui::CollapsingHeader("Camera"))
+	if (ImGui::TreeNode("Camera"))
 	{
-		ImGui::DragFloat3("pos", &cameraPos.x,0.1f);
+		ImGui::DragFloat3("position", &cameraPos.x,0.1f);
 		ImGui::DragFloat3("angle", &cameraAngle.x,0.01f);
+		ImGui::TreePop();
 	}
-	if (ImGui::CollapsingHeader("SpriteColor"))
+	if (ImGui::TreeNode("SpriteColor"))
 	{
 		ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
+		ImGui::TreePop();
 	}
-	if (ImGui::CollapsingHeader("Light"))
+	if (ImGui::TreeNode("Light"))
 	{
 		ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
+		ImGui::TreePop();
 	}
 
 
@@ -518,4 +526,29 @@ void Framework::OnSizeChanged(UINT64 width, UINT height)
 Framework::~Framework()
 {
 
+}
+
+void Framework::SetImguiStyle()
+{
+	ImGuiStyle* style = &ImGui::GetStyle();
+	style->WindowPadding = ImVec2(15, 15);
+	style->WindowRounding = 5.0f;
+	style->FramePadding = ImVec2(5, 5);
+	style->FrameRounding = 4.0f;
+	style->ItemSpacing = ImVec2(12, 8);
+	style->ItemInnerSpacing = ImVec2(8, 6);
+	style->IndentSpacing = 25.0f;
+	style->ScrollbarSize = 15.0f;
+	style->ScrollbarRounding = 9.0f;
+	style->GrabMinSize = 5.0f;
+	style->GrabRounding = 3.0f;
+
+	ImGui::StyleColorsLight(style);
+
+	//なぜかフォントが設定されない
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahomabd.ttf", 12);
+	/*io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 10);
+	io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 14);
+	io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 18);*/
 }

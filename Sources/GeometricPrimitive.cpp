@@ -157,12 +157,14 @@ void GeometricPrimitive::Render(ID3D11DeviceContext* immediateContext)
 
 void GeometricPrimitive::DrawDebug()
 {
-    if (ImGui::CollapsingHeader("GeometricPrimitive"))
+    if (ImGui::TreeNode("GeometricPrimitive"))
     {   
         ImGui::DragFloat3("position", &position.x,0.1f);
         ImGui::DragFloat3("scale", &scale.x,0.01f);
         ImGui::DragFloat3("angle", &angle.x,0.01f);
         ImGui::ColorEdit4("color", &color.x);
+
+        ImGui::TreePop();
     }
 }
 

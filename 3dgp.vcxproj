@@ -188,9 +188,9 @@
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput>%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>Resources\Shader\%(Filename).cso</ObjectFileOutput>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
-      <AssemblerOutputFile>%(Filename).cod</AssemblerOutputFile>
+      <AssemblerOutputFile>Resources\Shader\%(Filename).cod</AssemblerOutputFile>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

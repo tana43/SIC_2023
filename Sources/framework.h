@@ -25,7 +25,6 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 extern ImWchar glyphRangesJapanese[];
 #endif
 
-
 class Framework
 {
 public:
@@ -169,6 +168,8 @@ private:
 	void render(float elapsed_time/*Elapsed seconds from last frame*/);
 	bool uninitialize();
 
+	void SetImguiStyle();
+
 private:
 	high_resolution_timer tictoc;
 	uint32_t frames{ 0 };
@@ -211,5 +212,7 @@ private:
 	DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
+
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[3];
 };
 
