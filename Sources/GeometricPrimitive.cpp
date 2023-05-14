@@ -8,7 +8,8 @@
 
 int GeometricPrimitive::num{ 0 };
 
-GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType) : myNum(num++)
+GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType,DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 color) 
+    : myNum(num++),position(pos),color(color)
 {
 
     //std::unique_ptr<Vertex> vertices;
@@ -27,9 +28,9 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType) :
     case GeometricPrimitive::MeshType::Sphere:
         break;
 
-    case GeometricPrimitive::MeshType::Sylinder:
-        vertices = new Vertex[32];
-        indices = new uint32_t[136];
+    case GeometricPrimitive::MeshType::Cylinder:
+        vertices = new Vertex[98];
+        indices = new uint32_t[192];
         ShapeCylinderMesh(vertices, indices);
         break;
     }
@@ -210,26 +211,70 @@ void GeometricPrimitive::ShapeSphereMesh(Vertex* vertices, uint32_t* indices)
 
 void GeometricPrimitive::ShapeCylinderMesh(Vertex* vertices, uint32_t* indices)
 {
-    verticesIndex = 32;
-    float radian = -M_PI;
-    for (int i = 0; radian < M_PI; i += 4)
+    verticesIndex = 98;
+    float pi = static_cast<float>(M_PI);
+    float radian = -pi;
+    float r = 0.5f;
+    for (int i = 0; i < 6 * 16; i += 6)
     {
-        vertices[i]     = { {sinf(radian),0.5,cosf(radian)},{sinf(radian),0,cosf(radian)} };
-        vertices[i + 1] = { {sinf(radian),0.5,cosf(radian)},{0,1,0} };
+        vertices[i]     = { {sinf(radian) * r,0.5f,cosf(radian) * r},{sinf(radian),0,cosf(radian)} };
+        vertices[i + 1] = { {sinf(radian) * r,0.5f,cosf(radian) * r},{sinf(radian + (pi * 2.0f) / 8.0f),0,cosf(radian + (pi * 2.0f) / 8.0f)} };
+        vertices[i + 2] = { {sinf(radian) * r,0.5f,cosf(radian) * r},{0,1,0} };
 
-        vertices[i + 2] = { {sinf(radian),-0.5,cosf(radian)},{sinf(radian),0,cosf(radian)} };
-        vertices[i + 3] = { {sinf(radian),-0.5,cosf(radian)},{0,-1,0} };
+        vertices[i + 3] = { {sinf(radian) * r,-0.5f,cosf(radian) * r},{sinf(radian),0,cosf(radian)} };
+        vertices[i + 4] = { {sinf(radian) * r,-0.5f,cosf(radian) * r},{sinf(radian + (pi * 2.0f) / 8.0f),0,cosf(radian + (pi * 2.0f) / 8.0f)} };
+        vertices[i + 5] = { {sinf(radian) * r,-0.5f,cosf(radian) * r},{0,-1,0} };
 
-        radian += (M_PI * 2) / 8;
+        
+        radian += (pi * 2) / 16;
     }
+    //ã‰º‚Ì’†S“_
+    vertices[96] = { {0,0.5f,0},{0,1,0} };
+    vertices[97] = { {0,-0.5f,0},{0,-1,0} };
 
-    indicesindex = 134;
-    for (int i = 0; i < 8; i++)
+    indicesindex = 192;
+    for (int i = 0; i < 16; i++)
     {
+        int j = i * 12;
+        int k = i * 6;
 
+        if (i == 15)
+        {
+            //‚Â‚È‚¬–Ú•”•ª
+            indices[0 + j] = 4 + k;
+            indices[1 + j] = 0;
+            indices[2 + j] = 1 + k;
+
+            indices[3 + j] = 4 + k;
+            indices[4 + j] = 3;
+            indices[5 + j] = 0;
+
+            indices[6 + j] = 2 + k;
+            indices[7 + j] = 2;
+            indices[8 + j] = 96;
+
+            indices[9 + j] = 97;
+            indices[10 + j] = 5;
+            indices[11 + j] = 5 + k;
+            break;
+        }
+
+        indices[0 + j] = 4 + k;
+        indices[1 + j] = 6 + k;
+        indices[2 + j] = 1 + k;
+
+        indices[3 + j] = 4 + k;
+        indices[4 + j] = 9 + k;
+        indices[5 + j] = 6 + k;
+
+        indices[6 + j] = 2 + k;
+        indices[7 + j] = 8 + k;
+        indices[8 + j] = 96;
+
+        indices[ 9 + j] = 97;
+        indices[10 + j] = 11 + k;
+        indices[11 + j] = 5 + k;
     }
-
-    
 }
 
 void GeometricPrimitive::CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount, uint32_t* indices, size_t indexCount)

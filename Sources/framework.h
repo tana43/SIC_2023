@@ -203,7 +203,10 @@ private:
 	std::unique_ptr<Sprite> sprites[8];
 	std::unique_ptr<SpriteBatch> spritesBatches[8];
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
+
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
+	ID3D11DepthStencilState* settingDepthStencilState{ depthStencilStates[0].Get() };
+
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
 	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 

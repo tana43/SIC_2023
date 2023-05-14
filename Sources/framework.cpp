@@ -126,18 +126,21 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		//深度テスト：オフ,深度ライト：オン
 		depthStencilDesc.DepthEnable = FALSE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[1].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 		//深度テスト：オン,深度ライト：オフ
 		depthStencilDesc.DepthEnable = TRUE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[2].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 		//深度テスト：オフ,深度ライト：オフ
 		depthStencilDesc.DepthEnable = FALSE;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[3].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	}
@@ -170,8 +173,9 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 	geometricPrimitive[0] = std::make_unique<GeometricPrimitive>(device.Get());
-	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get());
-
+	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
+		GeometricPrimitive::MeshType::Cylinder,DirectX::XMFLOAT3( -1.5f, 0, 0 ), DirectX::XMFLOAT4(0.1f,0.8f,0.2f,1.0f));
+	
 	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
 	sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
@@ -342,7 +346,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
 	//深度ステートオブジェクトセット
-	immediateContext->OMSetDepthStencilState(depthStencilStates[0].Get(), 1);
+	immediateContext->OMSetDepthStencilState(settingDepthStencilState, 1);
 
 	//サンプラーステートオブジェクトをバインド
 	immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
@@ -580,23 +584,51 @@ void Framework::DrawDebug()
 		ImGui::TreePop();
 	}
 
-	static bool selectFlag[3] = {true,false,false};
+	static bool selectDFlag[4] = {true,false,false,false};
+	if (ImGui::BeginMenu("DepthStencilState"))
+	{
+		if (ImGui::MenuItem("Z_Test ON  : Z_Write ON","", selectDFlag[0]))
+		{
+			settingDepthStencilState = depthStencilStates[0].Get();
+			selectDFlag[0] = true; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = false;
+		}
+		if (ImGui::MenuItem("Z_Test OFF : Z_Write ON","", selectDFlag[1]))
+		{
+			settingDepthStencilState = depthStencilStates[1].Get();
+			selectDFlag[0] = false; selectDFlag[1] = true; selectDFlag[2] = false; selectDFlag[3] = false;
+		}
+		if (ImGui::MenuItem("Z_Test ON  : Z_Write OFF","", selectDFlag[2]))
+		{
+			settingDepthStencilState = depthStencilStates[2].Get();
+			selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = true; selectDFlag[3] = false;
+		}
+		if (ImGui::MenuItem("Z_Test OFF : Z_Write OFF", "", selectDFlag[3]))
+		{
+			settingDepthStencilState = depthStencilStates[3].Get();
+			selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = true;
+		}
+
+		ImGui::EndMenu();
+	}
+
+
+	static bool selectRFlag[3] = { true,false,false };
 	if (ImGui::BeginMenu("RasterizerState"))
 	{
-		if (ImGui::MenuItem("Solid","", selectFlag[0]))
+		if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
 		{
 			settingRasterizerState = rasterizerStates[0].Get();
-			selectFlag[0] = true; selectFlag[1] = false; selectFlag[2] = false;
+			selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false;
 		}
-		if (ImGui::MenuItem("Wireframe","", selectFlag[1]))
+		if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
 		{
 			settingRasterizerState = rasterizerStates[1].Get();
-			selectFlag[0] = false; selectFlag[1] = true; selectFlag[2] = false;
+			selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false;
 		}
-		if (ImGui::MenuItem("Wireframe Culling Off","", selectFlag[2]))
+		if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
 		{
 			settingRasterizerState = rasterizerStates[2].Get();
-			selectFlag[0] = false; selectFlag[1] = false; selectFlag[2] = true;
+			selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true;
 		}
 
 		ImGui::EndMenu();

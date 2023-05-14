@@ -27,7 +27,7 @@ public:
     {
         Cube,
         Sphere,
-        Sylinder,
+        Cylinder,
     };
 
 private:
@@ -40,7 +40,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
 public:
-    GeometricPrimitive(ID3D11Device* device,MeshType meshType = MeshType::Cube);
+    GeometricPrimitive(ID3D11Device* device, MeshType meshType = MeshType::Cube, 
+        DirectX::XMFLOAT3 pos = { 0,0,0 }, DirectX::XMFLOAT4 color = {1,1,1,1});
     virtual ~GeometricPrimitive() = default;
 
     void Render(ID3D11DeviceContext* immediateContext);
@@ -64,6 +65,6 @@ protected:
     DirectX::XMFLOAT3 position{0,0,0};
     DirectX::XMFLOAT3 angle{0,0,0};
     DirectX::XMFLOAT3 scale{1,1,1};
-    DirectX::XMFLOAT4 color{ 0.5f,0.8f,0.2f,1.0f };
+    DirectX::XMFLOAT4 color{1,1,1,1};
 };
 
