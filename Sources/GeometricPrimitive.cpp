@@ -3,21 +3,37 @@
 #include <sstream>
 #include "Shader.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 int GeometricPrimitive::num{ 0 };
 
-GeometricPrimitive::GeometricPrimitive(ID3D11Device* device)
+GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType) : myNum(num++)
 {
-    myNum = num;
-    num++;
 
     //std::unique_ptr<Vertex> vertices;
     //std::unique_ptr<uint32_t> indices;
     Vertex* vertices{};
     uint32_t* indices{};
 
-    vertices = new Vertex[24];
-    indices = new uint32_t[36];
-    ShapeCubeMesh(vertices, indices);
+    switch (meshType)
+    {
+    case GeometricPrimitive::MeshType::Cube:
+        vertices = new Vertex[24];
+        indices = new uint32_t[36];
+        ShapeCubeMesh(vertices, indices);
+        break;
+
+    case GeometricPrimitive::MeshType::Sphere:
+        break;
+
+    case GeometricPrimitive::MeshType::Sylinder:
+        vertices = new Vertex[32];
+        indices = new uint32_t[136];
+        ShapeCylinderMesh(vertices, indices);
+        break;
+    }
+    
 
     CreateComBuffers(device, vertices, verticesIndex, indices, indicesindex);
 
@@ -189,10 +205,31 @@ void GeometricPrimitive::ShapeCubeMesh(Vertex* vertices,uint32_t* indices)
 
 void GeometricPrimitive::ShapeSphereMesh(Vertex* vertices, uint32_t* indices)
 {
+
 }
 
 void GeometricPrimitive::ShapeCylinderMesh(Vertex* vertices, uint32_t* indices)
 {
+    verticesIndex = 32;
+    float radian = -M_PI;
+    for (int i = 0; radian < M_PI; i += 4)
+    {
+        vertices[i]     = { {sinf(radian),0.5,cosf(radian)},{sinf(radian),0,cosf(radian)} };
+        vertices[i + 1] = { {sinf(radian),0.5,cosf(radian)},{0,1,0} };
+
+        vertices[i + 2] = { {sinf(radian),-0.5,cosf(radian)},{sinf(radian),0,cosf(radian)} };
+        vertices[i + 3] = { {sinf(radian),-0.5,cosf(radian)},{0,-1,0} };
+
+        radian += (M_PI * 2) / 8;
+    }
+
+    indicesindex = 134;
+    for (int i = 0; i < 8; i++)
+    {
+
+    }
+
+    
 }
 
 void GeometricPrimitive::CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount, uint32_t* indices, size_t indexCount)

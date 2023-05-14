@@ -342,7 +342,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
 	//深度ステートオブジェクトセット
-	immediateContext->OMSetDepthStencilState(depthStencilStates[3].Get(), 1);
+	immediateContext->OMSetDepthStencilState(depthStencilStates[0].Get(), 1);
 
 	//サンプラーステートオブジェクトをバインド
 	immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
@@ -388,10 +388,10 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
 
-//	sprites[0].get()->Render(immediateContext.Get(),
-//		0.0f,0.0f,1280.0f,720.0f,
-//		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-//		0);
+	/*sprites[0].get()->Render(immediateContext.Get(),
+		0.0f,0.0f,1280.0f,720.0f,
+		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
+		0);*/
 //
 //	sprites[1].get()->Render(immediateContext.Get(),
 //		700.0f, 200.0f, 200.0f, 200.0f,

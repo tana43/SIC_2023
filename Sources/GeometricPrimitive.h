@@ -10,6 +10,7 @@
 
 class GeometricPrimitive
 {
+    static int num;
 public:
     struct Vertex
     {
@@ -21,7 +22,13 @@ public:
         DirectX::XMFLOAT4X4 world;
         DirectX::XMFLOAT4 materialColor;
     };
-    static int num;
+
+    enum class MeshType
+    {
+        Cube,
+        Sphere,
+        Sylinder,
+    };
 
 private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
@@ -33,7 +40,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
 public:
-    GeometricPrimitive(ID3D11Device* device);
+    GeometricPrimitive(ID3D11Device* device,MeshType meshType = MeshType::Cube);
     virtual ~GeometricPrimitive() = default;
 
     void Render(ID3D11DeviceContext* immediateContext);
