@@ -58,6 +58,9 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType,Di
     bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+    delete[] vertices;
+    delete[] indices;
 }
 
 void GeometricPrimitive::Render(ID3D11DeviceContext* immediateContext)
