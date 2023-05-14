@@ -169,6 +169,7 @@ private:
 	bool uninitialize();
 
 	void SetImguiStyle();
+	void DrawDebug();
 
 private:
 	high_resolution_timer tictoc;
@@ -214,5 +215,6 @@ private:
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[3];
+	ID3D11RasterizerState* settingRasterizerState{ rasterizerStates[0].Get()};
 };
 

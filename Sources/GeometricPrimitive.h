@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <wrl.h>
+#include <memory>
 
 #ifdef USE_IMGUI
 #include "../External/imgui/imgui.h"
@@ -20,6 +21,7 @@ public:
         DirectX::XMFLOAT4X4 world;
         DirectX::XMFLOAT4 materialColor;
     };
+    static int num;
 
 private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
@@ -38,7 +40,16 @@ public:
 
     void DrawDebug();
 
+private:
+    void ShapeCubeMesh(Vertex* vertices, uint32_t* indices);
+    void ShapeSphereMesh(Vertex* vertices, uint32_t* indices);
+    void ShapeCylinderMesh(Vertex* vertices, uint32_t* indices);
+
 protected:
+    int myNum;
+
+    size_t verticesIndex;
+    size_t indicesindex;
 
     void CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount,
         uint32_t* indices, size_t indexCount);

@@ -170,6 +170,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 	geometricPrimitive[0] = std::make_unique<GeometricPrimitive>(device.Get());
+	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get());
 
 	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
@@ -284,7 +285,33 @@ void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
 	viewport.MaxDepth = 1.0f;
 	immediateContext->RSSetViewports(1, &viewport);
 
+	//ラスタライザーステートオブジェクト生成
 	D3D11_RASTERIZER_DESC rasterizerDesc{};
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.FrontCounterClockwise = FALSE;
+	rasterizerDesc.DepthBias = 0;
+	rasterizerDesc.DepthBiasClamp = 0;
+	rasterizerDesc.SlopeScaledDepthBias = 0;
+	rasterizerDesc.DepthClipEnable = TRUE;
+	rasterizerDesc.ScissorEnable = FALSE;
+	rasterizerDesc.MultisampleEnable = FALSE;
+	rasterizerDesc.AntialiasedLineEnable = FALSE;
+	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[0].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.AntialiasedLineEnable = TRUE;
+	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[1].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+	
+	 rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.AntialiasedLineEnable = TRUE;
+	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[2].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
 }
 
 void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
@@ -302,34 +329,8 @@ void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 		FullscreenState(!fullscreenMode);
 	}
 
-
-#ifdef USE_IMGUI
-
-	ImGui::Begin("ImGUI");
-	if (ImGui::TreeNode("Camera"))
-	{
-		ImGui::DragFloat3("position", &cameraPos.x,0.1f);
-		ImGui::DragFloat3("angle", &cameraAngle.x,0.01f);
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("SpriteColor"))
-	{
-		ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("Light"))
-	{
-		ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
-		ImGui::TreePop();
-	}
-
-
-	geometricPrimitive[0]->DrawDebug();
-
-	ImGui::End();
-
+	DrawDebug();
 	
-#endif
 }
 void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 {
@@ -350,6 +351,9 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	//ブレンディングステートオブジェクトセット
 	immediateContext->OMSetBlendState(blendStates[0].Get(), nullptr, 0xFFFFFFFF);
+
+	//ラスタライザステートをセット
+	immediateContext->RSSetState(settingRasterizerState);
 
 	//ビュー・プロジェクション交換行列を計算
 	D3D11_VIEWPORT viewport;
@@ -430,6 +434,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	/*prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);*/
 
 	geometricPrimitive[0]->Render(immediateContext.Get());
+	geometricPrimitive[1]->Render(immediateContext.Get());
 
 #ifdef USE_IMGUI
 	ImGui::Render();
@@ -551,4 +556,55 @@ void Framework::SetImguiStyle()
 	/*io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 10);
 	io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 14);
 	io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 18);*/
+}
+
+void Framework::DrawDebug()
+{
+#ifdef USE_IMGUI
+
+	ImGui::Begin("Framework");
+	if (ImGui::TreeNode("Camera"))
+	{
+		ImGui::DragFloat3("position", &cameraPos.x, 0.1f);
+		ImGui::DragFloat3("angle", &cameraAngle.x, 0.01f);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("SpriteColor"))
+	{
+		ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Light"))
+	{
+		ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
+		ImGui::TreePop();
+	}
+
+	static bool selectFlag[3] = {true,false,false};
+	if (ImGui::BeginMenu("RasterizerState"))
+	{
+		if (ImGui::MenuItem("Solid","", selectFlag[0]))
+		{
+			settingRasterizerState = rasterizerStates[0].Get();
+			selectFlag[0] = true; selectFlag[1] = false; selectFlag[2] = false;
+		}
+		if (ImGui::MenuItem("Wireframe","", selectFlag[1]))
+		{
+			settingRasterizerState = rasterizerStates[1].Get();
+			selectFlag[0] = false; selectFlag[1] = true; selectFlag[2] = false;
+		}
+		if (ImGui::MenuItem("Wireframe Culling Off","", selectFlag[2]))
+		{
+			settingRasterizerState = rasterizerStates[2].Get();
+			selectFlag[0] = false; selectFlag[1] = false; selectFlag[2] = true;
+		}
+
+		ImGui::EndMenu();
+	}
+	ImGui::End();
+	geometricPrimitive[0]->DrawDebug();
+	geometricPrimitive[1]->DrawDebug();
+
+
+#endif
 }
