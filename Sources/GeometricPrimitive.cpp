@@ -15,6 +15,8 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device)
     Vertex* vertices{};
     uint32_t* indices{};
 
+    vertices = new Vertex[24];
+    indices = new uint32_t[36];
     ShapeCubeMesh(vertices, indices);
 
     CreateComBuffers(device, vertices, verticesIndex, indices, indicesindex);
@@ -83,7 +85,6 @@ void GeometricPrimitive::DrawDebug()
 void GeometricPrimitive::ShapeCubeMesh(Vertex* vertices,uint32_t* indices)
 {
     //Vertex  vertices[24]{};
-    vertices = new Vertex[24];
     verticesIndex = 24;
     //正立方体のコントロールポイント数は8個、
     //法線の向きが違う頂点が３個あるので頂点情報の総数は8x3 = 24個、
@@ -124,7 +125,7 @@ void GeometricPrimitive::ShapeCubeMesh(Vertex* vertices,uint32_t* indices)
     vertices[23] = { {-0.5f,-0.5f,-0.5f}, {0,0,-1} };
 
     //uint32_t indices[36]{};
-    indices = new uint32_t[36];
+    
     indicesindex = 36;
     //正立方体は６面持ち、１つの面は２つの３角形ポリゴンで構成されるので総数は6x2 = 12個、
     //正立方体を描画するために１２回の３角形ポリゴン描画が必要、よって参照される頂点情報は12x3 = 36回、
