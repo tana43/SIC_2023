@@ -4,7 +4,7 @@
 #include <WICTextureLoader.h>
 
 #ifdef  USE_IMGUI
-#include "../External/imgui/imgui.h"
+#include "../imgui/imgui.h"
 #endif //  USE_IMGUI
 
 

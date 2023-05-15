@@ -15,14 +15,14 @@
 #include "Sprite.h"
 #include "SpriteBatch.h"
 #include "GeometricPrimitive.h"
+#include "StaticMesh.h"
 
 #ifdef USE_IMGUI
-#include "../External/imgui/imgui.h"
-#include "../External/imgui/imgui_internal.h"
-#include "../External/imgui/imgui_impl_dx11.h"
-#include "../External/imgui/imgui_impl_win32.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_internal.h"
+#include "../imgui/imgui_impl_dx11.h"
+#include "../imgui/imgui_impl_win32.h"
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-extern ImWchar glyphRangesJapanese[];
 #endif
 
 class Framework
@@ -75,10 +75,8 @@ public:
 #ifdef USE_IMGUI
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\consola.ttf", 14.0f, nullptr, glyphRangesJapanese);
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX11_Init(device.Get(), immediateContext.Get());
-		ImGui::StyleColorsDark();
 #endif
 
 		while (WM_QUIT != msg.message)
@@ -202,13 +200,16 @@ private:
 
 	std::unique_ptr<Sprite> sprites[8];
 	std::unique_ptr<SpriteBatch> spritesBatches[8];
+	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
+	std::unique_ptr<StaticMesh> staticMeshes[8];
+
+
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
 	ID3D11DepthStencilState* settingDepthStencilState{ depthStencilStates[0].Get() };
 
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
-	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 

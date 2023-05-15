@@ -48,9 +48,9 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType,Di
         D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
     };
     
-    Shader::CreateVSFromCso(device, "../Resources/Shader/GeometricPrimitiveVS.cso", vertexShader.GetAddressOf(),
+    Shader::CreateVSFromCso(device, "./Resources/Shader/GeometricPrimitiveVS.cso", vertexShader.GetAddressOf(),
         inputLayout.GetAddressOf(), inputElememtDesc, ARRAYSIZE(inputElememtDesc));
-    Shader::CreatePSFromCso(device, "../Resources/Shader/GeometricPrimitivePS.cso", pixelShader.GetAddressOf());
+    Shader::CreatePSFromCso(device, "./Resources/Shader/GeometricPrimitivePS.cso", pixelShader.GetAddressOf());
     
     D3D11_BUFFER_DESC bufferDesc{};
     bufferDesc.ByteWidth = sizeof(Constants);
