@@ -441,6 +441,9 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	/*prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);*/
 
+	//深度ステートオブジェクトセット
+	immediateContext->OMSetDepthStencilState(depthStencilStates[0].Get(), 1);
+
 	geometricPrimitive[0]->Render(immediateContext.Get());
 	geometricPrimitive[1]->Render(immediateContext.Get());
 
