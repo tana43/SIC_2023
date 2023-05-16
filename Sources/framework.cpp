@@ -182,7 +182,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
 		GeometricPrimitive::MeshType::Cylinder, DirectX::XMFLOAT3(-1.5f, 0, 0), DirectX::XMFLOAT4(0.1f, 0.8f, 0.2f, 1.0f));
 
-	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(), L"./Resources/Bison/Bison.obj", DirectX::XMFLOAT3(1.5f, 0, 0));
+	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(), L"./Resources/Cup/cup.obj", DirectX::XMFLOAT3(1.5f, 0, 0));
 }
 
 bool Framework::initialize()

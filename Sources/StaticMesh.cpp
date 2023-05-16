@@ -62,6 +62,7 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename,DirectX:
                     if (L'/' != fin.peek())
                     {
                         fin >> vt;
+                        vertex.texcoord = texcoords.at(vt - 1);
                     }
                     if (L'/' == fin.peek())
                     {
