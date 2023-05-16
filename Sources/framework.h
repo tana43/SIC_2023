@@ -207,7 +207,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
-	ID3D11DepthStencilState* settingDepthStencilState{ depthStencilStates[0].Get() };
+	ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[3].Get() };
+	ID3D11DepthStencilState* setting3DDepthStencilState{ depthStencilStates[0].Get() };
 
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
 
@@ -219,6 +220,7 @@ private:
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[3];
-	ID3D11RasterizerState* settingRasterizerState{ rasterizerStates[0].Get()};
+	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get()};
+	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get()};
 };
 

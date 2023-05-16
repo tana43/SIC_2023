@@ -349,9 +349,6 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
-	//深度ステートオブジェクトセット
-	immediateContext->OMSetDepthStencilState(settingDepthStencilState, 1);
-
 	//サンプラーステートオブジェクトをバインド
 	immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
 	immediateContext->PSSetSamplers(1, 1, samplerStates[1].GetAddressOf());
@@ -359,9 +356,6 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	//ブレンディングステートオブジェクトセット
 	immediateContext->OMSetBlendState(blendStates[0].Get(), nullptr, 0xFFFFFFFF);
-
-	//ラスタライザステートをセット
-	immediateContext->RSSetState(settingRasterizerState);
 
 	//ビュー・プロジェクション交換行列を計算
 	D3D11_VIEWPORT viewport;
@@ -395,59 +389,72 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
+	//2D
+	{
+		//深度ステートオブジェクトセット
+		immediateContext->OMSetDepthStencilState(setting2DDepthStencilState, 1);
+		//ラスタライザステートをセット
+		immediateContext->RSSetState(setting2DRasterizerState);
 
-	/*sprites[0].get()->Render(immediateContext.Get(),
-		0.0f,0.0f,1280.0f,720.0f,
-		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-		0);*/
+		/*sprites[0].get()->Render(immediateContext.Get(),
+	0.0f,0.0f,1280.0f,720.0f,
+	spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
+	0);*/
 
-	sprites[1].get()->Render(immediateContext.Get(),
-		700.0f, 200.0f, 200.0f, 200.0f,
-		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-		45,
-		0, 0, 140.0f, 240.0f);
-//
-//	float x{ 0 };
-//	float y{ 0 };
-//#if 0
-//	for (size_t i = 0; i < 1092; i++)
-//	{
-//		sprites[1]->Render(immediateContext.Get(),
-//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
-//				1, 1, 1, 1, 0, 140*0, 240 * 0,140,240);
-//		x += 32;
-//		if (x > 1280 - 64)
-//		{
-//			x = 0;
-//			y += 24;
-//		}
-//	}
-//#else
-//	spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
-//	for (size_t i = 0; i < 1092; i++)
-//	{
-//		spritesBatches[0]->Render(immediateContext.Get(),
-//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
-//			1, 1, 1, 1, 0, 140 *0, 240 * 0,140,240);
-//		x += 32;
-//		if (x > 1280 - 64)
-//		{
-//			x = 0;
-//			y += 24;
-//		}
-//	}
-//	spritesBatches[0]->End(immediateContext.Get());
-//#endif
+		sprites[1].get()->Render(immediateContext.Get(),
+			700.0f, 200.0f, 200.0f, 200.0f,
+			spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
+			45,
+			0, 0, 140.0f, 240.0f);
+		//
+		//	float x{ 0 };
+		//	float y{ 0 };
+		//#if 0
+		//	for (size_t i = 0; i < 1092; i++)
+		//	{
+		//		sprites[1]->Render(immediateContext.Get(),
+		//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
+		//				1, 1, 1, 1, 0, 140*0, 240 * 0,140,240);
+		//		x += 32;
+		//		if (x > 1280 - 64)
+		//		{
+		//			x = 0;
+		//			y += 24;
+		//		}
+		//	}
+		//#else
+		//	spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
+		//	for (size_t i = 0; i < 1092; i++)
+		//	{
+		//		spritesBatches[0]->Render(immediateContext.Get(),
+		//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
+		//			1, 1, 1, 1, 0, 140 *0, 240 * 0,140,240);
+		//		x += 32;
+		//		if (x > 1280 - 64)
+		//		{
+		//			x = 0;
+		//			y += 24;
+		//		}
+		//	}
+		//	spritesBatches[0]->End(immediateContext.Get());
+		//#endif
 
-	/*prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);*/
+		//prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
+	}
 
-	//深度ステートオブジェクトセット
-	immediateContext->OMSetDepthStencilState(depthStencilStates[0].Get(), 1);
 
-	geometricPrimitive[0]->Render(immediateContext.Get());
-	geometricPrimitive[1]->Render(immediateContext.Get());
+	//3D
+	{
+		//深度ステートオブジェクトセット
+		immediateContext->OMSetDepthStencilState(setting3DDepthStencilState, 1);
+		//ラスタライザステートをセット
+		immediateContext->RSSetState(setting3DRasterizerState);
 
-	staticMeshes[0]->Render(immediateContext.Get());
+		geometricPrimitive[0]->Render(immediateContext.Get());
+		geometricPrimitive[1]->Render(immediateContext.Get());
+
+		staticMeshes[0]->Render(immediateContext.Get());
+	}
 
 #ifdef USE_IMGUI
 	ImGui::Render();
@@ -562,6 +569,7 @@ void Framework::SetImguiStyle()
 	style->GrabRounding = 3.0f;
 
 	ImGui::StyleColorsLight(style);
+	style->Alpha = 0.7f;
 
 	/*ImVec4* colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_Text] = ImVec4(0.75f, 0.75f, 0.75f, 1.00f);
@@ -627,75 +635,142 @@ void Framework::SetImguiStyle()
 void Framework::DrawDebug()
 {
 #ifdef USE_IMGUI
-
-	ImGui::Begin("Framework");
-	if (ImGui::TreeNode("Camera"))
+	if (ImGui::BeginMainMenuBar())
 	{
-		ImGui::DragFloat3("position", &cameraPos.x, 0.1f);
-		ImGui::DragFloat3("angle", &cameraAngle.x, 0.01f);
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("SpriteColor"))
-	{
-		ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("Light"))
-	{
-		ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
-		ImGui::TreePop();
-	}
+		if (ImGui::BeginMenu("Framework"))
+		{
+			if (ImGui::TreeNode("Camera"))
+			{
+				ImGui::DragFloat3("position", &cameraPos.x, 0.1f);
+				ImGui::DragFloat3("angle", &cameraAngle.x, 0.01f);
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("SpriteColor"))
+			{
+				ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("Light"))
+			{
+				ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
+				ImGui::TreePop();
+			}
 
-	static bool selectDFlag[4] = {true,false,false,false};
-	if (ImGui::BeginMenu("DepthStencilState"))
-	{
-		if (ImGui::MenuItem("Z_Test ON  : Z_Write ON","", selectDFlag[0]))
-		{
-			settingDepthStencilState = depthStencilStates[0].Get();
-			selectDFlag[0] = true; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = false;
-		}
-		if (ImGui::MenuItem("Z_Test OFF : Z_Write ON","", selectDFlag[1]))
-		{
-			settingDepthStencilState = depthStencilStates[1].Get();
-			selectDFlag[0] = false; selectDFlag[1] = true; selectDFlag[2] = false; selectDFlag[3] = false;
-		}
-		if (ImGui::MenuItem("Z_Test ON  : Z_Write OFF","", selectDFlag[2]))
-		{
-			settingDepthStencilState = depthStencilStates[2].Get();
-			selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = true; selectDFlag[3] = false;
-		}
-		if (ImGui::MenuItem("Z_Test OFF : Z_Write OFF", "", selectDFlag[3]))
-		{
-			settingDepthStencilState = depthStencilStates[3].Get();
-			selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = true;
+			ImGui::EndMenu();
 		}
 
-		ImGui::EndMenu();
+		if (ImGui::BeginMenu("2D"))
+		{
+			static bool selectDFlag[4] = { true,false,false,false };
+			if (ImGui::BeginMenu("DepthStencilState"))
+			{
+				if (ImGui::MenuItem("Z_Test ON  : Z_Write ON", "", selectDFlag[0]))
+				{
+					setting2DDepthStencilState = depthStencilStates[0].Get();
+					selectDFlag[0] = true; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Z_Test OFF : Z_Write ON", "", selectDFlag[1]))
+				{
+					setting2DDepthStencilState = depthStencilStates[1].Get();
+					selectDFlag[0] = false; selectDFlag[1] = true; selectDFlag[2] = false; selectDFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Z_Test ON  : Z_Write OFF", "", selectDFlag[2]))
+				{
+					setting2DDepthStencilState = depthStencilStates[2].Get();
+					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = true; selectDFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Z_Test OFF : Z_Write OFF", "", selectDFlag[3]))
+				{
+					setting2DDepthStencilState = depthStencilStates[3].Get();
+					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = true;
+				}
+
+				ImGui::EndMenu();
+			}
+
+
+			static bool selectRFlag[3] = { true,false,false };
+			if (ImGui::BeginMenu("RasterizerState"))
+			{
+				if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
+				{
+					setting2DRasterizerState = rasterizerStates[0].Get();
+					selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false;
+				}
+				if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
+				{
+					setting2DRasterizerState = rasterizerStates[1].Get();
+					selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false;
+				}
+				if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
+				{
+					setting2DRasterizerState = rasterizerStates[2].Get();
+					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true;
+				}
+
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
+		
+		if (ImGui::BeginMenu("3D"))
+		{
+			static bool selectDFlag[4] = { true,false,false,false };
+			if (ImGui::BeginMenu("DepthStencilState"))
+			{
+				if (ImGui::MenuItem("Z_Test ON  : Z_Write ON", "", selectDFlag[0]))
+				{
+					setting3DDepthStencilState = depthStencilStates[0].Get();
+					selectDFlag[0] = true; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Z_Test OFF : Z_Write ON", "", selectDFlag[1]))
+				{
+					setting3DDepthStencilState = depthStencilStates[1].Get();
+					selectDFlag[0] = false; selectDFlag[1] = true; selectDFlag[2] = false; selectDFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Z_Test ON  : Z_Write OFF", "", selectDFlag[2]))
+				{
+					setting3DDepthStencilState = depthStencilStates[2].Get();
+					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = true; selectDFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Z_Test OFF : Z_Write OFF", "", selectDFlag[3]))
+				{
+					setting3DDepthStencilState = depthStencilStates[3].Get();
+					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = true;
+				}
+
+				ImGui::EndMenu();
+			}
+
+
+			static bool selectRFlag[3] = { true,false,false };
+			if (ImGui::BeginMenu("RasterizerState"))
+			{
+				if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
+				{
+					setting3DRasterizerState = rasterizerStates[0].Get();
+					selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false;
+				}
+				if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
+				{
+					setting3DRasterizerState = rasterizerStates[1].Get();
+					selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false;
+				}
+				if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
+				{
+					setting3DRasterizerState = rasterizerStates[2].Get();
+					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true;
+				}
+
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
 	}
-
-
-	static bool selectRFlag[3] = { true,false,false };
-	if (ImGui::BeginMenu("RasterizerState"))
-	{
-		if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
-		{
-			settingRasterizerState = rasterizerStates[0].Get();
-			selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false;
-		}
-		if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
-		{
-			settingRasterizerState = rasterizerStates[1].Get();
-			selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false;
-		}
-		if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
-		{
-			settingRasterizerState = rasterizerStates[2].Get();
-			selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true;
-		}
-
-		ImGui::EndMenu();
-	}
-	ImGui::End();
+	
+	//ImGui::End();
 	geometricPrimitive[0]->DrawDebug();
 	geometricPrimitive[1]->DrawDebug();
 
