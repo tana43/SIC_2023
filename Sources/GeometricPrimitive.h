@@ -45,6 +45,8 @@ public:
     virtual ~GeometricPrimitive() = default;
 
     void Render(ID3D11DeviceContext* immediateContext);
+    void Render(ID3D11DeviceContext* immediateContext, 
+        const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor);
 
     void DrawDebug();
 

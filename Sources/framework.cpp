@@ -149,14 +149,14 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	{
 		D3D11_BLEND_DESC blendDesc{};
 		blendDesc.AlphaToCoverageEnable = FALSE;
-		blendDesc.IndependentBlendEnable = FALSE;
-		blendDesc.RenderTarget[0].BlendEnable = TRUE;
-		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.IndependentBlendEnable                = FALSE;
+		blendDesc.RenderTarget[0].BlendEnable           = TRUE;
+		blendDesc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		hr = device->CreateBlendState(&blendDesc, blendStates[0].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
@@ -182,7 +182,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
 		GeometricPrimitive::MeshType::Cylinder, DirectX::XMFLOAT3(-1.5f, 0, 0), DirectX::XMFLOAT4(0.1f, 0.8f, 0.2f, 1.0f));
 
-	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(), L"./Resources/torus.obj", DirectX::XMFLOAT3(1.5f, 0, 0),DirectX::XMFLOAT4(0.5f, 0.8f, 0.2f, 1.0f));
+	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(), L"./Resources/Bison/Bison.obj", DirectX::XMFLOAT3(1.5f, 0, 0));
 }
 
 bool Framework::initialize()
@@ -396,16 +396,16 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
 
-	sprites[0].get()->Render(immediateContext.Get(),
+	/*sprites[0].get()->Render(immediateContext.Get(),
 		0.0f,0.0f,1280.0f,720.0f,
 		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-		0);
-//
-//	sprites[1].get()->Render(immediateContext.Get(),
-//		700.0f, 200.0f, 200.0f, 200.0f,
-//		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-//		45,
-//		0, 0, 140.0f, 240.0f);
+		0);*/
+
+	sprites[1].get()->Render(immediateContext.Get(),
+		700.0f, 200.0f, 200.0f, 200.0f,
+		spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
+		45,
+		0, 0, 140.0f, 240.0f);
 //
 //	float x{ 0 };
 //	float y{ 0 };

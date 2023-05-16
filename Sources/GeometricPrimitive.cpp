@@ -65,6 +65,17 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType,Di
 
 void GeometricPrimitive::Render(ID3D11DeviceContext* immediateContext)
 {
+    DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(scale.x,scale.y,scale.z) };
+    DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z) };
+    DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(position.x,position.y,position.z) };
+    DirectX::XMFLOAT4X4 world;
+    DirectX::XMStoreFloat4x4(&world, S * R * T);
+
+    Render(immediateContext, world, color);
+}
+
+void GeometricPrimitive::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor)
+{
     uint32_t stride{ sizeof(Vertex) };
     uint32_t offset{ 0 };
     immediateContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
@@ -75,13 +86,7 @@ void GeometricPrimitive::Render(ID3D11DeviceContext* immediateContext)
     immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
     immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
-    DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(scale.x,scale.y,scale.z) };
-    DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z) };
-    DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(position.x,position.y,position.z) };
-    DirectX::XMFLOAT4X4 world;
-    DirectX::XMStoreFloat4x4(&world, S * R * T);
-
-    Constants data{ world,color};
+    Constants data{ world,materialColor };
     immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
     immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 

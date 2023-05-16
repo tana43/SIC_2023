@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <directxmath.h>
 #include <wrl.h>
+#include <fstream>
 
 #ifdef USE_IMGUI
 #include "../imgui/imgui.h"
@@ -14,6 +15,7 @@ public:
 	{
 		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT2 texcoord;
 	};
 	struct Constants
 	{
@@ -36,7 +38,9 @@ public:
 	virtual ~StaticMesh() = default;
 
 	void Render(ID3D11DeviceContext* immediateContext);
-	
+	void Render(ID3D11DeviceContext* immediateContext,
+		const DirectX::XMFLOAT4X4 & world, const DirectX::XMFLOAT4& materialColor);
+
 	void DrawDebug();
 
 protected:
@@ -47,5 +51,8 @@ protected:
 	DirectX::XMFLOAT3 angle{ 0,0,0 };
 	DirectX::XMFLOAT3 scale{ 1,1,1 };
 	DirectX::XMFLOAT4 color{ 1,1,1,1 };
+
+	std::wstring textureFilename;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
 };
 
