@@ -207,7 +207,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
-	ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[3].Get() };
+	ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[0].Get() };
 	ID3D11DepthStencilState* setting3DDepthStencilState{ depthStencilStates[0].Get() };
 
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];

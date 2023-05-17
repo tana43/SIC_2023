@@ -182,7 +182,17 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
 		GeometricPrimitive::MeshType::Cylinder, DirectX::XMFLOAT3(-1.5f, 0, 0), DirectX::XMFLOAT4(0.1f, 0.8f, 0.2f, 1.0f));
 
-	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(), L"./Resources/Cup/cup.obj", DirectX::XMFLOAT3(1.5f, 0, 0));
+	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cup/cup.obj", false, DirectX::XMFLOAT3(1.5f, 0, 0));
+
+
+	//各種ステートオブジェクトセット
+	{
+		setting2DDepthStencilState = depthStencilStates[3].Get();
+		setting3DDepthStencilState = depthStencilStates[0].Get();
+		setting2DRasterizerState = rasterizerStates[0].Get();
+		setting3DRasterizerState = rasterizerStates[0].Get();
+	}
+	
 }
 
 bool Framework::initialize()
@@ -396,10 +406,10 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		//ラスタライザステートをセット
 		immediateContext->RSSetState(setting2DRasterizerState);
 
-		/*sprites[0].get()->Render(immediateContext.Get(),
+		sprites[0].get()->Render(immediateContext.Get(),
 	0.0f,0.0f,1280.0f,720.0f,
 	spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-	0);*/
+	0);
 
 		sprites[1].get()->Render(immediateContext.Get(),
 			700.0f, 200.0f, 200.0f, 200.0f,
@@ -645,11 +655,6 @@ void Framework::DrawDebug()
 				ImGui::DragFloat3("angle", &cameraAngle.x, 0.01f);
 				ImGui::TreePop();
 			}
-			if (ImGui::TreeNode("SpriteColor"))
-			{
-				ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
-				ImGui::TreePop();
-			}
 			if (ImGui::TreeNode("Light"))
 			{
 				ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
@@ -661,7 +666,13 @@ void Framework::DrawDebug()
 
 		if (ImGui::BeginMenu("2D"))
 		{
-			static bool selectDFlag[4] = { true,false,false,false };
+			if (ImGui::TreeNode("SpriteColor"))
+			{
+				ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
+				ImGui::TreePop();
+			}
+
+			static bool selectDFlag[4] = { false,false,false,true };
 			if (ImGui::BeginMenu("DepthStencilState"))
 			{
 				if (ImGui::MenuItem("Z_Test ON  : Z_Write ON", "", selectDFlag[0]))

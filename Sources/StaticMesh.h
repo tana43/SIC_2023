@@ -23,6 +23,13 @@ public:
 		DirectX::XMFLOAT4 materialColor;
 	};
 
+	struct subset
+	{
+		std::wstring usemtl;
+		uint32_t indexStart{ 0 };
+		uint32_t indexCount{ 0 };
+	};
+
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
@@ -33,7 +40,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
 public:
-	StaticMesh(ID3D11Device* device, const wchar_t* objWhilename,
+	StaticMesh(ID3D11Device* device,const wchar_t* objWhilename, bool reverseV = false,
 		DirectX::XMFLOAT3 pos = { 0,0,0 }, DirectX::XMFLOAT4 color = { 1,1,1,1 });
 	virtual ~StaticMesh() = default;
 
@@ -54,5 +61,9 @@ protected:
 
 	std::wstring textureFilename;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+
+	bool reverseV;
+
+	std::vector<subset> subsets;
 };
 

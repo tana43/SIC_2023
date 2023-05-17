@@ -8,8 +8,8 @@
 #include "misc.h"
 #include "Texture.h"
 
-StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename,DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 color)
-    : position(pos), color(color)
+StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool reverseV, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 color)
+    : reverseV(reverseV), position(pos), color(color)
 {
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
@@ -44,7 +44,8 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename,DirectX:
         {
             float u, v; 
             fin >> u >> v;
-            texcoords.push_back({ u,1.0f - v });
+            if(reverseV)texcoords.push_back({ u,1.0f - v });
+            else texcoords.push_back({ u,v });
             fin.ignore(1024, L'\n');
         }
         else if (0 == wcscmp(command, L"f"))
@@ -187,6 +188,10 @@ void StaticMesh::DrawDebug()
 {
     std::string name = "StaticMesh";
     ImGui::Begin(name.c_str());
+
+    bool rV = reverseV ? true : false;
+    ImGui::Checkbox("Reverse V",&rV);
+
     ImGui::DragFloat3("position", &position.x, 0.1f);
     ImGui::DragFloat3("scale", &scale.x, 0.01f);
     ImGui::DragFloat3("angle", &angle.x, 0.01f);
