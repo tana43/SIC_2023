@@ -160,6 +160,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		hr = device->CreateBlendState(&blendDesc, blendStates[0].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+
 	}
 
 	D3D11_BUFFER_DESC bufferDesc{};
@@ -182,7 +184,9 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
 		GeometricPrimitive::MeshType::Cylinder, DirectX::XMFLOAT3(-1.5f, 0, 0), DirectX::XMFLOAT4(0.1f, 0.8f, 0.2f, 1.0f));
 
-	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cup/cup.obj", false, DirectX::XMFLOAT3(1.5f, 0, 0));
+	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/F-14A_Tomcat/F-14A_Tomcat.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
+	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
+	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 
 	//各種ステートオブジェクトセット
@@ -396,8 +400,10 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
 	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
 	data.lightDirection = { front.x,front.y,front.z,0 };
+	data.cameraPosition = { cameraPos.x,cameraPos.y,cameraPos.z,0 };
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
 	//2D
 	{
@@ -464,6 +470,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		geometricPrimitive[1]->Render(immediateContext.Get());
 
 		staticMeshes[0]->Render(immediateContext.Get());
+		staticMeshes[1]->Render(immediateContext.Get());
 	}
 
 #ifdef USE_IMGUI
@@ -786,6 +793,7 @@ void Framework::DrawDebug()
 	geometricPrimitive[1]->DrawDebug();
 
 	staticMeshes[0]->DrawDebug();
+	staticMeshes[1]->DrawDebug();
 
 #endif
 }

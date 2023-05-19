@@ -8,8 +8,10 @@
 #include "misc.h"
 #include "Texture.h"
 
+int StaticMesh::num{ 0 };
+
 StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool reverseV, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT4 color)
-    : reverseV(reverseV), position(pos), color(color)
+    : reverseV(reverseV), position(pos), color(color),myNum(num++)
 {
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
@@ -21,7 +23,7 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
     std::vector<std::wstring> mtlFilenames;
 
     std::wifstream fin(objFilename);
-    _ASSERT_EXPR(fin, L"'OBJ fole not found.");
+    _ASSERT_EXPR(fin, L"'OBJ file not found.");
     wchar_t command[256];
     while (fin)
     {
@@ -83,10 +85,22 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
             fin >> mtllib;
             mtlFilenames.push_back(mtllib);
         }
+        else if (0 == wcscmp(command,L"usemtl"))
+        {
+            wchar_t usemtl[MAX_PATH]{ 0 }; 
+            fin >> usemtl;
+            subsets.push_back({ usemtl,static_cast<uint32_t>(indices.size()),0 });
+        }
         else
         {
             fin.ignore(1024, L'\n');
         }
+    }
+    std::vector<Subset>::reverse_iterator iterator = subsets.rbegin();
+    iterator->indexCount = static_cast<uint32_t>(indices.size()) - iterator->indexStart;
+    for (iterator = subsets.rbegin() + 1; iterator != subsets.rend(); ++iterator)
+    {
+        iterator->indexCount = (iterator - 1)->indexStart - iterator->indexStart;
     }
     fin.close();
 
@@ -95,7 +109,7 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
     mtlFilename.replace_filename(std::filesystem::path(mtlFilenames[0]).filename());
 
     fin.open(mtlFilename);
-    _ASSERT_EXPR(fin, L"'MTL file not found.");
+    //_ASSERT_EXPR(fin, L"'MTL file not found.");
 
     while (fin)
     {
@@ -108,7 +122,34 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
 
             std::filesystem::path path(objFilename);
             path.replace_filename(std::filesystem::path(mapKd).filename());
-            textureFilename = path;
+            //textureFilename = path;
+            materials.rbegin()->textureFilenames[0] = path;
+            fin.ignore(1024, L'\n');
+        }
+        else if (0 == wcscmp(command,L"map_bump") || 0 == wcscmp(command,L"bump"))
+        {
+            fin.ignore();
+            wchar_t mapBump[256];
+            fin >> mapBump;
+            std::filesystem::path path(objFilename);
+            path.replace_filename(std::filesystem::path(mapBump).filename());
+            materials.rbegin()->textureFilenames[1] = path;
+            fin.ignore(1024, L'\n');
+        }
+        else if (0 == wcscmp(command,L"newmtl"))
+        {
+            fin.ignore();
+            wchar_t newmtl[256];
+            Material material;
+            fin >> newmtl;
+            material.name = newmtl;
+            materials.push_back(material);
+        }
+        else if (0 == wcscmp(command,L"Kd"))
+        {
+            float r, g, b;
+            fin >> r >> g >> b;
+            materials.rbegin()->Kd = { r,g,b,1 };
             fin.ignore(1024, L'\n');
         }
         else
@@ -117,6 +158,8 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
         }
     }
     fin.close();
+
+    
 
     CreateComBuffers(device, vertices.data(), vertices.size(), indices.data(), indices.size());
 
@@ -144,9 +187,43 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     D3D11_TEXTURE2D_DESC texture2dDesc{};
-    hr = LoadTextureFromFile(device, textureFilename.c_str(),
+    /*hr = LoadTextureFromFile(device, textureFilename.c_str(),
         shaderResourceView.GetAddressOf(), &texture2dDesc);
-    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));*/
+
+    //MTLファイルをもたないやつ用
+    if (materials.size() == 0)
+    {
+        for (const Subset& subset : subsets)
+        {
+            materials.push_back({ subset.usemtl });
+        }
+        for (Material& material : materials)
+        {
+            MakeDummyTexture(device, material.shaderResourceViews[0].GetAddressOf(), 0xFFFFFFFF, 16);
+            MakeDummyTexture(device, material.shaderResourceViews[1].GetAddressOf(), 0xFFFFFFFF, 16);
+        }
+    }
+    else 
+    {
+        for (Material& material : materials)
+        {
+            LoadTextureFromFile(device, material.textureFilenames[0].c_str(),
+                material.shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
+
+            //ノーマルマップもってないマテリアル用
+            if (material.textureFilenames[1].size() == 0)
+            {
+                MakeDummyTexture(device, material.shaderResourceViews[1].GetAddressOf(), 0xFFFFFFFF, 16);
+            }
+            else
+            {
+                LoadTextureFromFile(device, material.textureFilenames[1].c_str(),
+                    material.shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
+            }
+            
+        }
+    }
 }
 
 void StaticMesh::Render(ID3D11DeviceContext* immediateContext)
@@ -172,21 +249,29 @@ void StaticMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::XM
     immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
     immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
-    //シェーダーリソースビューをピクセルシェーダーにバインド
-    immediateContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
+    for (const Material& material : materials)
+    {
+        //シェーダーリソースビューをピクセルシェーダーにバインド
+        immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
+        immediateContext->PSSetShaderResources(1, 1, material.shaderResourceViews[1].GetAddressOf());
 
-    Constants data{ world,materialColor };
-    immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
-    immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+        Constants data{ world,materialColor };
+        immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
+        immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-    D3D11_BUFFER_DESC bufferDesc{};
-    indexBuffer->GetDesc(&bufferDesc);
-    immediateContext->DrawIndexed(bufferDesc.ByteWidth / sizeof(uint32_t), 0, 0);
+        for (const Subset& subset : subsets)
+        {
+            if (material.name == subset.usemtl)
+            {
+                immediateContext->DrawIndexed(subset.indexCount, subset.indexStart, 0);
+            }
+        }
+    }
 }
 
 void StaticMesh::DrawDebug()
 {
-    std::string name = "StaticMesh";
+    std::string name = "StaticMesh " + std::to_string(myNum);
     ImGui::Begin(name.c_str());
 
     bool rV = reverseV ? true : false;
@@ -223,5 +308,43 @@ void StaticMesh::CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t
     subresourceData.pSysMem = indices;
     hr = device->CreateBuffer(&bufferDesc, &subresourceData, indexBuffer.ReleaseAndGetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+}
+
+HRESULT StaticMesh::MakeDummyTexture(ID3D11Device* device, ID3D11ShaderResourceView** shaderResourceView, DWORD value, UINT dimension)
+{
+    HRESULT hr{ S_OK };
+
+    D3D11_TEXTURE2D_DESC texture2dDesc{};
+    texture2dDesc.Width = dimension;
+    texture2dDesc.Height = dimension;
+    texture2dDesc.MipLevels = 1;
+    texture2dDesc.ArraySize = 1;
+    texture2dDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texture2dDesc.SampleDesc.Count = 1;
+    texture2dDesc.SampleDesc.Quality = 0;
+    texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
+    texture2dDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    size_t texels = dimension * dimension;
+    std::unique_ptr<DWORD[]> sysmem{std::make_unique<DWORD[]>(texels)};
+    for (size_t i = 0; i < texels; ++i)sysmem[i] = value;
+
+    D3D11_SUBRESOURCE_DATA subresourceData;
+    subresourceData.pSysMem = sysmem.get();
+    subresourceData.SysMemPitch = sizeof(DWORD) * dimension;
+    
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
+    hr = device->CreateTexture2D(&texture2dDesc, &subresourceData, &texture2d);
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc{};
+    shaderResourceViewDesc.Format = texture2dDesc.Format;
+    shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    shaderResourceViewDesc.Texture2D.MipLevels = 1;
+    hr = device->CreateShaderResourceView(texture2d.Get(), &shaderResourceViewDesc,
+        shaderResourceView);
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+    return hr;
 }
 
