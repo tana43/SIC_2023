@@ -137,6 +137,9 @@
     <None Include="Sources\Shaders\StaticMesh.hlsli">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Sources\Shaders\SkinnedMesh.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Sources\Shaders\SpriteVS.hlsl">
@@ -155,6 +158,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\StaticMeshPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkinnedMeshVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkinnedMeshPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -45,6 +45,21 @@ public:
         DirectX::XMFLOAT4X4 world;
         DirectX::XMFLOAT4 materialColor;
     };
+    struct Mesh
+    {
+        uint64_t uniqueId{ 0 }; 
+        std::string name;
+        int64_t nodeIndex{ 0 };
+
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+
+    private:
+        Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+        friend class SkinnedMesh;
+    };
+    std::vector<Mesh> meshs;
 
 private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
@@ -55,6 +70,8 @@ private:
 public:
     SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate = false);
     virtual ~SkinnedMesh() = default;
+
+    void FetchMeshes(FbxScene* fbxxScene, std::vector<Mesh>& meshes);
 
 protected:
     Scene sceneView;
