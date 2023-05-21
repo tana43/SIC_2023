@@ -68,5 +68,8 @@ protected:
     DirectX::XMFLOAT3 angle{0,0,0};
     DirectX::XMFLOAT3 scale{1,1,1};
     DirectX::XMFLOAT4 color{1,1,1,1};
+
+    bool renderActive{ true };
+
 };
 

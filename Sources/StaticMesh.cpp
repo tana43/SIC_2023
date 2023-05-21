@@ -22,6 +22,9 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
     std::vector<DirectX::XMFLOAT2> texcoords;
     std::vector<std::wstring> mtlFilenames;
 
+    DirectX::XMFLOAT3 max{};
+    DirectX::XMFLOAT3 min{};
+
     std::wifstream fin(objFilename);
     _ASSERT_EXPR(fin, L"'OBJ file not found.");
     wchar_t command[256];
@@ -34,6 +37,13 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
             fin >> x >> y >> z;
             positions.push_back({ x,y,z });
             fin.ignore(1024, L'\n');
+
+            if (x > max.x)max.x = x;
+            if (y > max.y)max.y = y;
+            if (z > max.z)max.z = z;
+            if (x < min.x)min.x = x;
+            if (y < min.y)min.y = y;
+            if (z < min.z)min.z = z;
         }
         else if (0 == wcscmp(command, L"vn"))
         {
@@ -161,7 +171,8 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
 
     
 
-    CreateComBuffers(device, vertices.data(), vertices.size(), indices.data(), indices.size());
+    CreateComBuffers(device, vertices.data(), vertices.size(), indices.data(), indices.size(),
+        vertexBuffer.ReleaseAndGetAddressOf(),indexBuffer.ReleaseAndGetAddressOf());
 
     HRESULT hr{ S_OK };
 
@@ -221,9 +232,11 @@ StaticMesh::StaticMesh(ID3D11Device* device, const wchar_t* objFilename, bool re
                 LoadTextureFromFile(device, material.textureFilenames[1].c_str(),
                     material.shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
             }
-            
         }
     }
+
+    //バウンディングボックス用メッシュ作成
+    CreateBoundingBox(device,max,min);
 }
 
 void StaticMesh::Render(ID3D11DeviceContext* immediateContext)
@@ -239,6 +252,7 @@ void StaticMesh::Render(ID3D11DeviceContext* immediateContext)
 
 void StaticMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor)
 {
+    if (!renderActive)return;
     uint32_t stride{ sizeof(Vertex) };
     uint32_t offset{ 0 };
     immediateContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
@@ -269,10 +283,40 @@ void StaticMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::XM
     }
 }
 
+void StaticMesh::BoundingBoxRender(ID3D11DeviceContext* immediateContext)
+{
+    if (!renderActive)return;
+    uint32_t stride{ sizeof(Vertex) };
+    uint32_t offset{ 0 };
+    DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) };
+    DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z) };
+    DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(position.x, position.y, position.z) };
+    DirectX::XMFLOAT4X4 world;
+    DirectX::XMStoreFloat4x4(&world, S * R * T);
+
+    immediateContext->IASetVertexBuffers(0, 1, bVertexBuffer.GetAddressOf(), &stride, &offset);
+    immediateContext->IASetIndexBuffer(bIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    immediateContext->IASetInputLayout(bInputLayout.Get());
+
+    immediateContext->VSSetShader(bVertexShader.Get(), nullptr, 0);
+    immediateContext->PSSetShader(bPixelShader.Get(), nullptr, 0);
+
+    Constants data{ world,DirectX::XMFLOAT4(1,1,1,1)};
+    immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
+    immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
+    D3D11_BUFFER_DESC bufferDesc{};
+    bIndexBuffer->GetDesc(&bufferDesc);
+    immediateContext->DrawIndexed(bufferDesc.ByteWidth / sizeof(uint32_t), 0, 0);
+}
+
 void StaticMesh::DrawDebug()
 {
     std::string name = "StaticMesh " + std::to_string(myNum);
     ImGui::Begin(name.c_str());
+
+    ImGui::Checkbox("RenderActive", &renderActive);
 
     bool rV = reverseV ? true : false;
     ImGui::Checkbox("Reverse V",&rV);
@@ -284,7 +328,8 @@ void StaticMesh::DrawDebug()
     ImGui::End();
 }
 
-void StaticMesh::CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount, uint32_t* indices, size_t indexCount)
+void StaticMesh::CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount, uint32_t* indices, size_t indexCount,
+    ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer)
 {
     HRESULT hr{ S_OK };
 
@@ -299,14 +344,14 @@ void StaticMesh::CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t
     subresourceData.pSysMem = vertices;
     subresourceData.SysMemPitch = 0;
     subresourceData.SysMemSlicePitch = 0;
-    hr = device->CreateBuffer(&bufferDesc, &subresourceData, vertexBuffer.ReleaseAndGetAddressOf());
+    hr = device->CreateBuffer(&bufferDesc, &subresourceData, vertexBuffer);
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     bufferDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * indexCount);
     bufferDesc.Usage = D3D11_USAGE_DEFAULT;
     bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
     subresourceData.pSysMem = indices;
-    hr = device->CreateBuffer(&bufferDesc, &subresourceData, indexBuffer.ReleaseAndGetAddressOf());
+    hr = device->CreateBuffer(&bufferDesc, &subresourceData, indexBuffer);
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
@@ -346,5 +391,134 @@ HRESULT StaticMesh::MakeDummyTexture(ID3D11Device* device, ID3D11ShaderResourceV
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     return hr;
+}
+
+void StaticMesh::CreateBoundingBox(ID3D11Device* device,const DirectX::XMFLOAT3 max, const DirectX::XMFLOAT3 min)
+{
+    Vertex vertices[24]{};
+        //Vertex  vertices[24]{};
+    size_t verticesIndex = 24;
+    //正立方体のコントロールポイント数は8個、
+    //法線の向きが違う頂点が３個あるので頂点情報の総数は8x3 = 24個、
+    //頂点情報配列（vertices）にすべて頂点の位置・法線情報を格納する。
+
+    vertices[0] = { {max.x,max.y,min.z},{1,0,0} };
+    vertices[1] = { {max.x,max.y,min.z},{0,1,0} };
+    vertices[2] = { {max.x,max.y,min.z},{0,0,-1} };
+
+    vertices[3] = { {max.x,max.y,max.z}, {1,0,0} };
+    vertices[4] = { {max.x,max.y,max.z}, {0,1,0} };
+    vertices[5] = { {max.x,max.y,max.z}, {0,0,1} };
+
+    vertices[6] = { {min.x,max.y,max.z}, {-1,0,0} };
+    vertices[7] = { {min.x,max.y,max.z}, {0,1,0} };
+    vertices[8] = { {min.x,max.y,max.z}, {0,0,1} };
+
+    vertices[9]  = { {min.x,max.y,min.z}, {-1,0,0} };
+    vertices[10] = { {min.x,max.y,min.z}, {0,1,0} };
+    vertices[11] = { {min.x,max.y,min.z}, {0,0,-1} };
+
+
+    //こっから下４つ
+    vertices[12] = { {max.x,min.y,min.z},{1,0,0} };
+    vertices[13] = { {max.x,min.y,min.z},{0,-1,0} };
+    vertices[14] = { {max.x,min.y,min.z},{0,0,-1} };
+
+    vertices[15] = { {max.x,min.y,max.z}, {1,0,0} };
+    vertices[16] = { {max.x,min.y,max.z}, {0,-1,0} };
+    vertices[17] = { {max.x,min.y,max.z}, {0,0,1} };
+
+    vertices[18] = { {min.x,min.y,max.z}, {-1,0,0} };
+    vertices[19] = { {min.x,min.y,max.z}, {0,-1,0} };
+    vertices[20] = { {min.x,min.y,max.z}, {0,0,1} };
+
+    vertices[21] = { {min.x,min.y,min.z}, {-1,0,0} };
+    vertices[22] = { {min.x,min.y,min.z}, {0,-1,0} };
+    vertices[23] = { {min.x,min.y,min.z}, {0,0,-1} };
+
+    uint32_t indices[36]{};
+    size_t indicesindex = 36;
+    //正立方体は６面持ち、１つの面は２つの３角形ポリゴンで構成されるので総数は6x2 = 12個、
+    //正立方体を描画するために１２回の３角形ポリゴン描画が必要、よって参照される頂点情報は12x3 = 36回、
+    //3角形ポリゴンが参照する頂点情報のインデックス（頂点番号）を描画順に配列（indices）に格納する。
+    //時計回りが表面になるように格納すること。
+
+    indices[0] = 2;
+    indices[1] = 23;
+    indices[2] = 9;
+
+    indices[3] = 2;
+    indices[4] = 14;
+    indices[5] = 23;
+
+
+    indices[6] = 0;
+    indices[7] = 3;
+    indices[8] = 12;
+
+    indices[9] = 3;
+    indices[10] = 15;
+    indices[11] = 12;
+
+
+    indices[12] = 5;
+    indices[13] = 8;
+    indices[14] = 17;
+
+    indices[15] = 8;
+    indices[16] = 20;
+    indices[17] = 17;
+
+
+    indices[18] = 6;
+    indices[19] = 9;
+    indices[20] = 18;
+
+    indices[21] = 9;
+    indices[22] = 21;
+    indices[23] = 18;
+
+
+    //こっから上下面
+    indices[24] = 7;
+    indices[25] = 4;
+    indices[26] = 10;
+
+    indices[27] = 4;
+    indices[28] = 1;
+    indices[29] = 10;
+
+
+    indices[30] = 16;
+    indices[31] = 19;
+    indices[32] = 13;
+
+    indices[33] = 19;
+    indices[34] = 22;
+    indices[35] = 13;
+
+    HRESULT hr{ S_OK };
+
+    CreateComBuffers(device,vertices,verticesIndex,indices,indicesindex,
+        bVertexBuffer.ReleaseAndGetAddressOf(),bIndexBuffer.ReleaseAndGetAddressOf());
+
+    D3D11_INPUT_ELEMENT_DESC inputElememtDesc[]
+    {
+        {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
+        D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
+        D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
+    };
+
+    Shader::CreateVSFromCso(device, "./Resources/Shader/GeometricPrimitiveVS.cso", bVertexShader.GetAddressOf(),
+        bInputLayout.GetAddressOf(), inputElememtDesc, ARRAYSIZE(inputElememtDesc));
+    Shader::CreatePSFromCso(device, "./Resources/Shader/GeometricPrimitivePS.cso", bPixelShader.GetAddressOf());
+
+    D3D11_BUFFER_DESC bufferDesc{};
+    bufferDesc.ByteWidth = sizeof(Constants);
+    bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    hr = device->CreateBuffer(&bufferDesc, nullptr, bConstantBuffer.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 

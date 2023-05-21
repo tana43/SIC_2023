@@ -188,6 +188,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.000.fbx");
 
 	//各種ステートオブジェクトセット
 	{
@@ -471,6 +472,13 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 		staticMeshes[0]->Render(immediateContext.Get());
 		staticMeshes[1]->Render(immediateContext.Get());
+
+#ifdef _DEBUG
+		immediateContext->RSSetState(rasterizerStates[1].Get());
+		staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
+		staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
+#endif // _DEBUG
+
 	}
 
 #ifdef USE_IMGUI

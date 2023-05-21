@@ -65,6 +65,7 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device,MeshType meshType,Di
 
 void GeometricPrimitive::Render(ID3D11DeviceContext* immediateContext)
 {
+    if (!renderActive)return;
     DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(scale.x,scale.y,scale.z) };
     DirectX::XMMATRIX R{ DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z) };
     DirectX::XMMATRIX T{ DirectX::XMMatrixTranslation(position.x,position.y,position.z) };
@@ -99,6 +100,8 @@ void GeometricPrimitive::DrawDebug()
 {
     std::string name = "GeometricPrimitive " + std::to_string(myNum);
     ImGui::Begin(name.c_str());
+
+    ImGui::Checkbox("RenderActive", &renderActive);
     ImGui::DragFloat3("position", &position.x,0.1f);
     ImGui::DragFloat3("scale", &scale.x,0.01f);
     ImGui::DragFloat3("angle", &angle.x,0.01f);

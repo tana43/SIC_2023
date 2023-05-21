@@ -16,6 +16,7 @@
 #include "SpriteBatch.h"
 #include "GeometricPrimitive.h"
 #include "StaticMesh.h"
+#include "SkinnedMesh.h"
 
 #ifdef USE_IMGUI
 #include "../imgui/imgui.h"
@@ -203,6 +204,7 @@ private:
 	std::unique_ptr<SpriteBatch> spritesBatches[8];
 	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 	std::unique_ptr<StaticMesh> staticMeshes[8];
+	std::unique_ptr<SkinnedMesh> skinnedMeshes[8];
 
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
