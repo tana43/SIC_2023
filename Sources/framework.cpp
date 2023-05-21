@@ -188,7 +188,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.000.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/nico.fbx");
 
 	//各種ステートオブジェクトセット
 	{
@@ -467,16 +467,18 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		//ラスタライザステートをセット
 		immediateContext->RSSetState(setting3DRasterizerState);
 
-		geometricPrimitive[0]->Render(immediateContext.Get());
-		geometricPrimitive[1]->Render(immediateContext.Get());
+		//geometricPrimitive[0]->Render(immediateContext.Get());
+		//geometricPrimitive[1]->Render(immediateContext.Get());
 
-		staticMeshes[0]->Render(immediateContext.Get());
-		staticMeshes[1]->Render(immediateContext.Get());
+		//staticMeshes[0]->Render(immediateContext.Get());
+		//staticMeshes[1]->Render(immediateContext.Get());
+
+		skinnedMeshes[0]->Render(immediateContext.Get());
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());
-		staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
-		staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
+		//staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
+		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
 #endif // _DEBUG
 
 	}
@@ -802,6 +804,8 @@ void Framework::DrawDebug()
 
 	staticMeshes[0]->DrawDebug();
 	staticMeshes[1]->DrawDebug();
+
+	skinnedMeshes[0]->DrawDebug();
 
 #endif
 }

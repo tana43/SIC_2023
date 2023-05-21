@@ -33,6 +33,8 @@ struct Scene
 
 class SkinnedMesh
 {
+    static int num;
+
 public:
     struct Vertex
     {
@@ -59,7 +61,7 @@ public:
         Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
         friend class SkinnedMesh;
     };
-    std::vector<Mesh> meshs;
+    std::vector<Mesh> meshes;
 
 private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
@@ -67,13 +69,27 @@ private:
     Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
+    DirectX::XMFLOAT3 position{ 0, 0, 0 };
+    DirectX::XMFLOAT3 angle{ 0, 0, 0 };
+    DirectX::XMFLOAT3 scale{ 1, 1, 1 };
+    DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
+
 public:
     SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate = false);
     virtual ~SkinnedMesh() = default;
 
-    void FetchMeshes(FbxScene* fbxxScene, std::vector<Mesh>& meshes);
+    void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
+    void CreateComObjects(ID3D11Device* device, const char* fbxFilename);
+
+    void Render(ID3D11DeviceContext* immediateContext);
+    void Render(ID3D11DeviceContext* immediateContext,
+        const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor);
+
+    void DrawDebug();
 
 protected:
     Scene sceneView;
+    int myNum;
+    bool renderActive{true};
 };
 
