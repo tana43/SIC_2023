@@ -226,28 +226,28 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
             mesh.indexBuffer.ReleaseAndGetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-        for (std::unordered_map<uint64_t,Material>::iterator itr = materials.begin();
-            itr != materials.end(); ++itr)
-        {
-            if (itr->second.textureFilenames[0].size() > 0)
-            {
-                std::filesystem::path path(fbxFilename);
-                path.replace_filename(itr->second.textureFilenames[0]);
-                D3D11_TEXTURE2D_DESC texture2dDesc;
-                LoadTextureFromFile(device, path.c_str(),
-                    itr->second.shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
-            }
-            else
-            {
-                MakeDummyTexture(device, itr->second.shaderResourceViews->GetAddressOf(),
-                    0xFFFFFFFF, 16);
-            }
-        }
-
 #if 1
         mesh.vertices.clear();
         mesh.indices.clear();
 #endif // 1
+    }
+
+    for (std::unordered_map<uint64_t, Material>::iterator itr = materials.begin();
+        itr != materials.end(); ++itr)
+    {
+        if (itr->second.textureFilenames[0].size() > 0)
+        {
+            std::filesystem::path path(fbxFilename);
+            path.replace_filename(itr->second.textureFilenames[0]);
+            D3D11_TEXTURE2D_DESC texture2dDesc;
+            LoadTextureFromFile(device, path.c_str(),
+                itr->second.shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
+        }
+        else
+        {
+            MakeDummyTexture(device, itr->second.shaderResourceViews->GetAddressOf(),
+                0xFFFFFFFF, 16);
+        }
     }
 
     HRESULT hr = S_OK;

@@ -62,7 +62,6 @@ public:
         Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
         friend class SkinnedMesh;
     };
-    std::vector<Mesh> meshes;
 
     struct Material
     {
@@ -76,7 +75,6 @@ public:
         std::string textureFilenames[4];
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[4];
     };
-    std::unordered_map<uint64_t, Material> materials;
 
 private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
@@ -107,5 +105,8 @@ protected:
     Scene sceneView;
     int myNum;
     bool renderActive{true};
+
+    std::vector<Mesh> meshes;
+    std::unordered_map<uint64_t, Material> materials;
 };
 
