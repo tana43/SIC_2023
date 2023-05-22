@@ -1,9 +1,11 @@
 #include "SkinnedMesh.h"
 #include "misc.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #include <sstream>
 #include <functional>
+#include <filesystem>
 
 #ifdef USE_IMGUI
 #include "../imgui/imgui.h"
@@ -32,7 +34,8 @@ SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool tri
         fbxConverter.RemoveBadPolygonsFromMeshes(fbxScene);
     }
 
-    std::function<void(FbxNode*)> traverse{[&](FbxNode* fbxNode) {
+    std::function<void(FbxNode*)> traverse{[&](FbxNode* fbxNode)
+    {
         Scene::Node& node{sceneView.nodes.emplace_back()};
         node.attribute = fbxNode->GetNodeAttribute() ?
             fbxNode->GetNodeAttribute()->GetAttributeType() : FbxNodeAttribute::EType::eUnknown;
@@ -66,6 +69,8 @@ SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool tri
     traverse(fbxScene->GetRootNode());
 
     FetchMeshes(fbxScene, meshes);
+
+    FetchMaterials(fbxScene, materials);
 
     fbxManager->Destroy();
 
@@ -130,6 +135,66 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 mesh.indices.at(vertexIndex) = vertexIndex;
             }
         }
+
+
+    }
+}
+
+void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t, Material>& materials)
+{
+    const size_t nodeCount{ sceneView.nodes.size() };
+    for (size_t nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+    {
+        const Scene::Node& node{sceneView.nodes.at(nodeIndex)};
+        const FbxNode* fbxNode{ fbxScene->FindNodeByName(node.name.c_str()) };
+
+        const int materialCount{ fbxNode->GetMaterialCount() };
+        for (int materialIndex = 0; materialIndex < materialCount; ++materialIndex)
+        {
+            const FbxSurfaceMaterial* fbxMaterial{ fbxNode->GetMaterial(materialIndex) };
+
+            Material material;
+            material.name = fbxMaterial->GetName();
+            material.uniqueId = fbxMaterial->GetUniqueID();
+            FbxProperty fbxProperty;
+            fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
+            if (fbxProperty.IsValid())
+            {
+                const FbxDouble3 color{ fbxProperty.Get<FbxDouble3>() };
+                material.Kd.x = static_cast<float>(color[0]);
+                material.Kd.y = static_cast<float>(color[1]);
+                material.Kd.z = static_cast<float>(color[2]);
+                material.Kd.w = 1.0f;
+
+                const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
+                material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
+            }
+            fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
+            if (fbxProperty.IsValid())
+            {
+                const FbxDouble3 color{ fbxProperty.Get<FbxDouble3>() };
+                material.Ka.x = static_cast<float>(color[0]);
+                material.Ka.y = static_cast<float>(color[1]);
+                material.Ka.z = static_cast<float>(color[2]);
+                material.Ka.w = 1.0f;
+
+                //const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
+                //material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
+            }
+            fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sSpecular);
+            if (fbxProperty.IsValid())
+            {
+                const FbxDouble3 color{ fbxProperty.Get<FbxDouble3>() };
+                material.Ks.x = static_cast<float>(color[0]);
+                material.Ks.y = static_cast<float>(color[1]);
+                material.Ks.z = static_cast<float>(color[2]);
+                material.Ks.w = 1.0f;
+
+                //const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
+                //material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
+            }
+            materials.emplace(material.uniqueId, std::move(material));
+        }
     }
 }
 
@@ -160,6 +225,25 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
         hr = device->CreateBuffer(&bufferDesc, &subresourceData,
             mesh.indexBuffer.ReleaseAndGetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+        for (std::unordered_map<uint64_t,Material>::iterator itr = materials.begin();
+            itr != materials.end(); ++itr)
+        {
+            if (itr->second.textureFilenames[0].size() > 0)
+            {
+                std::filesystem::path path(fbxFilename);
+                path.replace_filename(itr->second.textureFilenames[0]);
+                D3D11_TEXTURE2D_DESC texture2dDesc;
+                LoadTextureFromFile(device, path.c_str(),
+                    itr->second.shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
+            }
+            else
+            {
+                MakeDummyTexture(device, itr->second.shaderResourceViews->GetAddressOf(),
+                    0xFFFFFFFF, 16);
+            }
+        }
+
 #if 1
         mesh.vertices.clear();
         mesh.indices.clear();
@@ -170,7 +254,7 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
     D3D11_INPUT_ELEMENT_DESC inputElementDesc[]
     {
         {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
-        {"NORMAL",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
+        {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
     };
     Shader::CreateVSFromCso(device, "./Resources/Shader/SkinnedMeshVS.cso", vertexShader.ReleaseAndGetAddressOf(),
@@ -190,7 +274,7 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
 void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext)
 {
     DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-    DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.z,angle.y,angle.z);
+    DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z);
     DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x,position.y,position.z);
 
     DirectX::XMFLOAT4X4 world;
@@ -212,6 +296,8 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
 
         immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
         immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
+
+        immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
         Constants data;
         data.world = world;

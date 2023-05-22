@@ -81,9 +81,6 @@ protected:
 	void CreateComBuffers(ID3D11Device* device, Vertex* vertices, size_t vertexCount,
 		uint32_t* indices, size_t indexCount, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer);
 
-	HRESULT MakeDummyTexture(ID3D11Device* device, ID3D11ShaderResourceView** shaderResourceView,
-		DWORD value/*0xAABBGGRR*/, UINT dimension);
-
 	void CreateBoundingBox(ID3D11Device* device,const DirectX::XMFLOAT3 max,const DirectX::XMFLOAT3 min);
 
 	DirectX::XMFLOAT3 position{ 0, 0, 0 };

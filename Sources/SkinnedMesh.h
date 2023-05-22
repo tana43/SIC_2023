@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <fbxsdk.h>
+#include <unordered_map>
 
 struct Scene
 {
@@ -63,6 +64,20 @@ public:
     };
     std::vector<Mesh> meshes;
 
+    struct Material
+    {
+        uint64_t uniqueId{ 0 };
+        std::string name;
+
+        DirectX::XMFLOAT4 Ka{0.2f, 0.2f, 0.2f, 1.0f};
+        DirectX::XMFLOAT4 Kd{0.8f, 0.8f, 0.8f, 1.0f};
+        DirectX::XMFLOAT4 Ks{1.0f, 1.0f, 1.0f, 1.0f};
+
+        std::string textureFilenames[4];
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[4];
+    };
+    std::unordered_map<uint64_t, Material> materials;
+
 private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
@@ -79,6 +94,7 @@ public:
     virtual ~SkinnedMesh() = default;
 
     void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
+    void FetchMaterials(FbxScene* fbxScene,std::unordered_map<uint64_t,Material>& materials);
     void CreateComObjects(ID3D11Device* device, const char* fbxFilename);
 
     void Render(ID3D11DeviceContext* immediateContext);
