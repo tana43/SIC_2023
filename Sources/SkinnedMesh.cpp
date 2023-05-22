@@ -94,6 +94,33 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         mesh.name = fbxMesh->GetNode()->GetName();
         mesh.nodeIndex = sceneView.indexOf(mesh.uniqueId);
 
+        std::vector<Mesh::Subset>& subsets{mesh.subsets};
+        const int materialCount{ fbxMesh->GetNode()->GetMaterialCount() };
+        subsets.resize(materialCount > 0 ? materialCount : 1);
+        for (int materialIndex = 0; materialIndex < materialCount; ++materialIndex)
+        {
+            const FbxSurfaceMaterial* fbxMaterial{ fbxMesh->GetNode()->GetMaterial(materialIndex) };
+            subsets.at(materialIndex).materialName = fbxMaterial->GetName();
+            subsets.at(materialIndex).materialUniqueId = fbxMaterial->GetUniqueID();
+        }
+        if (materialCount > 0)
+        {
+            const int polygonCount{ fbxMesh->GetPolygonCount() }; 
+            for (int polygonIndex = polygonCount; polygonIndex < polygonCount; ++polygonIndex)
+            {
+                const int materialIndex{ 
+                    fbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex) };
+                subsets.at(materialIndex).indexCount += 3;
+            }
+            uint32_t offset{ 0 };
+            for (Mesh::Subset& subset : subsets)
+            {
+                subset.startIndexLocation = offset;
+                offset += subset.indexCount;
+                subset.indexCount = 0;
+            }
+        }
+
         const int polygonCount{ fbxMesh->GetPolygonCount() };
         mesh.vertices.resize(polygonCount * 3LL);
         mesh.indices.resize(polygonCount * 3LL);
@@ -103,6 +130,12 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         const FbxVector4* controlPoints{ fbxMesh->GetControlPoints() };
         for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
         {
+            const int materialIndex{ materialCount > 0 ?
+            fbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex) : 0 };
+            Mesh::Subset& subset{subsets.at(materialIndex)};
+            const uint32_t offset{ subset.startIndexLocation + subset.indexCount };
+
+
             for (int positionInPolygon = 0; positionInPolygon < 3; ++positionInPolygon)
             {
                 const int vertexIndex{ polygonIndex * 3 + positionInPolygon };
@@ -132,11 +165,10 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 }
 
                 mesh.vertices.at(vertexIndex) = std::move(vertex);
-                mesh.indices.at(vertexIndex) = vertexIndex;
+                mesh.indices.at(static_cast<size_t>(offset) + positionInPolygon) = vertexIndex;
+                subset.indexCount++;
             }
         }
-
-
     }
 }
 
@@ -305,9 +337,19 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
         immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-        D3D11_BUFFER_DESC bufferDesc;
-        mesh.indexBuffer->GetDesc(&bufferDesc);
-        immediateContext->DrawIndexed(bufferDesc.ByteWidth / sizeof(uint32_t), 0, 0);
+        for (const Mesh::Subset& subset : mesh.subsets)
+        {
+            const Material& material{ materials.at(subset.materialUniqueId) };
+
+            DirectX::XMStoreFloat4(&data.materialColor, 
+                DirectX::XMVectorMultiply(DirectX::XMLoadFloat4(&materialColor),DirectX::XMLoadFloat4(&material.Kd)));
+            immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
+            immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
+            immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
+
+            immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);
+        }
     }
 }
 

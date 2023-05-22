@@ -57,6 +57,16 @@ public:
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
 
+        struct Subset
+        {
+            uint64_t materialUniqueId{ 0 };
+            std::string materialName;
+
+            uint32_t startIndexLocation{ 0 };
+            uint32_t indexCount{ 0 };
+        };
+        std::vector<Subset> subsets;
+
     private:
         Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
         Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;

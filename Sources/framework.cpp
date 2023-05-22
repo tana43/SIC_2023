@@ -188,7 +188,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.001.0.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.002.0.fbx");
 
 	//各種ステートオブジェクトセット
 	{
