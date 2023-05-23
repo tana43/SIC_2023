@@ -106,7 +106,7 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         if (materialCount > 0)
         {
             const int polygonCount{ fbxMesh->GetPolygonCount() }; 
-            for (int polygonIndex = polygonCount; polygonIndex < polygonCount; ++polygonIndex)
+            for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
             {
                 const int materialIndex{ 
                     fbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex) };
@@ -300,7 +300,6 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
 
     hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffer.ReleaseAndGetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
 }
 
 void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext)
@@ -329,13 +328,11 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
         immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
-        immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
+        //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
         Constants data;
         data.world = world;
-        data.materialColor = materialColor;
-        immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
-        immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+       /* data.materialColor = materialColor;*/
 
         for (const Mesh::Subset& subset : mesh.subsets)
         {

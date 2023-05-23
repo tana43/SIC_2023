@@ -197,7 +197,6 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		setting2DRasterizerState = rasterizerStates[0].Get();
 		setting3DRasterizerState = rasterizerStates[0].Get();
 	}
-	
 }
 
 bool Framework::initialize()
