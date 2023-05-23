@@ -264,6 +264,12 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
 #endif // 1
     }
 
+    if (materials.size() == 0)
+    {
+        Material dummy{};
+        materials.emplace(0, dummy);
+    }
+
     for (std::unordered_map<uint64_t, Material>::iterator itr = materials.begin();
         itr != materials.end(); ++itr)
     {

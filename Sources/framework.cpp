@@ -174,9 +174,9 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	
-	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
-	sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
-	sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
+	//sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
+	//sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
+	//sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
 
 	spritesBatches[0] = std::make_unique<SpriteBatch>(device.Get(), L"./Resources/player-sprites.png", 2048);
 
@@ -188,7 +188,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.002.0.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.000.fbx");
 
 	//各種ステートオブジェクトセット
 	{
@@ -412,16 +412,16 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		//ラスタライザステートをセット
 		immediateContext->RSSetState(setting2DRasterizerState);
 
-		sprites[0].get()->Render(immediateContext.Get(),
+	/*	sprites[0].get()->Render(immediateContext.Get(),
 	0.0f,0.0f,1280.0f,720.0f,
 	spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-	0);
+	0);*/
 
-		sprites[1].get()->Render(immediateContext.Get(),
+		/*sprites[1].get()->Render(immediateContext.Get(),
 			700.0f, 200.0f, 200.0f, 200.0f,
 			spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
 			45,
-			0, 0, 140.0f, 240.0f);
+			0, 0, 140.0f, 240.0f);*/
 		//
 		//	float x{ 0 };
 		//	float y{ 0 };
