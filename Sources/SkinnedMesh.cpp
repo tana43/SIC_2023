@@ -21,6 +21,7 @@ struct BoneInfluence
 };
 using BoneInfluencePerControlPoint = std::vector<BoneInfluence>;
 
+//ボーン影響度を取得する関数
 void FetchBoneInfluences(const FbxMesh* fbxMesh, std::vector<BoneInfluencePerControlPoint>& boneInfluences)
 {
     const int controlPointsCount{ fbxMesh->GetControlPointsCount() };
@@ -44,7 +45,7 @@ void FetchBoneInfluences(const FbxMesh* fbxMesh, std::vector<BoneInfluencePerCon
                 double controlPointWeight{ fbxCluster->GetControlPointWeights()[controlPointIndex] };
                 BoneInfluence& boneInfluenc{ boneInfluences.at(controlPointIndex).emplace_back() };
                 boneInfluenc.boneIndex = static_cast<uint32_t>(clusterIndex);
-                boneInfluenc.boneIndex = static_cast<float>(controlPointWeight);
+                boneInfluenc.boneWeight = static_cast<float>(controlPointWeight);
             }
         }
     }
@@ -160,6 +161,7 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         mesh.nodeIndex = sceneView.indexOf(mesh.uniqueId);
         mesh.defaultGlobalTransform = ToXMFloat4x4(fbxMesh->GetNode()->EvaluateGlobalTransform());
 
+        //ボーン影響度取得
         std::vector<BoneInfluencePerControlPoint> boneInfluences;
         FetchBoneInfluences(fbxMesh, boneInfluences);
 
@@ -174,23 +176,13 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         }
         if (materialCount > 0)
         {
-            const int polygonCount{ fbxMesh->GetPolygonCount() }; 
+            const int polygonCount{ fbxMesh->GetPolygonCount() };
             for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
             {
-                int skinCount{ fbxMesh->GetDeformerCount(FbxDeformer::eSkin) };
-                for (int skinIndex = 0; skinIndex < skinCount; ++skinIndex)
-                {
-                    FbxSkin* fbxSkin{ static_cast<FbxSkin*>(fbxMesh->GetDeformer(skinIndex,FbxDeformer::eSkin)) };
-
-                    int clusterCount{ fbxSkin->GetClusterCount() };
-                    for (int clusterIndex = 0; clusterIndex < clusterCount; ++clusterIndex)
-                    {
-                        FbxCluster* fbxCluster{ fbxSkin->GetCluster(clusterIndex) };
-                        
-                    }
-                }
+                const int materialIndex{
+                    fbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex) };
+                subsets.at(materialIndex).indexCount += 3;
             }
-
             uint32_t offset{ 0 };
             for (Mesh::Subset& subset : subsets)
             {
@@ -214,7 +206,6 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
             Mesh::Subset& subset{subsets.at(materialIndex)};
             const uint32_t offset{ subset.startIndexLocation + subset.indexCount };
 
-
             for (int positionInPolygon = 0; positionInPolygon < 3; ++positionInPolygon)
             {
                 const int vertexIndex{ polygonIndex * 3 + positionInPolygon };
@@ -229,7 +220,7 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 for (size_t influenceIndex = 0; influenceIndex < influencePerControlPoint.size();
                     ++influenceIndex)
                 {
-                    if (influenceIndex < 3)
+                    if (influenceIndex < MAX_BONE_INFLUENCES)
                     {
                         vertex.boneWeights[influenceIndex] =
                             influencePerControlPoint.at(influenceIndex).boneWeight;
@@ -261,6 +252,8 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 subset.indexCount++;
             }
         }
+
+        
     }
 }
 
