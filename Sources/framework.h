@@ -217,6 +217,8 @@ private:
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 
+	float cameraFov{30};
+	float cameraFar{100.0f};
 	DirectX::XMFLOAT3 cameraPos{ 0.0f, 0.0f, -10.0f};
 	DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};

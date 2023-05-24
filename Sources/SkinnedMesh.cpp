@@ -77,6 +77,35 @@ SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool tri
     CreateComObjects(device, fbxFilename);
 }
 
+inline DirectX::XMFLOAT4X4 ToXMFloat4x4(const FbxAMatrix& fbxamatrix)
+{
+    DirectX::XMFLOAT4X4 xmfloat4x4;
+    for (int row = 0; row < 4; ++row)
+    {
+        for (int column = 0; column < 4; ++column)
+        {
+            xmfloat4x4.m[row][column] = static_cast<float>(fbxamatrix[row][column]);
+        }
+    }
+    return xmfloat4x4;
+}
+inline DirectX::XMFLOAT3 ToXMFloat3(const FbxDouble3& fbxdouble3)
+{
+    DirectX::XMFLOAT3 xmfloat3;
+    xmfloat3.x = static_cast<float>(fbxdouble3[0]);
+    xmfloat3.y = static_cast<float>(fbxdouble3[1]);
+    xmfloat3.z = static_cast<float>(fbxdouble3[2]);
+    return xmfloat3;
+}
+inline DirectX::XMFLOAT4 ToXMFloat4(const FbxDouble4& fbxdouble4)
+{
+    DirectX::XMFLOAT4 xmfloat4;
+    xmfloat4.x = static_cast<float>(fbxdouble4[0]);
+    xmfloat4.y = static_cast<float>(fbxdouble4[1]);
+    xmfloat4.z = static_cast<float>(fbxdouble4[2]);
+    xmfloat4.w = static_cast<float>(fbxdouble4[3]);
+    return xmfloat4;
+}
 void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
 {
     for (const Scene::Node& node : sceneView.nodes)
@@ -169,6 +198,8 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 subset.indexCount++;
             }
         }
+
+        mesh.defaultGlobalTransform = ToXMFloat4x4(fbxMesh->GetNode()->EvaluateGlobalTransform());
     }
 }
 
@@ -227,6 +258,11 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
             }
             materials.emplace(material.uniqueId, std::move(material));
         }
+        if (materialCount == 0)
+        {
+            Material dummy{};
+            materials.emplace(0, dummy);
+        }
     }
 }
 
@@ -262,12 +298,6 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
         mesh.vertices.clear();
         mesh.indices.clear();
 #endif // 1
-    }
-
-    if (materials.size() == 0)
-    {
-        Material dummy{};
-        materials.emplace(0, dummy);
     }
 
     for (std::unordered_map<uint64_t, Material>::iterator itr = materials.begin();
@@ -310,12 +340,23 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
 
 void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext)
 {
+    const DirectX::XMFLOAT4X4 coordinateSystemTransforms[]{
+        { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 0:RHS Y-UP
+        { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 1:LHS Y-UP
+        { -1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 2:RHS Z-UP
+        { 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 3:LHS Z-UP
+    };
+
+    const float scaleFactor = 1.0f;
+    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[1]),
+        DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
+
     DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
     DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z);
     DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x,position.y,position.z);
 
     DirectX::XMFLOAT4X4 world;
-    DirectX::XMStoreFloat4x4(&world,S * R * T);
+    DirectX::XMStoreFloat4x4(&world,C * S * R * T);
 
     Render(immediateContext,world,color);
 }
@@ -337,7 +378,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
         Constants data;
-        data.world = world;
+        DirectX::XMStoreFloat4x4(&data.world,DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
        /* data.materialColor = materialColor;*/
 
         for (const Mesh::Subset& subset : mesh.subsets)
@@ -367,5 +408,6 @@ void SkinnedMesh::DrawDebug()
     ImGui::DragFloat3("scale", &scale.x, 0.01f);
     ImGui::DragFloat3("angle", &angle.x, 0.01f);
     ImGui::ColorEdit4("color", &color.x);
+
     ImGui::End();
 }

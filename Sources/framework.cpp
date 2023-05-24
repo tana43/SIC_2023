@@ -188,7 +188,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/cube.000.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/nico.fbx");
 
 	//各種ステートオブジェクトセット
 	{
@@ -377,7 +377,7 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	immediateContext->RSGetViewports(&numViewports, &viewport);
 
 	float aspectRaito{ viewport.Width / viewport.Height };
-	DirectX::XMMATRIX P{ DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(30),aspectRaito,0.1f,100.0f) };
+	DirectX::XMMATRIX P{ DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(cameraFov),aspectRaito,0.1f,cameraFar) };
 
 	DirectX::XMMATRIX Transform =DirectX::XMMatrixRotationRollPitchYaw(cameraAngle.x, cameraAngle.y, cameraAngle.z);
 	DirectX::XMVECTOR Front = Transform.r[2];
@@ -668,7 +668,9 @@ void Framework::DrawDebug()
 			if (ImGui::TreeNode("Camera"))
 			{
 				ImGui::DragFloat3("position", &cameraPos.x, 0.1f);
-				ImGui::DragFloat3("angle", &cameraAngle.x, 0.01f);
+				ImGui::DragFloat3("Angle", &cameraAngle.x, 0.01f);
+				ImGui::DragFloat("Fov", &cameraFov,0.1f);
+				ImGui::DragFloat("Far", &cameraFar,1.0f);
 				ImGui::TreePop();
 			}
 			if (ImGui::TreeNode("Light"))

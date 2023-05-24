@@ -57,6 +57,8 @@ public:
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
 
+        DirectX::XMFLOAT4X4 defaultGlobalTransform{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+
         struct Subset
         {
             uint64_t materialUniqueId{ 0 };

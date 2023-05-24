@@ -96,7 +96,5 @@ protected:
 	
 	std::vector<Subset> subsets;
 	std::vector<Material> materials;
-
-	
 };
 
