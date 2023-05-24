@@ -188,7 +188,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./resources/nico.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
 
 	//各種ステートオブジェクトセット
 	{
@@ -318,6 +318,11 @@ void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
 	rasterizerDesc.MultisampleEnable = FALSE;
 	rasterizerDesc.AntialiasedLineEnable = FALSE;
 	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[0].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+	//面カリングを逆向きにするステート
+	rasterizerDesc.FrontCounterClockwise = TRUE;
+	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[3].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
@@ -772,23 +777,28 @@ void Framework::DrawDebug()
 			}
 
 
-			static bool selectRFlag[3] = { true,false,false };
+			static bool selectRFlag[4] = { true,false,false,false };
 			if (ImGui::BeginMenu("RasterizerState"))
 			{
 				if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
 				{
 					setting3DRasterizerState = rasterizerStates[0].Get();
-					selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false;
+					selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false; selectRFlag[3] = false;
 				}
 				if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
 				{
 					setting3DRasterizerState = rasterizerStates[1].Get();
-					selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false;
+					selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false; selectRFlag[3] = false;
 				}
 				if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
 				{
 					setting3DRasterizerState = rasterizerStates[2].Get();
-					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true;
+					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true; selectRFlag[3] = false;
+				}
+				if (ImGui::MenuItem("Solid Reverse", "", selectRFlag[3]))
+				{
+					setting3DRasterizerState = rasterizerStates[3].Get();
+					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = false; selectRFlag[3] = true;
 				}
 
 				ImGui::EndMenu();

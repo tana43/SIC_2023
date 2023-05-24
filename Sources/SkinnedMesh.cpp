@@ -14,6 +14,42 @@
 
 int SkinnedMesh::num{};
 
+struct BoneInfluence
+{
+    uint32_t boneIndex;
+    float boneWeight;
+};
+using BoneInfluencePerControlPoint = std::vector<BoneInfluence>;
+
+void FetchBoneInfluences(const FbxMesh* fbxMesh, std::vector<BoneInfluencePerControlPoint>& boneInfluences)
+{
+    const int controlPointsCount{ fbxMesh->GetControlPointsCount() };
+    boneInfluences.resize(controlPointsCount);
+
+    const int skinCount{ fbxMesh->GetDeformerCount(FbxDeformer::eSkin) };
+    for (int skinIndex = 0; skinIndex < skinCount; ++skinIndex)
+    {
+        const FbxSkin* fbxSkin{ static_cast<FbxSkin*>(fbxMesh->GetDeformer(skinIndex,FbxDeformer::eSkin)) };
+
+        const int clusterCount{ fbxSkin->GetClusterCount() };
+        for (int clusterIndex = 0; clusterIndex < clusterCount; ++clusterIndex)
+        {
+            const FbxCluster* fbxCluster{ fbxSkin->GetCluster(clusterIndex) };
+
+            const int controlPointIndicesCount{ fbxCluster->GetControlPointIndicesCount() };
+            for (int controlPointIndicesIndex = 0; 
+                controlPointIndicesIndex < controlPointIndicesCount; ++controlPointIndicesIndex)
+            {
+                int controlPointIndex{ fbxCluster->GetControlPointIndices()[controlPointIndicesIndex] };
+                double controlPointWeight{ fbxCluster->GetControlPointWeights()[controlPointIndex] };
+                BoneInfluence& boneInfluenc{ boneInfluences.at(controlPointIndex).emplace_back() };
+                boneInfluenc.boneIndex = static_cast<uint32_t>(clusterIndex);
+                boneInfluenc.boneIndex = static_cast<float>(controlPointWeight);
+            }
+        }
+    }
+}
+
 SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate) : myNum(num++)
 {
     FbxManager* fbxManager{ FbxManager::Create() };
@@ -122,6 +158,10 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         mesh.uniqueId = fbxMesh->GetNode()->GetUniqueID();
         mesh.name = fbxMesh->GetNode()->GetName();
         mesh.nodeIndex = sceneView.indexOf(mesh.uniqueId);
+        mesh.defaultGlobalTransform = ToXMFloat4x4(fbxMesh->GetNode()->EvaluateGlobalTransform());
+
+        std::vector<BoneInfluencePerControlPoint> boneInfluences;
+        FetchBoneInfluences(fbxMesh, boneInfluences);
 
         std::vector<Mesh::Subset>& subsets{mesh.subsets};
         const int materialCount{ fbxMesh->GetNode()->GetMaterialCount() };
@@ -137,10 +177,20 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
             const int polygonCount{ fbxMesh->GetPolygonCount() }; 
             for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
             {
-                const int materialIndex{ 
-                    fbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex) };
-                subsets.at(materialIndex).indexCount += 3;
+                int skinCount{ fbxMesh->GetDeformerCount(FbxDeformer::eSkin) };
+                for (int skinIndex = 0; skinIndex < skinCount; ++skinIndex)
+                {
+                    FbxSkin* fbxSkin{ static_cast<FbxSkin*>(fbxMesh->GetDeformer(skinIndex,FbxDeformer::eSkin)) };
+
+                    int clusterCount{ fbxSkin->GetClusterCount() };
+                    for (int clusterIndex = 0; clusterIndex < clusterCount; ++clusterIndex)
+                    {
+                        FbxCluster* fbxCluster{ fbxSkin->GetCluster(clusterIndex) };
+                        
+                    }
+                }
             }
+
             uint32_t offset{ 0 };
             for (Mesh::Subset& subset : subsets)
             {
@@ -175,6 +225,19 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 vertex.position.y = static_cast<float>(controlPoints[polygonVertex][1]);
                 vertex.position.z = static_cast<float>(controlPoints[polygonVertex][2]);
 
+                const BoneInfluencePerControlPoint& influencePerControlPoint{ boneInfluences.at(polygonVertex) };
+                for (size_t influenceIndex = 0; influenceIndex < influencePerControlPoint.size();
+                    ++influenceIndex)
+                {
+                    if (influenceIndex < 3)
+                    {
+                        vertex.boneWeights[influenceIndex] =
+                            influencePerControlPoint.at(influenceIndex).boneWeight;
+                        vertex.boneIndices[influenceIndex] =
+                            influencePerControlPoint.at(influenceIndex).boneIndex;
+                    }
+                }
+
                 if (fbxMesh->GetElementNormalCount() > 0)
                 {
                     FbxVector4 normal; 
@@ -198,8 +261,6 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 subset.indexCount++;
             }
         }
-
-        mesh.defaultGlobalTransform = ToXMFloat4x4(fbxMesh->GetNode()->EvaluateGlobalTransform());
     }
 }
 
@@ -324,6 +385,8 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
         {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
+        {"WEIGHTS",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
+        {"BONES",0,DXGI_FORMAT_R32G32B32A32_UINT,0,D3D11_APPEND_ALIGNED_ELEMENT},
     };
     Shader::CreateVSFromCso(device, "./Resources/Shader/SkinnedMeshVS.cso", vertexShader.ReleaseAndGetAddressOf(),
         inputLayout.ReleaseAndGetAddressOf(), inputElementDesc, ARRAYSIZE(inputElementDesc));
@@ -348,7 +411,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext)
     };
 
     const float scaleFactor = 1.0f;
-    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[1]),
+    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[2]),
         DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
 
     DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);

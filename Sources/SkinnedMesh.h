@@ -37,11 +37,14 @@ class SkinnedMesh
     static int num;
 
 public:
+    static const int MAX_BONE_INFLUENCES{ 4 };
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
         DirectX::XMFLOAT3 normal{0, 1, 0};
         DirectX::XMFLOAT2 texcoord{0, 0};
+        float boneWeights[MAX_BONE_INFLUENCES]{ 1,0,0,0 };
+        uint32_t boneIndices[MAX_BONE_INFLUENCES]{};
     };
     struct Constants
     {

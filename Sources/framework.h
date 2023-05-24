@@ -224,7 +224,7 @@ private:
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[3];
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[4];
 	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get()};
 	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get()};
 };
