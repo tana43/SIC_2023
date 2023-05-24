@@ -42,7 +42,7 @@ void FetchBoneInfluences(const FbxMesh* fbxMesh, std::vector<BoneInfluencePerCon
                 controlPointIndicesIndex < controlPointIndicesCount; ++controlPointIndicesIndex)
             {
                 int controlPointIndex{ fbxCluster->GetControlPointIndices()[controlPointIndicesIndex] };
-                double controlPointWeight{ fbxCluster->GetControlPointWeights()[controlPointIndex] };
+                double controlPointWeight{ fbxCluster->GetControlPointWeights()[controlPointIndicesIndex] };
                 BoneInfluence& boneInfluenc{ boneInfluences.at(controlPointIndex).emplace_back() };
                 boneInfluenc.boneIndex = static_cast<uint32_t>(clusterIndex);
                 boneInfluenc.boneWeight = static_cast<float>(controlPointWeight);
@@ -216,11 +216,13 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 vertex.position.y = static_cast<float>(controlPoints[polygonVertex][1]);
                 vertex.position.z = static_cast<float>(controlPoints[polygonVertex][2]);
 
+
+                //ウェイト値を頂点にセット
                 const BoneInfluencePerControlPoint& influencePerControlPoint{ boneInfluences.at(polygonVertex) };
-                for (size_t influenceIndex = 0; influenceIndex < influencePerControlPoint.size();
-                    ++influenceIndex)
+                for (size_t influenceIndex = 0; influenceIndex < influencePerControlPoint.size();++influenceIndex)
                 {
-                    if (influenceIndex < MAX_BONE_INFLUENCES)
+                    const size_t maxBoneInfluence{ influencePerControlPoint.max_size() };
+                    if (influenceIndex < maxBoneInfluence)
                     {
                         vertex.boneWeights[influenceIndex] =
                             influencePerControlPoint.at(influenceIndex).boneWeight;
