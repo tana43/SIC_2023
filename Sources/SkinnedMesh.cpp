@@ -322,6 +322,29 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
     }
 }
 
+void SkinnedMesh::FeachSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
+{
+    const int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
+    for (int deformerIndex = 0; deformerIndex < deformerCount; ++deformerIndex)
+    {
+        FbxSkin* skin = static_cast<FbxSkin*>(fbxMesh->GetDeformer(deformerIndex, FbxDeformer::eSkin));
+        const int clusterCount = skin->GetClusterCount();
+        bindPose.bones.resize(clusterCount);
+        for (int clusterIndex = 0; clusterIndex < clusterCount; ++clusterIndex)
+        {
+            FbxCluster* cluster = skin->GetCluster(clusterIndex);
+
+            Skeleton::Bone& bone{bindPose.bones.at(clusterIndex)};
+            bone.name = cluster->GetLink()->GetName();
+            bone.uniqueId = cluster->GetLink()->GetUniqueID();
+            bone.parentIndex = bindPose.indexof(cluster->GetLink()->GetParent()->GetUniqueID());
+            bone.parentIndex = sceneView.indexOf(bone.uniqueId);
+
+
+        }
+    }
+}
+
 void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename)
 {
     for (Mesh& mesh : meshes)
@@ -438,6 +461,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         Constants data;
         DirectX::XMStoreFloat4x4(&data.world,DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
 #if 0
+        //ダミー行列
         DirectX::XMStoreFloat4x4(&data.boneTransforms[0], DirectX::XMMatrixIdentity());
         DirectX::XMStoreFloat4x4(&data.boneTransforms[1], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(+45)));
         DirectX::XMStoreFloat4x4(&data.boneTransforms[2], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)));
