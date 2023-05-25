@@ -46,10 +46,12 @@ public:
         float boneWeights[MAX_BONE_INFLUENCES]{ 1,0,0,0 };
         uint32_t boneIndices[MAX_BONE_INFLUENCES]{};
     };
+    static const int MAX_BONES{ 256 };
     struct Constants
     {
         DirectX::XMFLOAT4X4 world;
         DirectX::XMFLOAT4 materialColor;
+        DirectX::XMFLOAT4X4 boneTransforms[MAX_BONES]{ {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1} };
     };
     struct Mesh
     {

@@ -14,10 +14,13 @@ struct VS_OUT
     float2 texcoord : TEXCOORD;
     float4 color : COLOR;
 };
+
+static const int MAX_BONES = 256;
 cbuffer SCENE_CONSTANT_BUFFER : register(b0)
 {
     row_major float4x4 world;
     float4 materialColor;
+    row_major float4x4 boneTransforms[MAX_BONES];
 };
 cbuffer SCENE_CONSTANT_BUFFER : register(b1)
 {

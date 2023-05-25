@@ -437,7 +437,11 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
 
         Constants data;
         DirectX::XMStoreFloat4x4(&data.world,DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
-       /* data.materialColor = materialColor;*/
+#if 0
+        DirectX::XMStoreFloat4x4(&data.boneTransforms[0], DirectX::XMMatrixIdentity());
+        DirectX::XMStoreFloat4x4(&data.boneTransforms[1], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(+45)));
+        DirectX::XMStoreFloat4x4(&data.boneTransforms[2], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)));
+#endif
 
         for (const Mesh::Subset& subset : mesh.subsets)
         {
