@@ -165,6 +165,9 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         std::vector<BoneInfluencePerControlPoint> boneInfluences;
         FetchBoneInfluences(fbxMesh, boneInfluences);
 
+        //バインドポーズ取得(初期ポーズ)
+        FeachSkeleton(fbxMesh, mesh.bindPose);
+
         std::vector<Mesh::Subset>& subsets{mesh.subsets};
         const int materialCount{ fbxMesh->GetNode()->GetMaterialCount() };
         subsets.resize(materialCount > 0 ? materialCount : 1);
@@ -276,6 +279,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
             material.name = fbxMaterial->GetName();
             material.uniqueId = fbxMaterial->GetUniqueID();
             FbxProperty fbxProperty;
+            //ディフューズ取得
             fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
             if (fbxProperty.IsValid())
             {
@@ -288,6 +292,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
                 const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
                 material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
             }
+            //アンビエント取得
             fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
             if (fbxProperty.IsValid())
             {
@@ -300,6 +305,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
                 //const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
                 //material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
             }
+            //スペキュラ取得
             fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sSpecular);
             if (fbxProperty.IsValid())
             {
@@ -322,12 +328,16 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
     }
 }
 
+//メッシュからバインドポーズの情報を抽出
 void SkinnedMesh::FeachSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
 {
+    //メッシュからスキンを取得
     const int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
     for (int deformerIndex = 0; deformerIndex < deformerCount; ++deformerIndex)
     {
         FbxSkin* skin = static_cast<FbxSkin*>(fbxMesh->GetDeformer(deformerIndex, FbxDeformer::eSkin));
+
+        //スキンからクラスター（頂点影響力とそれに対応するボーン）を取得
         const int clusterCount = skin->GetClusterCount();
         bindPose.bones.resize(clusterCount);
         for (int clusterIndex = 0; clusterIndex < clusterCount; ++clusterIndex)
@@ -340,7 +350,18 @@ void SkinnedMesh::FeachSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
             bone.parentIndex = bindPose.indexof(cluster->GetLink()->GetParent()->GetUniqueID());
             bone.parentIndex = sceneView.indexOf(bone.uniqueId);
 
+            //メッシュのローカル空間からシーンのグローバル空間に変換するために使う
+            FbxAMatrix referenceGlobalInitPosition;
+            cluster->GetTransformMatrix(referenceGlobalInitPosition);
 
+            //ボーンのローカル空間からシーンのグローバル空間に変換するために使う
+            FbxAMatrix clusterGlobalInitPosition;
+            cluster->GetTransformLinkMatrix(clusterGlobalInitPosition);
+
+            //オフセット行列の作成
+            //※メッシュ空間からボーン空間への交換をする行列をオフセット行列と呼ぶ
+            bone.offsetTransform
+                = ToXMFloat4x4(clusterGlobalInitPosition.Inverse() * referenceGlobalInitPosition);
         }
     }
 }
@@ -466,6 +487,25 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         DirectX::XMStoreFloat4x4(&data.boneTransforms[1], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(+45)));
         DirectX::XMStoreFloat4x4(&data.boneTransforms[2], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)));
 #endif
+        
+#if 1
+        //ダミー行列
+        DirectX::XMMATRIX B[3];
+        B[0] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(0).offsetTransform);
+        B[1] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(1).offsetTransform);
+        B[2] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(2).offsetTransform);
+
+        DirectX::XMMATRIX A[3];
+
+        A[0] = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(90),0,0);
+        A[1] = DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(45)) * DirectX::XMMatrixTranslation(0, 2, 0);
+        A[2] = DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)) * DirectX::XMMatrixTranslation(0, 2, 0);
+
+        DirectX::XMStoreFloat4x4(&data.boneTransforms[0], B[0] * A[0]);
+        DirectX::XMStoreFloat4x4(&data.boneTransforms[1], B[1] * A[1] * A[0]);
+        DirectX::XMStoreFloat4x4(&data.boneTransforms[2], B[2] * A[2] * A[1] * A[0]);
+#endif // 1
+
 
         for (const Mesh::Subset& subset : mesh.subsets)
         {
