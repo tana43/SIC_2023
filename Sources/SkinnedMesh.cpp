@@ -109,6 +109,9 @@ SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool tri
 
     FetchMaterials(fbxScene, materials);
 
+    float samplingRate = 0;
+    FetchAnimations(fbxScene,animationClips,samplingRate);
+
     fbxManager->Destroy();
 
     CreateComObjects(device, fbxFilename);
@@ -166,7 +169,7 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         FetchBoneInfluences(fbxMesh, boneInfluences);
 
         //バインドポーズ取得(初期ポーズ)
-        FeachSkeleton(fbxMesh, mesh.bindPose);
+        FetchSkeleton(fbxMesh, mesh.bindPose);
 
         std::vector<Mesh::Subset>& subsets{mesh.subsets};
         const int materialCount{ fbxMesh->GetNode()->GetMaterialCount() };
@@ -329,7 +332,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
 }
 
 //メッシュからバインドポーズの情報を抽出
-void SkinnedMesh::FeachSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
+void SkinnedMesh::FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
 {
     //メッシュからスキンを取得
     const int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
@@ -363,6 +366,61 @@ void SkinnedMesh::FeachSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
             bone.offsetTransform
                 = ToXMFloat4x4(clusterGlobalInitPosition.Inverse() * referenceGlobalInitPosition);
         }
+    }
+}
+
+//アニメーション情報抽出
+void SkinnedMesh::FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& animationClips, 
+    float samplingRate/*１秒間にアニメーションを取り出す回数。この値が０の場合はアニメーションデータはデフォルトのフレームレートでサンプリングされる*/)
+{
+    FbxArray<FbxString*> animationStackNames;
+    fbxScene->FillAnimStackNameArray(animationStackNames);
+    const int animationStackCount{ animationStackNames.GetCount() };
+    for (int animationStackIndex = 0;  animationStackIndex < animationStackCount; ++animationStackIndex)
+    {
+        Animation& animationClip{ animationClips.emplace_back() };
+        animationClip.name = animationStackNames[animationStackIndex]->Buffer();
+
+        FbxAnimStack* animationStack{ fbxScene->FindMember<FbxAnimStack>(animationClip.name.c_str()) };
+        fbxScene->SetCurrentAnimationStack(animationStack);
+
+        //１秒をFbxTimeに変換
+        const FbxTime::EMode timeMode{fbxScene->GetGlobalSettings().GetTimeMode()};
+        FbxTime oneSecond;
+        oneSecond.SetTime(0/*時間*/, 0/*分*/, 1/*秒*/, 0, 0, timeMode);
+
+        //サンプリングレートが０ならデフォルト値を取得
+        animationClip.samplingRate = samplingRate > 0 ?
+            samplingRate : static_cast<float>(oneSecond.GetFrameRate(timeMode));
+        const FbxTime samplingInterval{static_cast<FbxLongLong>(oneSecond.Get() / animationClip.samplingRate)};
+
+        //アニメーション情報を取得
+        const FbxTakeInfo* takeInfo{ fbxScene->GetTakeInfo(animationClip.name.c_str()) };
+
+        const FbxTime startTime{ takeInfo->mLocalTimeSpan.GetStart() };
+        const FbxTime stopTime{ takeInfo->mLocalTimeSpan.GetStop() };
+        for (FbxTime time = startTime; time < stopTime; time += samplingInterval)
+        {
+            Animation::Keyframe& keyframe{animationClip.sequence.emplace_back()};
+
+            const size_t nodeCount{ sceneView.nodes.size() };
+            keyframe.nodes.resize(nodeCount);
+            for (size_t nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+            {
+                FbxNode* fbxNode{ fbxScene->FindNodeByName(sceneView.nodes.at(nodeIndex).name.c_str()) };
+                if (fbxNode)
+                {
+                    Animation::Keyframe::Node& node{keyframe.nodes.at(nodeIndex)};
+
+                    //グローバル座標系への交換行列
+                    node.globalTransform = ToXMFloat4x4(fbxNode->EvaluateGlobalTransform(time));
+                }
+            }
+        }
+    }
+    for (int animationStackIndex = 0; animationStackIndex < animationStackCount; ++animationStackIndex)
+    {
+        delete animationStackNames[animationStackIndex];
     }
 }
 
@@ -440,7 +498,7 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
-void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext)
+void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation::Keyframe* keyframe)
 {
     const DirectX::XMFLOAT4X4 coordinateSystemTransforms[]{
         { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 0:RHS Y-UP
@@ -460,10 +518,13 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext)
     DirectX::XMFLOAT4X4 world;
     DirectX::XMStoreFloat4x4(&world,C * S * R * T);
 
-    Render(immediateContext,world,color);
+    Render(immediateContext,world,color,keyframe);
 }
 
-void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor)
+void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, 
+    const DirectX::XMFLOAT4X4& world, 
+    const DirectX::XMFLOAT4& materialColor,
+    const Animation::Keyframe* keyframe)
 {
     for (const Mesh& mesh : meshes)
     {
@@ -488,7 +549,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         DirectX::XMStoreFloat4x4(&data.boneTransforms[2], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)));
 #endif
         
-#if 1
+#if 0
         //ダミー行列
         DirectX::XMMATRIX B[3];
         B[0] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(0).offsetTransform);
@@ -505,17 +566,34 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const DirectX::X
         DirectX::XMStoreFloat4x4(&data.boneTransforms[1], B[1] * A[1] * A[0]);
         DirectX::XMStoreFloat4x4(&data.boneTransforms[2], B[2] * A[2] * A[1] * A[0]);
 #endif // 1
+    
 
+        //unit25
+        //多分ボーンの情報をローカルからグローバルに変えてる多分多分
+        const size_t boneCount{ mesh.bindPose.bones.size() };
+        for (int boneIndex = 0; boneIndex < boneCount; ++boneIndex)
+        {
+            const Skeleton::Bone& bone{mesh.bindPose.bones.at(boneIndex)};
+            const Animation::Keyframe::Node& boneNode{ keyframe->nodes.at(bone.nodeIndex)};
+            DirectX::XMStoreFloat4x4(&data.boneTransforms[boneIndex],
+                DirectX::XMMatrixMultiply(
+                    DirectX::XMMatrixMultiply(
+                        DirectX::XMLoadFloat4x4(&bone.offsetTransform),
+                        DirectX::XMLoadFloat4x4(&boneNode.globalTransform)
+                    ),
+                    DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform))
+                )
+            );
+        }
 
         for (const Mesh::Subset& subset : mesh.subsets)
         {
             const Material& material{ materials.at(subset.materialUniqueId) };
 
-            DirectX::XMStoreFloat4(&data.materialColor, 
-                DirectX::XMVectorMultiply(DirectX::XMLoadFloat4(&materialColor),DirectX::XMLoadFloat4(&material.Kd)));
+            DirectX::XMStoreFloat4(&data.materialColor,
+                DirectX::XMVectorMultiply(DirectX::XMLoadFloat4(&materialColor), DirectX::XMLoadFloat4(&material.Kd)));
             immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
             immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
-
             immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
 
             immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);

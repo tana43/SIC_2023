@@ -359,7 +359,7 @@ void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 	//ImGui::ShowDemoWindow();
 	
 }
-void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	HRESULT hr{ S_OK };
 
@@ -477,7 +477,24 @@ void Framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 		//staticMeshes[0]->Render(immediateContext.Get());
 		//staticMeshes[1]->Render(immediateContext.Get());
 
-		skinnedMeshes[0]->Render(immediateContext.Get());
+		int clipIndex{ 0 };
+		int frameIndex{ 0 };
+		static float animationTick{ 0 };
+
+		Animation& animation{ skinnedMeshes[0]->animationClips.at(clipIndex) };
+		frameIndex = static_cast<int>(animationTick * animation.samplingRate);
+		if (frameIndex > animation.sequence.size() - 1)
+		{
+			frameIndex = 0;
+			animationTick = 0;
+		}
+		else
+		{
+			animationTick += elapsedTime;
+		}
+
+		Animation::Keyframe& keyframe{animation.sequence.at(frameIndex)};
+		skinnedMeshes[0]->Render(immediateContext.Get(),&keyframe);
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());

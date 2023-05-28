@@ -62,6 +62,23 @@ struct Skeleton
     }
 };
 
+struct Animation
+{
+    std::string name;
+    float samplingRate{ 0 };
+
+    struct Keyframe
+    {
+        struct Node
+        {
+            //ノードのローカル空間からシーンのグローバル空間に変更するために使う
+            DirectX::XMFLOAT4X4 globalTransform{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+        };
+        std::vector<Node> nodes;
+    };
+    std::vector<Keyframe> sequence;
+};
+
 class SkinnedMesh
 {
     static int num;
@@ -125,6 +142,8 @@ public:
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[4];
     };
 
+    std::vector<Animation> animationClips;
+
 private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
@@ -142,13 +161,15 @@ public:
 
     void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
     void FetchMaterials(FbxScene* fbxScene,std::unordered_map<uint64_t,Material>& materials);
-    void FeachSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
+    void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
+    void FetchAnimations(FbxScene* fbxScene,std::vector<Animation>& animationClips,float samplingRate);
 
     void CreateComObjects(ID3D11Device* device, const char* fbxFilename);
 
-    void Render(ID3D11DeviceContext* immediateContext);
+    void Render(ID3D11DeviceContext* immediateContext, const Animation::Keyframe* keyframe);
     void Render(ID3D11DeviceContext* immediateContext,
-        const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor);
+        const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor,
+        const Animation::Keyframe* keyframe);
 
     void DrawDebug();
 
@@ -159,5 +180,6 @@ protected:
 
     std::vector<Mesh> meshes;
     std::unordered_map<uint64_t, Material> materials;
+
 };
 
