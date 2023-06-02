@@ -541,7 +541,11 @@ void SkinnedMesh::Render(
         //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
         Constants data;
-        DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
+        //DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
+        //メッシュのglobalTransformが時間軸で変化しているので、その行列をキーフレームから取得する
+        //取得したglobalTransform行列を定数バッファのワールド交換行列に合成する
+        const Animation::Keyframe::Node& meshNode{keyframe->nodes.at(mesh.nodeIndex)};
+        DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&meshNode.globalTransform) * DirectX::XMLoadFloat4x4(&world));
 #if 0
         //ダミー行列
         DirectX::XMStoreFloat4x4(&data.boneTransforms[0], DirectX::XMMatrixIdentity());

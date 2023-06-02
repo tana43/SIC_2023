@@ -189,7 +189,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/plantune.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/Drone166/Drone166.1.fbx");
 
 	//各種ステートオブジェクトセット
 	{
