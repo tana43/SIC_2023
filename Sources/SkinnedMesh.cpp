@@ -147,6 +147,25 @@ inline DirectX::XMFLOAT4 ToXMFloat4(const FbxDouble4& fbxdouble4)
     xmfloat4.w = static_cast<float>(fbxdouble4[3]);
     return xmfloat4;
 }
+
+void SkinnedMesh::UpdateAnimation(Animation::Keyframe& keyframe)
+{
+    size_t nodeCount{ keyframe.nodes.size() };
+    for (size_t nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+    {
+        Animation::Keyframe::Node& node{keyframe.nodes.at(nodeIndex)};
+        DirectX::XMMATRIX S{DirectX::XMMatrixScaling(node.scaling.x, node.scaling.y, node.scaling.z)};
+        DirectX::XMMATRIX R{DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation))};
+        DirectX::XMMATRIX T{DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z)};
+
+        int64_t parentIndex{ sceneView.nodes.at(nodeIndex).parentIndex };
+        DirectX::XMMATRIX P{parentIndex < 0 ? DirectX::XMMatrixIdentity() :
+            DirectX::XMLoadFloat4x4(&keyframe.nodes.at(parentIndex).globalTransform)};
+
+        DirectX::XMStoreFloat4x4(&node.globalTransform, S * R * T * P);
+    }
+}
+
 void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
 {
     for (const Scene::Node& node : sceneView.nodes)
@@ -413,6 +432,12 @@ void SkinnedMesh::FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& an
 
                     //グローバル座標系への交換行列
                     node.globalTransform = ToXMFloat4x4(fbxNode->EvaluateGlobalTransform(time));
+
+                    //parentのローカル座標系に関する変換行列
+                    const FbxAMatrix& localTransform{ fbxNode->EvaluateLocalTransform(time) };
+                    node.scaling = ToXMFloat3(localTransform.GetS());
+                    node.rotation = ToXMFloat4(localTransform.GetQ());
+                    node.translation = ToXMFloat3(localTransform.GetT());
                 }
             }
         }

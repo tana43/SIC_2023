@@ -73,6 +73,10 @@ struct Animation
         {
             //ノードのローカル空間からシーンのグローバル空間に変更するために使う
             DirectX::XMFLOAT4X4 globalTransform{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+
+            DirectX::XMFLOAT3 scaling{1, 1, 1};
+            DirectX::XMFLOAT4 rotation{0, 0, 0, 1};//Rotation Quaternion
+            DirectX::XMFLOAT3 translation{0, 0, 0};
         };
         std::vector<Node> nodes;
     };
@@ -168,6 +172,8 @@ public:
         const Animation::Keyframe* keyframe);
 
     void DrawDebug();
+
+    void UpdateAnimation(Animation::Keyframe& keyframe);
 
 protected:
     Scene sceneView;

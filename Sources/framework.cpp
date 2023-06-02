@@ -189,7 +189,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/Drone166/Drone166.1.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/plantune.fbx");
 
 	//各種ステートオブジェクトセット
 	{
@@ -495,7 +495,15 @@ void Framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
 		}
 
 		Animation::Keyframe& keyframe{animation.sequence.at(frameIndex)};
+#if 1
+		DirectX::XMStoreFloat4(&keyframe.nodes.at(30).rotation,
+			DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1, 0, 0, 0), 1.5f));
+		keyframe.nodes.at(30).translation.x = 300.0f;
+		skinnedMeshes[0]->UpdateAnimation(keyframe);
+#endif // 1
+
 		skinnedMeshes[0]->Render(immediateContext.Get(),&keyframe);
+
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());
