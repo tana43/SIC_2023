@@ -51,7 +51,7 @@ void FetchBoneInfluences(const FbxMesh* fbxMesh, std::vector<BoneInfluencePerCon
     }
 }
 
-SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate) : myNum(num++)
+SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate,float samplingRate) : myNum(num++)
 {
     FbxManager* fbxManager{ FbxManager::Create() };
     FbxScene* fbxScene{ FbxScene::Create(fbxManager,"") };
@@ -87,7 +87,7 @@ SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool tri
     } };
     traverse(fbxScene->GetRootNode());
 
-#if 1
+#if 0
     for (const Scene::Node& node : sceneView.nodes)
     {
         FbxNode* fbxNode{ fbxScene->FindNodeByName(node.name.c_str()) };
@@ -103,13 +103,14 @@ SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool tri
     }
 #endif // 1
 
-    traverse(fbxScene->GetRootNode());
-
     FetchMeshes(fbxScene, meshes);
 
     FetchMaterials(fbxScene, materials);
 
+#if 0
     float samplingRate = 0;
+#endif // 0
+
     FetchAnimations(fbxScene,animationClips,samplingRate);
 
     fbxManager->Destroy();
@@ -260,8 +261,6 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 subset.indexCount++;
             }
         }
-
-        
     }
 }
 
@@ -282,7 +281,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
             material.name = fbxMaterial->GetName();
             material.uniqueId = fbxMaterial->GetUniqueID();
             FbxProperty fbxProperty;
-            //ディフューズ取得
+            //ディフューズ取得(拡散反射光、ザラつきを表現）
             fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
             if (fbxProperty.IsValid())
             {
@@ -295,7 +294,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
                 const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
                 material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
             }
-            //アンビエント取得
+            //アンビエント取得(環境光、各オブジェクトに別々のパラメータを設定するとキモなるらしい)
             fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
             if (fbxProperty.IsValid())
             {
@@ -308,7 +307,7 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
                 //const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
                 //material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
             }
-            //スペキュラ取得
+            //スペキュラ取得(鏡面反射光、ツヤを表現する　人工物以外にはあまり使わない方がいい)
             fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sSpecular);
             if (fbxProperty.IsValid())
             {
@@ -351,7 +350,7 @@ void SkinnedMesh::FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose)
             bone.name = cluster->GetLink()->GetName();
             bone.uniqueId = cluster->GetLink()->GetUniqueID();
             bone.parentIndex = bindPose.indexof(cluster->GetLink()->GetParent()->GetUniqueID());
-            bone.parentIndex = sceneView.indexOf(bone.uniqueId);
+            bone.nodeIndex = sceneView.indexOf(bone.uniqueId);
 
             //メッシュのローカル空間からシーンのグローバル空間に変換するために使う
             FbxAMatrix referenceGlobalInitPosition;
@@ -508,7 +507,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation:
     };
 
     const float scaleFactor = 1.0f;
-    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[2]),
+    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[0]),
         DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
 
     DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
@@ -521,7 +520,8 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation:
     Render(immediateContext,world,color,keyframe);
 }
 
-void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, 
+void SkinnedMesh::Render(
+    ID3D11DeviceContext* immediateContext, 
     const DirectX::XMFLOAT4X4& world, 
     const DirectX::XMFLOAT4& materialColor,
     const Animation::Keyframe* keyframe)
@@ -541,14 +541,14 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext,
         //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
         Constants data;
-        DirectX::XMStoreFloat4x4(&data.world,DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
+        DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
 #if 0
         //ダミー行列
         DirectX::XMStoreFloat4x4(&data.boneTransforms[0], DirectX::XMMatrixIdentity());
         DirectX::XMStoreFloat4x4(&data.boneTransforms[1], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(+45)));
         DirectX::XMStoreFloat4x4(&data.boneTransforms[2], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)));
 #endif
-        
+
 #if 0
         //ダミー行列
         DirectX::XMMATRIX B[3];
@@ -558,7 +558,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext,
 
         DirectX::XMMATRIX A[3];
 
-        A[0] = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(90),0,0);
+        A[0] = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(90), 0, 0);
         A[1] = DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(45)) * DirectX::XMMatrixTranslation(0, 2, 0);
         A[2] = DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)) * DirectX::XMMatrixTranslation(0, 2, 0);
 
@@ -566,24 +566,21 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext,
         DirectX::XMStoreFloat4x4(&data.boneTransforms[1], B[1] * A[1] * A[0]);
         DirectX::XMStoreFloat4x4(&data.boneTransforms[2], B[2] * A[2] * A[1] * A[0]);
 #endif // 1
-    
+
 
         //unit25
         //多分ボーンの情報をローカルからグローバルに変えてる多分多分
         const size_t boneCount{ mesh.bindPose.bones.size() };
+        _ASSERT_EXPR(boneCount < MAX_BONES, L"The value of the 'bone_count' has exceeded MAX_BONES.");
+
         for (int boneIndex = 0; boneIndex < boneCount; ++boneIndex)
         {
             const Skeleton::Bone& bone{mesh.bindPose.bones.at(boneIndex)};
             const Animation::Keyframe::Node& boneNode{ keyframe->nodes.at(bone.nodeIndex)};
             DirectX::XMStoreFloat4x4(&data.boneTransforms[boneIndex],
-                DirectX::XMMatrixMultiply(
-                    DirectX::XMMatrixMultiply(
-                        DirectX::XMLoadFloat4x4(&bone.offsetTransform),
-                        DirectX::XMLoadFloat4x4(&boneNode.globalTransform)
-                    ),
-                    DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform))
-                )
-            );
+                DirectX::XMLoadFloat4x4(&bone.offsetTransform) *
+                DirectX::XMLoadFloat4x4(&boneNode.globalTransform) *
+                DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform)));
         }
 
         for (const Mesh::Subset& subset : mesh.subsets)
@@ -594,6 +591,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext,
                 DirectX::XMVectorMultiply(DirectX::XMLoadFloat4(&materialColor), DirectX::XMLoadFloat4(&material.Kd)));
             immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
             immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
             immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
 
             immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);

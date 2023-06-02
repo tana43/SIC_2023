@@ -188,7 +188,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
+	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/plantune.fbx");
 
 	//各種ステートオブジェクトセット
 	{
@@ -581,8 +582,13 @@ void Framework::FullscreenState(BOOL fullscreen)
 	}
 }
 
+// RendrDoc
+
 void Framework::OnSizeChanged(UINT64 width, UINT height)
 {
+	//最小化対応
+	if (width == 0 || height == 0)return;
+
 	HRESULT hr{ S_OK };
 	if (width != framebufferDimensions.cx || height != framebufferDimensions.cy)
 	{

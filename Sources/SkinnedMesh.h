@@ -88,8 +88,8 @@ public:
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
-        DirectX::XMFLOAT3 normal{0, 1, 0};
-        DirectX::XMFLOAT2 texcoord{0, 0};
+        DirectX::XMFLOAT3 normal;
+        DirectX::XMFLOAT2 texcoord;
         float boneWeights[MAX_BONE_INFLUENCES]{ 1,0,0,0 };
         uint32_t boneIndices[MAX_BONE_INFLUENCES]{};
     };
@@ -121,13 +121,13 @@ public:
         };
         std::vector<Subset> subsets;
 
+        Skeleton bindPose;
     private:
         Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
         Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
         friend class SkinnedMesh;
-
-        Skeleton bindPose;
     };
+    std::vector<Mesh> meshes;
 
     struct Material
     {
@@ -141,6 +141,7 @@ public:
         std::string textureFilenames[4];
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[4];
     };
+    std::unordered_map<uint64_t, Material> materials;
 
     std::vector<Animation> animationClips;
 
@@ -156,13 +157,8 @@ private:
     DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
 
 public:
-    SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate = false);
+    SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate = false,float samplingRate = 0);
     virtual ~SkinnedMesh() = default;
-
-    void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
-    void FetchMaterials(FbxScene* fbxScene,std::unordered_map<uint64_t,Material>& materials);
-    void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
-    void FetchAnimations(FbxScene* fbxScene,std::vector<Animation>& animationClips,float samplingRate);
 
     void CreateComObjects(ID3D11Device* device, const char* fbxFilename);
 
@@ -178,8 +174,9 @@ protected:
     int myNum;
     bool renderActive{true};
 
-    std::vector<Mesh> meshes;
-    std::unordered_map<uint64_t, Material> materials;
-
+    void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
+    void FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t, Material>& materials);
+    void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
+    void FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& animationClips, float samplingRate);
 };
 
