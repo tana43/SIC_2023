@@ -65,7 +65,7 @@ public:
 	Framework(Framework&&) noexcept = delete;
 	Framework& operator=(Framework&&) noexcept = delete;
 
-	int run()
+	int Run()
 	{
 		MSG msg{};
 
@@ -91,7 +91,7 @@ public:
 			else
 			{
 				tictoc.tick();
-				calculateFrameStats();
+				CalculateFrameStats();
 				Update(tictoc.time_interval());
 				Render(tictoc.time_interval());
 			}
@@ -175,7 +175,7 @@ private:
 	high_resolution_timer tictoc;
 	uint32_t frames{ 0 };
 	float elapsed_time{ 0.0f };
-	void calculateFrameStats()
+	void CalculateFrameStats()
 	{
 		if (++frames, (tictoc.time_stamp() - elapsed_time) >= 1.0f)
 		{
@@ -229,5 +229,6 @@ private:
 	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get()};
 
 	float boneTranslationX{ 300.0f };
+	float blendAnimation{ 0.5f };
 };
 

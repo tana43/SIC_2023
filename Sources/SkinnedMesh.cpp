@@ -448,6 +448,52 @@ void SkinnedMesh::FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& an
     }
 }
 
+void SkinnedMesh::BlendAnimations(const Animation::Keyframe* keyframes[2], float factor, Animation::Keyframe& keyframe)
+{
+    size_t nodeCount{ keyframes[0]->nodes.size() };
+    keyframe.nodes.resize(nodeCount);
+    for (size_t nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+    {
+        DirectX::XMVECTOR S[2]{
+            DirectX::XMLoadFloat3(&keyframes[0]->nodes.at(nodeIndex).scaling),
+            DirectX::XMLoadFloat3(&keyframes[1]->nodes.at(nodeIndex).scaling)
+        };
+        DirectX::XMStoreFloat3(&keyframe.nodes.at(nodeIndex).scaling, DirectX::XMVectorLerp(S[0], S[1], factor));
+
+        DirectX::XMVECTOR R[2]{
+            DirectX::XMLoadFloat4(&keyframes[0]->nodes.at(nodeIndex).rotation),
+            DirectX::XMLoadFloat4(&keyframes[1]->nodes.at(nodeIndex).rotation)
+        };
+        DirectX::XMStoreFloat4(&keyframe.nodes.at(nodeIndex).rotation, DirectX::XMQuaternionSlerp(R[0], R[1], factor));
+
+        DirectX::XMVECTOR T[2]{
+            DirectX::XMLoadFloat3(&keyframes[0]->nodes.at(nodeIndex).translation),
+            DirectX::XMLoadFloat3(&keyframes[1]->nodes.at(nodeIndex).translation)
+        };
+        DirectX::XMStoreFloat3(&keyframe.nodes.at(nodeIndex).translation, DirectX::XMVectorLerp(T[0], T[1], factor));
+    }
+}
+
+bool SkinnedMesh::AppendAnimations(const char* animationFilename, float samplingRate)
+{
+    //別ファイルからアニメーション抽出
+    FbxManager* fbxManager{ FbxManager::Create() };
+    FbxScene* fbxScene{ FbxScene::Create(fbxManager,"") };
+
+    FbxImporter* fbxImporter{ FbxImporter::Create(fbxManager,"") };
+    bool importStatus{ false };
+    importStatus = fbxImporter->Initialize(animationFilename);
+    _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
+    importStatus = fbxImporter->Import(fbxScene);
+    _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
+
+    FetchAnimations(fbxScene, animationClips, samplingRate);
+
+    fbxManager->Destroy();
+
+    return true;
+}
+
 void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename)
 {
     for (Mesh& mesh : meshes)
@@ -531,7 +577,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation:
         { 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 3:LHS Z-UP
     };
 
-    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[0]),
+    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[2]),
         DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
 
     DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
@@ -636,8 +682,8 @@ void SkinnedMesh::DrawDebug()
 
     ImGui::DragFloat3("Position", &position.x, 0.1f);
     ImGui::DragFloat3("Scale", &scale.x, 0.01f);
-    ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);
     ImGui::DragFloat3("Angle", &angle.x, 0.01f);
+    ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);
     ImGui::ColorEdit4("Color", &color.x);
 
     ImGui::End();

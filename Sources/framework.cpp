@@ -189,7 +189,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/plantune.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_Mesh.fbx");
+	skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 
 	//各種ステートオブジェクトセット
 	{
@@ -478,6 +479,10 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		//staticMeshes[0]->Render(immediateContext.Get());
 		//staticMeshes[1]->Render(immediateContext.Get());
 
+
+
+
+#if 0
 		int clipIndex{ 0 };
 		int frameIndex{ 0 };
 		static float animationTick{ 0 };
@@ -495,13 +500,22 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		}
 
 		Animation::Keyframe& keyframe{animation.sequence.at(frameIndex)};
-#if 1
+#if 0
 		DirectX::XMStoreFloat4(&keyframe.nodes.at(30).rotation,
 			DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1, 0, 0, 0), 1.5f));
 		keyframe.nodes.at(30).translation.x = boneTranslationX;
 		skinnedMeshes[0]->UpdateAnimation(keyframe);
 #endif // 1
+#else
+		Animation::Keyframe keyframe;
+		const Animation::Keyframe* keyframes[2]{
+			&skinnedMeshes[0]->animationClips.at(0).sequence.at(40),
+			&skinnedMeshes[0]->animationClips.at(0).sequence.at(80)
+		};
+		skinnedMeshes[0]->BlendAnimations(keyframes, blendAnimation, keyframe);
+		skinnedMeshes[0]->UpdateAnimation(keyframe);
 
+#endif // 0
 		skinnedMeshes[0]->Render(immediateContext.Get(),&keyframe);
 
 
@@ -836,6 +850,8 @@ void Framework::DrawDebug()
 			}
 
 			ImGui::DragFloat("BoneTranslation",&boneTranslationX);
+
+			ImGui::SliderFloat("BlendAnimation",&blendAnimation,0.0f,1.0f);
 
 			ImGui::EndMenu();
 		}

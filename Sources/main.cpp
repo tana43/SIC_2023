@@ -44,5 +44,5 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_  HINSTANCE prev_instance, _
 	bool fullscreen{ FALSE };
 	Framework framework(hwnd,fullscreen);
 	SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&framework));
-	return framework.run();
+	return framework.Run();
 }

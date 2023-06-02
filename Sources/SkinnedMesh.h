@@ -175,6 +175,10 @@ public:
 
     void UpdateAnimation(Animation::Keyframe& keyframe);
 
+    bool AppendAnimations(const char* animationFilename, float samplingRate);
+
+    void BlendAnimations(const Animation::Keyframe* keyframes[2], float factor, Animation::Keyframe& keyframe);
+
 protected:
     Scene sceneView;
     int myNum;
