@@ -531,7 +531,6 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation:
         { 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 3:LHS Z-UP
     };
 
-    const float scaleFactor = 1.0f;
     DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[0]),
         DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
 
@@ -635,10 +634,11 @@ void SkinnedMesh::DrawDebug()
 
     ImGui::Checkbox("RenderActive", &renderActive);
 
-    ImGui::DragFloat3("position", &position.x, 0.1f);
-    ImGui::DragFloat3("scale", &scale.x, 0.01f);
-    ImGui::DragFloat3("angle", &angle.x, 0.01f);
-    ImGui::ColorEdit4("color", &color.x);
+    ImGui::DragFloat3("Position", &position.x, 0.1f);
+    ImGui::DragFloat3("Scale", &scale.x, 0.01f);
+    ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);
+    ImGui::DragFloat3("Angle", &angle.x, 0.01f);
+    ImGui::ColorEdit4("Color", &color.x);
 
     ImGui::End();
 }

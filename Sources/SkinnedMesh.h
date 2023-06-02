@@ -180,6 +180,8 @@ protected:
     int myNum;
     bool renderActive{true};
 
+    float scaleFactor{1.0f};
+
     void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
     void FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t, Material>& materials);
     void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);

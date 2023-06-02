@@ -200,7 +200,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	}
 }
 
-bool Framework::initialize()
+bool Framework::Initialize()
 {
 
 	return true;
@@ -340,7 +340,7 @@ void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
 
 }
 
-void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 {
 #ifdef USE_IMGUI
 	//static変数は一度しか初期化されないので、ラムダの中身を一度だけ呼ぶようにしている
@@ -360,7 +360,7 @@ void Framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 	//ImGui::ShowDemoWindow();
 	
 }
-void Framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
+void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	HRESULT hr{ S_OK };
 
@@ -498,7 +498,7 @@ void Framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
 #if 1
 		DirectX::XMStoreFloat4(&keyframe.nodes.at(30).rotation,
 			DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1, 0, 0, 0), 1.5f));
-		keyframe.nodes.at(30).translation.x = 300.0f;
+		keyframe.nodes.at(30).translation.x = boneTranslationX;
 		skinnedMeshes[0]->UpdateAnimation(keyframe);
 #endif // 1
 
@@ -524,7 +524,7 @@ void Framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
-bool Framework::uninitialize()
+bool Framework::Uninitialize()
 {
 	return true;
 }
@@ -834,6 +834,9 @@ void Framework::DrawDebug()
 
 				ImGui::EndMenu();
 			}
+
+			ImGui::DragFloat("BoneTranslation",&boneTranslationX);
+
 			ImGui::EndMenu();
 		}
 
