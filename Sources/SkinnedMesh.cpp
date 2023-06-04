@@ -4,6 +4,7 @@
 #include "Texture.h"
 
 #include <sstream>
+#include <fstream>
 #include <functional>
 #include <filesystem>
 
@@ -53,67 +54,85 @@ void FetchBoneInfluences(const FbxMesh* fbxMesh, std::vector<BoneInfluencePerCon
 
 SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate,float samplingRate) : myNum(num++)
 {
-    FbxManager* fbxManager{ FbxManager::Create() };
-    FbxScene* fbxScene{ FbxScene::Create(fbxManager,"") };
-
-    FbxImporter* fbxImporter{ FbxImporter::Create(fbxManager,"") };
-    bool importStatus{ false };
-    importStatus = fbxImporter->Initialize(fbxFilename);
-    _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());  
-
-    importStatus = fbxImporter->Import(fbxScene);
-    _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
-
-    FbxGeometryConverter fbxConverter(fbxManager);
-    if (triangulate)
-    {
-        fbxConverter.Triangulate(fbxScene, true/*replace*/, false/*legacy*/);
-        fbxConverter.RemoveBadPolygonsFromMeshes(fbxScene);
+    //シリアライズされたデータがある場合そちらからロード、ねければ従来通りFBXからロード
+    std::filesystem::path cerealFilename(fbxFilename);
+    cerealFilename.replace_extension("cereal");
+    if (std::filesystem::exists(cerealFilename.c_str()))
+    {  
+        std::ifstream ifs(cerealFilename.c_str(), std::ios::binary);
+        cereal::BinaryInputArchive deserialization(ifs);
+        deserialization(sceneView, meshes, materials, animationClips);
     }
-
-    std::function<void(FbxNode*)> traverse{[&](FbxNode* fbxNode)
+    else
     {
-        Scene::Node& node{sceneView.nodes.emplace_back()};
-        node.attribute = fbxNode->GetNodeAttribute() ?
-            fbxNode->GetNodeAttribute()->GetAttributeType() : FbxNodeAttribute::EType::eUnknown;
-        node.name = fbxNode->GetName();
-        node.uniqueId = fbxNode->GetUniqueID();
-        node.parentIndex = sceneView.indexOf(fbxNode->GetParent() ?
-            fbxNode->GetParent()->GetUniqueID() : 0);
-        for (int childIndex = 0; childIndex < fbxNode->GetChildCount(); ++childIndex)
+        FbxManager* fbxManager{ FbxManager::Create() };
+        FbxScene* fbxScene{ FbxScene::Create(fbxManager,"") };
+
+        FbxImporter* fbxImporter{ FbxImporter::Create(fbxManager,"") };
+        bool importStatus{ false };
+        importStatus = fbxImporter->Initialize(fbxFilename);
+        _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
+
+        importStatus = fbxImporter->Import(fbxScene);
+        _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
+
+        FbxGeometryConverter fbxConverter(fbxManager);
+        if (triangulate)
         {
-            traverse(fbxNode->GetChild(childIndex));
+            fbxConverter.Triangulate(fbxScene, true/*replace*/, false/*legacy*/);
+            fbxConverter.RemoveBadPolygonsFromMeshes(fbxScene);
         }
-    } };
-    traverse(fbxScene->GetRootNode());
+
+        std::function<void(FbxNode*)> traverse{[&](FbxNode* fbxNode)
+            {
+                Scene::Node& node{sceneView.nodes.emplace_back()};
+                node.attribute = fbxNode->GetNodeAttribute() ?
+                    fbxNode->GetNodeAttribute()->GetAttributeType() : FbxNodeAttribute::EType::eUnknown;
+                node.name = fbxNode->GetName();
+                node.uniqueId = fbxNode->GetUniqueID();
+                node.parentIndex = sceneView.indexOf(fbxNode->GetParent() ?
+                    fbxNode->GetParent()->GetUniqueID() : 0);
+                for (int childIndex = 0; childIndex < fbxNode->GetChildCount(); ++childIndex)
+                {
+                    traverse(fbxNode->GetChild(childIndex));
+                }
+        } };
+        traverse(fbxScene->GetRootNode());
 
 #if 0
-    for (const Scene::Node& node : sceneView.nodes)
-    {
-        FbxNode* fbxNode{ fbxScene->FindNodeByName(node.name.c_str()) };
-        //Display node data in the output window as debug
-        std::string nodeName = fbxNode->GetName();
-        uint64_t uid = fbxNode->GetUniqueID();
-        uint64_t parentUid = fbxNode->GetParent() ? fbxNode->GetParent()->GetUniqueID() : 0;
-        int32_t type = fbxNode->GetNodeAttribute() ? fbxNode->GetNodeAttribute()->GetAttributeType() : 0;
+        for (const Scene::Node& node : sceneView.nodes)
+        {
+            FbxNode* fbxNode{ fbxScene->FindNodeByName(node.name.c_str()) };
+            //Display node data in the output window as debug
+            std::string nodeName = fbxNode->GetName();
+            uint64_t uid = fbxNode->GetUniqueID();
+            uint64_t parentUid = fbxNode->GetParent() ? fbxNode->GetParent()->GetUniqueID() : 0;
+            int32_t type = fbxNode->GetNodeAttribute() ? fbxNode->GetNodeAttribute()->GetAttributeType() : 0;
 
-        std::stringstream debugString;
-        debugString << nodeName << ":" << uid << ":" << parentUid << ":" << type << "\n";
-        OutputDebugStringA(debugString.str().c_str());
-    }
+            std::stringstream debugString;
+            debugString << nodeName << ":" << uid << ":" << parentUid << ":" << type << "\n";
+            OutputDebugStringA(debugString.str().c_str());
+        }
 #endif // 1
 
-    FetchMeshes(fbxScene, meshes);
+        FetchMeshes(fbxScene, meshes);
 
-    FetchMaterials(fbxScene, materials);
+        FetchMaterials(fbxScene, materials);
 
 #if 0
-    float samplingRate = 0;
+        float samplingRate = 0;
 #endif // 0
 
-    FetchAnimations(fbxScene,animationClips,samplingRate);
+        FetchAnimations(fbxScene, animationClips, samplingRate);
 
-    fbxManager->Destroy();
+        fbxManager->Destroy();
+
+        std::ofstream ofs(cerealFilename.c_str(), std::ios::binary);
+        cereal::BinaryOutputArchive serialization(ofs);
+        serialization(sceneView, meshes, materials, animationClips);
+    }
+
+    
 
     CreateComObjects(device, fbxFilename);
 }
@@ -193,7 +212,7 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
 
         std::vector<Mesh::Subset>& subsets{mesh.subsets};
         const int materialCount{ fbxMesh->GetNode()->GetMaterialCount() };
-        subsets.resize(materialCount > 0 ? materialCount : 1);
+        subsets.resize(materialCount > 0 ? materialCount : 1);  
         for (int materialIndex = 0; materialIndex < materialCount; ++materialIndex)
         {
             const FbxSurfaceMaterial* fbxMaterial{ fbxMesh->GetNode()->GetMaterial(materialIndex) };
@@ -227,6 +246,11 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         const FbxVector4* controlPoints{ fbxMesh->GetControlPoints() };
         for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
         {
+            if (polygonIndex % 1000 == 0)
+            {
+                int i = 1;
+            }
+
             const int materialIndex{ materialCount > 0 ?
             fbxMesh->GetElementMaterial()->GetIndexArray().GetAt(polygonIndex) : 0 };
             Mesh::Subset& subset{subsets.at(materialIndex)};
@@ -275,10 +299,35 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                     vertex.texcoord.y = 1.0f - static_cast<float>(uv[1]);
                 }
 
+                //法線ベクトルの値を取得
+                if (fbxMesh->GenerateTangentsData(0,false))
+                {
+                    const FbxGeometryElementTangent* tangent = fbxMesh->GetElementTangent(0);
+                    _ASSERT_EXPR(tangent->GetMappingMode() == FbxGeometryElement::EMappingMode::eByPolygonVertex &&
+                        tangent->GetReferenceMode() == FbxGeometryElement::EReferenceMode::eDirect,
+                        L"Only supports a combination of these modes.");
+
+                    vertex.tangent.x = static_cast<float>(tangent->GetDirectArray().GetAt(vertexIndex)[0]);
+                    vertex.tangent.y = static_cast<float>(tangent->GetDirectArray().GetAt(vertexIndex)[1]);
+                    vertex.tangent.z = static_cast<float>(tangent->GetDirectArray().GetAt(vertexIndex)[2]);
+                    vertex.tangent.w = static_cast<float>(tangent->GetDirectArray().GetAt(vertexIndex)[3]);
+                }
+
                 mesh.vertices.at(vertexIndex) = std::move(vertex);
                 mesh.indices.at(static_cast<size_t>(offset) + positionInPolygon) = vertexIndex;
                 subset.indexCount++;
             }
+        }
+
+        //バウンディングボックス作成
+        for (const Vertex& v : mesh.vertices)
+        {
+            mesh.boundingBox[0].x = std::min<float>(mesh.boundingBox[0].x, v.position.x);
+            mesh.boundingBox[0].y = std::min<float>(mesh.boundingBox[0].y, v.position.y);
+            mesh.boundingBox[0].z = std::min<float>(mesh.boundingBox[0].z, v.position.z);
+            mesh.boundingBox[1].x = std::max<float>(mesh.boundingBox[1].x, v.position.x);
+            mesh.boundingBox[1].y = std::max<float>(mesh.boundingBox[1].y, v.position.y);
+            mesh.boundingBox[1].z = std::max<float>(mesh.boundingBox[1].z, v.position.z);
         }
     }
 }
@@ -339,6 +388,15 @@ void SkinnedMesh::FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t
                 //const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
                 //material.textureFilenames[0] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
             }
+
+            //法線マップのファイル名を取得
+            fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sNormalMap);
+            if (fbxProperty.IsValid())
+            {
+                const FbxFileTexture* fileTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
+                material.textureFilenames[1] = fileTexture ? fileTexture->GetRelativeFileName() : "";
+            }
+
             materials.emplace(material.uniqueId, std::move(material));
         }
         if (materialCount == 0)
@@ -476,21 +534,36 @@ void SkinnedMesh::BlendAnimations(const Animation::Keyframe* keyframes[2], float
 
 bool SkinnedMesh::AppendAnimations(const char* animationFilename, float samplingRate)
 {
-    //別ファイルからアニメーション抽出
-    FbxManager* fbxManager{ FbxManager::Create() };
-    FbxScene* fbxScene{ FbxScene::Create(fbxManager,"") };
+    //シリアライズされたデータがある場合そちらからロード、ねければ従来通りFBXからロード
+    std::filesystem::path cerealFilename(animationFilename);
+    cerealFilename.replace_extension("cereal");
+    if (std::filesystem::exists(cerealFilename.c_str()))
+    {
+        std::ifstream ifs(cerealFilename.c_str(), std::ios::binary);
+        cereal::BinaryInputArchive deserialization(ifs);
+        deserialization(animationClips);
+    }
+    else
+    {
+        //別ファイルからアニメーション抽出
+        FbxManager* fbxManager{ FbxManager::Create() };
+        FbxScene* fbxScene{ FbxScene::Create(fbxManager,"") };
 
-    FbxImporter* fbxImporter{ FbxImporter::Create(fbxManager,"") };
-    bool importStatus{ false };
-    importStatus = fbxImporter->Initialize(animationFilename);
-    _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
-    importStatus = fbxImporter->Import(fbxScene);
-    _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
+        FbxImporter* fbxImporter{ FbxImporter::Create(fbxManager,"") };
+        bool importStatus{ false };
+        importStatus = fbxImporter->Initialize(animationFilename);
+        _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
+        importStatus = fbxImporter->Import(fbxScene);
+        _ASSERT_EXPR_A(importStatus, fbxImporter->GetStatus().GetErrorString());
 
-    FetchAnimations(fbxScene, animationClips, samplingRate);
+        FetchAnimations(fbxScene, animationClips, samplingRate);
 
-    fbxManager->Destroy();
+        fbxManager->Destroy();
 
+        std::ofstream ofs(cerealFilename.c_str(), std::ios::binary);
+        cereal::BinaryOutputArchive serialization(ofs);
+        serialization(animationClips);
+    }
     return true;
 }
 
@@ -531,18 +604,21 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
     for (std::unordered_map<uint64_t, Material>::iterator itr = materials.begin();
         itr != materials.end(); ++itr)
     {
-        if (itr->second.textureFilenames[0].size() > 0)
+        for (size_t textureIndex = 0; textureIndex < 2; ++textureIndex)
         {
-            std::filesystem::path path(fbxFilename);
-            path.replace_filename(itr->second.textureFilenames[0]);
-            D3D11_TEXTURE2D_DESC texture2dDesc;
-            LoadTextureFromFile(device, path.c_str(),
-                itr->second.shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
-        }
-        else
-        {
-            MakeDummyTexture(device, itr->second.shaderResourceViews->GetAddressOf(),
-                0xFFFFFFFF, 16);
+            if (itr->second.textureFilenames[textureIndex].size() > 0)
+            {
+                std::filesystem::path path(fbxFilename);
+                path.replace_filename(itr->second.textureFilenames[textureIndex]);
+                D3D11_TEXTURE2D_DESC texture2dDesc;
+                LoadTextureFromFile(device, path.c_str(),
+                    itr->second.shaderResourceViews[textureIndex].GetAddressOf(), &texture2dDesc);
+            }
+            else
+            {
+                MakeDummyTexture(device, itr->second.shaderResourceViews[textureIndex].GetAddressOf(),
+                    textureIndex == 1 ? 0xFFFF7F7F : 0xFFFFFFFF, 16);
+            }
         }
     }
 
@@ -551,6 +627,7 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
     {
         {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
+        {"TANGENT",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"WEIGHTS",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT},
         {"BONES",0,DXGI_FORMAT_R32G32B32A32_UINT,0,D3D11_APPEND_ALIGNED_ELEMENT},
@@ -577,7 +654,7 @@ void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation:
         { 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 3:LHS Z-UP
     };
 
-    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[2]),
+    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[0]),
         DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
 
     DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
@@ -611,65 +688,55 @@ void SkinnedMesh::Render(
         //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
         Constants data;
-        //DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
-        //メッシュのglobalTransformが時間軸で変化しているので、その行列をキーフレームから取得する
-        //取得したglobalTransform行列を定数バッファのワールド交換行列に合成する
-        const Animation::Keyframe::Node& meshNode{keyframe->nodes.at(mesh.nodeIndex)};
-        DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&meshNode.globalTransform) * DirectX::XMLoadFloat4x4(&world));
-#if 0
-        //ダミー行列
-        DirectX::XMStoreFloat4x4(&data.boneTransforms[0], DirectX::XMMatrixIdentity());
-        DirectX::XMStoreFloat4x4(&data.boneTransforms[1], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(+45)));
-        DirectX::XMStoreFloat4x4(&data.boneTransforms[2], DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)));
-#endif
-
-#if 0
-        //ダミー行列
-        DirectX::XMMATRIX B[3];
-        B[0] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(0).offsetTransform);
-        B[1] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(1).offsetTransform);
-        B[2] = DirectX::XMLoadFloat4x4(&mesh.bindPose.bones.at(2).offsetTransform);
-
-        DirectX::XMMATRIX A[3];
-
-        A[0] = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(90), 0, 0);
-        A[1] = DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(45)) * DirectX::XMMatrixTranslation(0, 2, 0);
-        A[2] = DirectX::XMMatrixRotationRollPitchYaw(0, 0, DirectX::XMConvertToRadians(-45)) * DirectX::XMMatrixTranslation(0, 2, 0);
-
-        DirectX::XMStoreFloat4x4(&data.boneTransforms[0], B[0] * A[0]);
-        DirectX::XMStoreFloat4x4(&data.boneTransforms[1], B[1] * A[1] * A[0]);
-        DirectX::XMStoreFloat4x4(&data.boneTransforms[2], B[2] * A[2] * A[1] * A[0]);
-#endif // 1
-
-
-        //unit25
-        //多分ボーンの情報をローカルからグローバルに変えてる多分多分
-        const size_t boneCount{ mesh.bindPose.bones.size() };
-        _ASSERT_EXPR(boneCount < MAX_BONES, L"The value of the 'bone_count' has exceeded MAX_BONES.");
-
-        for (int boneIndex = 0; boneIndex < boneCount; ++boneIndex)
+        if (keyframe && keyframe->nodes.size() > 0)
         {
-            const Skeleton::Bone& bone{mesh.bindPose.bones.at(boneIndex)};
-            const Animation::Keyframe::Node& boneNode{ keyframe->nodes.at(bone.nodeIndex)};
-            DirectX::XMStoreFloat4x4(&data.boneTransforms[boneIndex],
-                DirectX::XMLoadFloat4x4(&bone.offsetTransform) *
-                DirectX::XMLoadFloat4x4(&boneNode.globalTransform) *
-                DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform)));
-        }
+            //メッシュのglobalTransformが時間軸で変化しているので、その行列をキーフレームから取得する
+            //取得したglobalTransform行列を定数バッファのワールド交換行列に合成する
+            const Animation::Keyframe::Node& meshNode{keyframe->nodes.at(mesh.nodeIndex)};
+            DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&meshNode.globalTransform) * DirectX::XMLoadFloat4x4(&world));
 
+            const size_t boneCount{ mesh.bindPose.bones.size() };
+            _ASSERT_EXPR(boneCount < MAX_BONES, L"The value of the 'boneCount' has exceeded MAX_BONES.");
+
+            //多分ボーンの情報をローカルからグローバルに変えてる多分多分
+            for (size_t boneIndex = 0; boneIndex < boneCount; ++boneIndex)
+            {
+                const Skeleton::Bone& bone{mesh.bindPose.bones.at(boneIndex)};
+                const Animation::Keyframe::Node& boneNode{keyframe->nodes.at(bone.nodeIndex)};
+                DirectX::XMStoreFloat4x4(&data.boneTransforms[boneIndex],
+                    DirectX::XMLoadFloat4x4(&bone.offsetTransform) *
+                    DirectX::XMLoadFloat4x4(&boneNode.globalTransform) *
+                    DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform))
+                );
+            }
+        }
+        else//アニメーションを持っていない
+        {
+            DirectX::XMStoreFloat4x4(&data.world,
+                DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
+            for (size_t boneIndex = 0; boneIndex < MAX_BONES; ++boneIndex)
+            {
+                data.boneTransforms[boneIndex] = { 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+            }
+        }
         for (const Mesh::Subset& subset : mesh.subsets)
         {
             const Material& material{ materials.at(subset.materialUniqueId) };
-
             DirectX::XMStoreFloat4(&data.materialColor,
-                DirectX::XMVectorMultiply(DirectX::XMLoadFloat4(&materialColor), DirectX::XMLoadFloat4(&material.Kd)));
+                DirectX::XMVectorMultiply(
+                    DirectX::XMLoadFloat4(&materialColor),
+                    DirectX::XMLoadFloat4(&material.Kd))
+                );
             immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
             immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
             immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
+            immediateContext->PSSetShaderResources(1, 1, material.shaderResourceViews[1].GetAddressOf());
 
             immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);
         }
+
+        //DirectX::XMStoreFloat4x4(&data.world, DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
     }
 }
 
@@ -685,6 +752,15 @@ void SkinnedMesh::DrawDebug()
     ImGui::DragFloat3("Angle", &angle.x, 0.01f);
     ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);
     ImGui::ColorEdit4("Color", &color.x);
+
+    /*if (ImGui::TreeNode("Material"))
+    {
+        ImGui::DragFloat3("Ka", &materials[0].Ka.x,0.01f);
+        ImGui::DragFloat3("Kd", &materials[0].Kd.x,0.01f);
+        ImGui::DragFloat3("Ks", &materials[0].Ks.x,0.01f);
+
+        ImGui::TreePop();
+    }*/
 
     ImGui::End();
 }

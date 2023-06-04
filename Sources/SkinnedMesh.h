@@ -7,6 +7,12 @@
 #include <fbxsdk.h>
 #include <unordered_map>
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/set.hpp>
+#include <cereal/types/unordered_map.hpp>
+
 struct Scene
 {
     struct Node
@@ -15,6 +21,12 @@ struct Scene
         std::string name;
         FbxNodeAttribute::EType attribute{FbxNodeAttribute::EType::eUnknown};
         int64_t parentIndex{ -1 };
+
+        template<class T>
+        void serialize(T& archive)
+        {
+            archive(uniqueId, name, attribute, parentIndex);
+        }
     };
     std::vector<Node> nodes;
     int64_t indexOf(uint64_t uniqueId)const
@@ -30,6 +42,12 @@ struct Scene
         }
         return -1;
     }
+
+    template<class T>
+    void serialize(T& archive)
+    {
+        archive(nodes);
+    }
 };
 
 struct Skeleton
@@ -44,6 +62,12 @@ struct Skeleton
         DirectX::XMFLOAT4X4 offsetTransform{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
         bool isOrphan() const { return parentIndex < 0; }
+
+        template<class T>
+        void serialize(T& archive)
+        {
+            archive(uniqueId, name, parentIndex, nodeIndex, offsetTransform);;
+        }
     };
 
     std::vector<Bone> bones;
@@ -59,6 +83,12 @@ struct Skeleton
             ++index;
         }
         return -1;
+    }
+
+    template<class T>
+    void serialize(T& archive)
+    {
+        archive(bones);
     }
 };
 
@@ -77,10 +107,28 @@ struct Animation
             DirectX::XMFLOAT3 scaling{1, 1, 1};
             DirectX::XMFLOAT4 rotation{0, 0, 0, 1};//Rotation Quaternion
             DirectX::XMFLOAT3 translation{0, 0, 0};
+
+            template<class T>
+            void serialize(T& archive)
+            {
+                archive(globalTransform, scaling, rotation, translation);
+            }
         };
         std::vector<Node> nodes;
+
+        template<class T>
+        void serialize(T& archive)
+        {
+            archive(nodes);
+        }
     };
     std::vector<Keyframe> sequence;
+
+    template<class T>
+    void serialize(T& archive)
+    {
+        archive(name, samplingRate, sequence);
+    }
 };
 
 class SkinnedMesh
@@ -93,9 +141,16 @@ public:
     {
         DirectX::XMFLOAT3 position;
         DirectX::XMFLOAT3 normal;
+        DirectX::XMFLOAT4 tangent{1, 0, 0, 1};
         DirectX::XMFLOAT2 texcoord;
-        float boneWeights[MAX_BONE_INFLUENCES]{ 1,0,0,0 };
-        uint32_t boneIndices[MAX_BONE_INFLUENCES]{};
+        FLOAT boneWeights[MAX_BONE_INFLUENCES]{ 1,0,0,0 };
+        INT boneIndices[MAX_BONE_INFLUENCES]{};
+
+        template<class T>
+        void serialize(T& archive)
+        {
+            archive(position, normal, tangent, texcoord, boneWeights, boneIndices);
+        }
     };
     static const int MAX_BONES{ 256 };
     struct Constants
@@ -122,10 +177,30 @@ public:
 
             uint32_t startIndexLocation{ 0 };
             uint32_t indexCount{ 0 };
+
+            template<class T>
+            void serialize(T& archive)
+            {
+                archive(materialUniqueId,materialName,startIndexLocation,indexCount);
+            }
         };
         std::vector<Subset> subsets;
 
         Skeleton bindPose;
+
+        DirectX::XMFLOAT3 boundingBox[2]
+        {
+            {+D3D11_FLOAT32_MAX,+D3D11_FLOAT32_MAX,+D3D11_FLOAT32_MAX},
+            {-D3D11_FLOAT32_MAX,-D3D11_FLOAT32_MAX,-D3D11_FLOAT32_MAX}
+        };
+
+        template<class T>
+        void serialize(T& archive)
+        {
+            archive(uniqueId, name, nodeIndex, subsets, defaultGlobalTransform,
+                bindPose, boundingBox, vertices, indices);
+        }
+
     private:
         Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
         Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
@@ -144,6 +219,12 @@ public:
 
         std::string textureFilenames[4];
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[4];
+
+        template<class T>
+        void serialize(T& archive)
+        {
+            archive(uniqueId, name, Ka, Kd, Ks, textureFilenames);
+        }
     };
     std::unordered_map<uint64_t, Material> materials;
 
@@ -191,4 +272,53 @@ protected:
     void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
     void FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& animationClips, float samplingRate);
 };
+
+//serializeテンプレート関数
+namespace DirectX
+{
+    template<class T>
+    void serialize(T& archive, DirectX::XMFLOAT2& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y)
+        );
+    }
+
+    template<class T>
+    void serialize(T& archive, DirectX::XMFLOAT3& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y),
+            cereal::make_nvp("z", v.z)
+        );
+    }
+
+    template<class T>
+    void serialize(T& archive, DirectX::XMFLOAT4& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y),
+            cereal::make_nvp("z", v.z),
+            cereal::make_nvp("w", v.w)
+        );
+    }
+
+    template<class T>
+    void serialize(T& archive, DirectX::XMFLOAT4X4& m)
+    {
+        archive(
+            cereal::make_nvp("_11", m._11),cereal::make_nvp("_12", m._12),
+            cereal::make_nvp("_13", m._13),cereal::make_nvp("_14", m._14),
+            cereal::make_nvp("_21", m._21),cereal::make_nvp("_22", m._22),
+            cereal::make_nvp("_23", m._23),cereal::make_nvp("_24", m._24),
+            cereal::make_nvp("_31", m._31),cereal::make_nvp("_32", m._32),
+            cereal::make_nvp("_33", m._33),cereal::make_nvp("_34", m._34),
+            cereal::make_nvp("_41", m._41),cereal::make_nvp("_42", m._42),
+            cereal::make_nvp("_43", m._43),cereal::make_nvp("_44", m._44)
+        );
+    }
+}
 
