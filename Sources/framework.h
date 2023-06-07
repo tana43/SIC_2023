@@ -18,6 +18,9 @@
 #include "StaticMesh.h"
 #include "SkinnedMesh.h"
 
+#include "FrameBuffer.h"
+#include "FullscreenQuad.h"
+
 #ifdef USE_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_internal.h"
@@ -205,6 +208,7 @@ private:
 	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 	std::unique_ptr<StaticMesh> staticMeshes[8];
 	std::unique_ptr<SkinnedMesh> skinnedMeshes[8];
+	std::unique_ptr<FrameBuffer> frameBuffers[8];
 
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
@@ -224,11 +228,13 @@ private:
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[4];
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[5];
 	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get()};
 	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get()};
 
 	float boneTranslationX{ 300.0f };
 	float blendAnimation{ 0.5f };
+
+	std::unique_ptr<FullscreenQuad> bitBlockTransfer;
 };
 

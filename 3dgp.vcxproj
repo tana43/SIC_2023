@@ -208,7 +208,9 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Sources\FrameBuffer.cpp" />
     <ClCompile Include="Sources\Framework.cpp" />
+    <ClCompile Include="Sources\FullscreenQuad.cpp" />
     <ClCompile Include="Sources\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
     <ClCompile Include="Sources\Shader.cpp" />
@@ -227,7 +229,9 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="Sources\FrameBuffer.h" />
     <ClInclude Include="Sources\Framework.h" />
+    <ClInclude Include="Sources\FullscreenQuad.h" />
     <ClInclude Include="Sources\GeometricPrimitive.h" />
     <ClInclude Include="Sources\high_resolution_timer.h" />
     <ClInclude Include="Sources\misc.h" />
@@ -239,12 +243,25 @@
     <ClInclude Include="Sources\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Sources\Shaders\FullscreenQuad.hlsli" />
     <None Include="Sources\Shaders\GeometricPrimitive.hlsli" />
     <None Include="Sources\Shaders\SkinnedMesh.hlsli" />
     <None Include="Sources\Shaders\Sprite.hlsli" />
     <None Include="Sources\Shaders\StaticMesh.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Sources\Shaders\FullscreenQuadPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\FullscreenQuadVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="Sources\Shaders\GeometricPrimitivePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

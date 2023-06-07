@@ -1,12 +1,14 @@
 #include "Texture.h"
 #include "misc.h"
 #include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 
 #include <wrl.h>
 
 #include <string>
 #include <map>
 #include <memory>
+#include <filesystem>
 
 static std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
 HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename,
@@ -24,8 +26,19 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename,
     }
     else
     {
-        hr = DirectX::CreateWICTextureFromFile(device, filename, resource.GetAddressOf(), shaderResourceView);
-        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+        std::filesystem::path ddsFilename(filename);
+        ddsFilename.replace_extension("dds");
+        if (std::filesystem::exists(ddsFilename.c_str()))
+        {
+            hr = DirectX::CreateDDSTextureFromFile(device, ddsFilename.c_str(), resource.GetAddressOf(),shaderResourceView);
+            _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+        }
+        else
+        {
+            hr = DirectX::CreateWICTextureFromFile(device, filename, resource.GetAddressOf(), shaderResourceView);
+            _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+        }
+
         resources.insert(std::make_pair(filename, *shaderResourceView));
     }
 

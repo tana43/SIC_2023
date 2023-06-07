@@ -21,9 +21,12 @@ void Shader::CreateVSFromCso(ID3D11Device* device, const char* csoName, ID3D11Ve
     hr = device->CreateVertexShader(csoData.get(), csoSize, nullptr, vertexShader);
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-    hr = device->CreateInputLayout(inputElementDesc, BytecodeLength,
-        csoData.get(), csoSize, inputLayout);
-    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    if (inputLayout)
+    {
+        hr = device->CreateInputLayout(inputElementDesc, BytecodeLength,
+            csoData.get(), csoSize, inputLayout);
+        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    }
 }
 
 void Shader::CreatePSFromCso(ID3D11Device* device, const char* csoName, ID3D11PixelShader** pixelShader)

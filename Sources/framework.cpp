@@ -178,7 +178,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
 	//sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
 
-	spritesBatches[0] = std::make_unique<SpriteBatch>(device.Get(), L"./Resources/player-sprites.png", 2048);
+	spritesBatches[0] = std::make_unique<SpriteBatch>(device.Get(), L"./Resources/screenshot.jpg", 1);
 
 	geometricPrimitive[0] = std::make_unique<GeometricPrimitive>(device.Get());
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
@@ -189,10 +189,15 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
+	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
 
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
-	skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
+	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
+	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
+
+	frameBuffers[0] = std::make_unique<FrameBuffer>(device.Get(), 1280, 720);
+
+	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
 	//各種ステートオブジェクトセット
 	{
@@ -335,10 +340,17 @@ void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
 	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[1].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	
-	 rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	rasterizerDesc.AntialiasedLineEnable = TRUE;
 	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[2].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+	//面カリング無し
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.AntialiasedLineEnable = TRUE;
+	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[4].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 }
@@ -414,6 +426,23 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
+	frameBuffers[0]->Clear(immediateContext.Get(), color[0], color[1], color[2], color[3]);
+	frameBuffers[0]->Activate(immediateContext.Get());
+	
+	immediateContext->RSSetState(rasterizerStates[4].Get());
+	spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
+	spritesBatches[0]->Render(immediateContext.Get(), 0, 0, 1280, 720, 1, 1, 1, 1, 0);
+	spritesBatches[0]->End(immediateContext.Get());
+
+	
+#if 1
+	bitBlockTransfer->Bilt(immediateContext.Get(),
+		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1);
+#endif // 1
+
+	frameBuffers[0]->Deactivate(immediateContext.Get());
+	
+
 	//2D
 	{
 		//深度ステートオブジェクトセット
@@ -465,6 +494,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		//#endif
 
 		//prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
+
+		
+
 	}
 
 
@@ -484,7 +516,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 
 
-#if 0
+#if 1
 		int clipIndex{ 0 };
 		int frameIndex{ 0 };
 		static float animationTick{ 0 };
@@ -518,7 +550,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		skinnedMeshes[0]->UpdateAnimation(keyframe);
 
 #endif // 0
-		skinnedMeshes[0]->Render(immediateContext.Get(),&keyframe);
+		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
 
 #ifdef _DEBUG
@@ -528,6 +560,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // _DEBUG
 
 	}
+
+	
 
 #ifdef USE_IMGUI
 	ImGui::Render();
@@ -646,10 +680,10 @@ void Framework::SetImguiStyle()
 	style->GrabMinSize = 5.0f;
 	style->GrabRounding = 3.0f;
 
-	ImGui::StyleColorsLight(style);
-	style->Alpha = 0.7f;
+	//ImGui::StyleColorsLight(style);
+	//style->Alpha = 0.7f;
 
-	/*ImVec4* colors = ImGui::GetStyle().Colors;
+	ImVec4* colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_Text] = ImVec4(0.75f, 0.75f, 0.75f, 1.00f);
 	colors[ImGuiCol_TextDisabled] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
 	colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.94f);
@@ -698,7 +732,7 @@ void Framework::SetImguiStyle()
 	colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
 	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);*/
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
 	//フォント設定
 	ImGuiIO& io = ImGui::GetIO();
