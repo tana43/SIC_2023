@@ -198,10 +198,20 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
         FbxMesh* fbxMesh{ fbxNode->GetMesh() };
 
         Mesh& mesh{ meshes.emplace_back() };
+
+#if 0
         mesh.uniqueId = fbxMesh->GetNode()->GetUniqueID();
         mesh.name = fbxMesh->GetNode()->GetName();
         mesh.nodeIndex = sceneView.indexOf(mesh.uniqueId);
         mesh.defaultGlobalTransform = ToXMFloat4x4(fbxMesh->GetNode()->EvaluateGlobalTransform());
+#else
+        mesh.uniqueId = node.uniqueId;
+        mesh.name = node.name;
+        mesh.nodeIndex = sceneView.indexOf(node.uniqueId);
+        mesh.defaultGlobalTransform = ToXMFloat4x4(fbxNode->EvaluateGlobalTransform());
+#endif // 0
+
+        
 
         //É{Å[ÉìâeãøìxéÊìæ
         std::vector<BoneInfluencePerControlPoint> boneInfluences;
@@ -271,8 +281,9 @@ void SkinnedMesh::FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes)
                 const BoneInfluencePerControlPoint& influencePerControlPoint{ boneInfluences.at(polygonVertex) };
                 for (size_t influenceIndex = 0; influenceIndex < influencePerControlPoint.size();++influenceIndex)
                 {
-                    const size_t maxBoneInfluence{ influencePerControlPoint.max_size() };
-                    if (influenceIndex < maxBoneInfluence)
+                    
+                    //const size_t maxBoneInfluence{ influencePerControlPoint.max_size() };
+                    if (influenceIndex < MAX_BONE_INFLUENCES)
                     {
                         vertex.boneWeights[influenceIndex] =
                             influencePerControlPoint.at(influenceIndex).boneWeight;

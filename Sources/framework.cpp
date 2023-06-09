@@ -189,8 +189,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
+	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
@@ -429,18 +429,15 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	frameBuffers[0]->Clear(immediateContext.Get(), color[0], color[1], color[2], color[3]);
 	frameBuffers[0]->Activate(immediateContext.Get());
 	
-	immediateContext->RSSetState(rasterizerStates[4].Get());
+	immediateContext->RSSetState(setting3DRasterizerState);
+	//immediateContext->RSSetState(rasterizerStates[4].Get());
 	spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
 	spritesBatches[0]->Render(immediateContext.Get(), 0, 0, 1280, 720, 1, 1, 1, 1, 0);
 	spritesBatches[0]->End(immediateContext.Get());
 
 	
-#if 1
-	bitBlockTransfer->Bilt(immediateContext.Get(),
-		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1);
-#endif // 1
 
-	frameBuffers[0]->Deactivate(immediateContext.Get());
+
 	
 
 	//2D
@@ -551,6 +548,14 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 #endif // 0
 		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
+
+
+#if 0
+		bitBlockTransfer->Bilt(immediateContext.Get(),
+			frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1);
+#endif // 1
+	frameBuffers[0]->Deactivate(immediateContext.Get());
+
 
 
 #ifdef _DEBUG
@@ -680,10 +685,10 @@ void Framework::SetImguiStyle()
 	style->GrabMinSize = 5.0f;
 	style->GrabRounding = 3.0f;
 
-	//ImGui::StyleColorsLight(style);
-	//style->Alpha = 0.7f;
+	ImGui::StyleColorsLight(style);
+	style->Alpha = 0.7f;
 
-	ImVec4* colors = ImGui::GetStyle().Colors;
+	/*ImVec4* colors = ImGui::GetStyle().Colors;
 	colors[ImGuiCol_Text] = ImVec4(0.75f, 0.75f, 0.75f, 1.00f);
 	colors[ImGuiCol_TextDisabled] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
 	colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.94f);
@@ -732,7 +737,7 @@ void Framework::SetImguiStyle()
 	colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
 	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);*/
 
 	//ÉtÉHÉìÉgê›íË
 	ImGuiIO& io = ImGui::GetIO();
