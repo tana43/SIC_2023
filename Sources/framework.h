@@ -208,7 +208,7 @@ private:
 	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 	std::unique_ptr<StaticMesh> staticMeshes[8];
 	std::unique_ptr<SkinnedMesh> skinnedMeshes[8];
-	std::unique_ptr<FrameBuffer> frameBuffers[8];
+	std::unique_ptr<Framebuffer> frameBuffers[8];
 
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];

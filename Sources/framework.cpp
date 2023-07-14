@@ -195,7 +195,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 
-	frameBuffers[0] = std::make_unique<FrameBuffer>(device.Get(), 1280, 720);
+	frameBuffers[0] = std::make_unique<Framebuffer>(device.Get(), 1280, 720);
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
@@ -426,19 +426,10 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
-	frameBuffers[0]->Clear(immediateContext.Get(), color[0], color[1], color[2], color[3]);
+	frameBuffers[0]->Clear(immediateContext.Get());
 	frameBuffers[0]->Activate(immediateContext.Get());
-	
-	immediateContext->RSSetState(setting3DRasterizerState);
+
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
-	spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
-	spritesBatches[0]->Render(immediateContext.Get(), 0, 0, 1280, 720, 1, 1, 1, 1, 0);
-	spritesBatches[0]->End(immediateContext.Get());
-
-	
-
-
-	
 
 	//2D
 	{
@@ -492,7 +483,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 		//prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
 
-		
+		spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
+		spritesBatches[0]->Render(immediateContext.Get(), 0, 0, 1280, 720, 1, 1, 1, 1, 0);
+		spritesBatches[0]->End(immediateContext.Get());
 
 	}
 
@@ -549,14 +542,17 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // 0
 		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
+		
 
-#if 0
-		bitBlockTransfer->Bilt(immediateContext.Get(),
-			frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1);
-#endif // 1
+
 	frameBuffers[0]->Deactivate(immediateContext.Get());
 
-
+#if 0
+	immediateContext->RSSetState(rasterizerStates[4].Get());
+	immediateContext->OMSetDepthStencilState(depthStencilStates[3].Get(), 1);
+	bitBlockTransfer->Bilt(immediateContext.Get(),
+		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1);
+#endif // 1
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());

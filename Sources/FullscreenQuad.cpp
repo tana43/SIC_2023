@@ -20,7 +20,7 @@ void FullscreenQuad::Bilt(ID3D11DeviceContext* immediateContext, ID3D11ShaderRes
         immediateContext->PSSetShader(embeddedPixelShader.Get(), 0, 0);
 
 
-    immediateContext->CSGetShaderResources(startSlot, numViews, shaderResourceView);
+    immediateContext->PSSetShaderResources(startSlot, numViews, shaderResourceView);
 
     immediateContext->Draw(4, 0);
 }

@@ -1,7 +1,7 @@
 #include "FrameBuffer.h"
 #include "misc.h"
 
-FrameBuffer::FrameBuffer(ID3D11Device* device, uint32_t width, uint32_t height)
+Framebuffer::Framebuffer(ID3D11Device* device, uint32_t width, uint32_t height)
 {
     HRESULT hr{ S_OK };
 
@@ -64,14 +64,14 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, uint32_t width, uint32_t height)
     viewport.TopLeftY = 0.0f;
 }
 
-void FrameBuffer::Clear(ID3D11DeviceContext* immediateContext, float r, float g, float b, float a, float depth)
+void Framebuffer::Clear(ID3D11DeviceContext* immediateContext, float r, float g, float b, float a, float depth)
 {
     float color[4]{ r,g,b,a };
     immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
     immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH, depth, 0);
 }
 
-void FrameBuffer::Activate(ID3D11DeviceContext* immediateContext)
+void Framebuffer::Activate(ID3D11DeviceContext* immediateContext)
 {
     viewportCount = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
     immediateContext->RSGetViewports(&viewportCount, cachedViewports);
@@ -79,11 +79,11 @@ void FrameBuffer::Activate(ID3D11DeviceContext* immediateContext)
         cachedDepthStencilView.ReleaseAndGetAddressOf());
 
     immediateContext->RSSetViewports(1, &viewport);
-    immediateContext->OMSetRenderTargets(1, cachedRenderTargetView.GetAddressOf(),
-        cachedDepthStencilView.Get());
+    immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(),
+        depthStencilView.Get());
 }
 
-void FrameBuffer::Deactivate(ID3D11DeviceContext* immediateContext)
+void Framebuffer::Deactivate(ID3D11DeviceContext* immediateContext)
 {
     immediateContext->RSSetViewports(viewportCount, cachedViewports);
     immediateContext->OMSetRenderTargets(1, cachedRenderTargetView.GetAddressOf(),
