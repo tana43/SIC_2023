@@ -187,5 +187,8 @@
     <FxCompile Include="Sources\Shaders\FullscreenQuadPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="Sources\Shaders\LuminanceExtractionPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

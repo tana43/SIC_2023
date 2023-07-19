@@ -57,6 +57,12 @@ public:
 	};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffers[8];
 
+	struct ParametricConstants
+	{
+		float extractionThreshold{ 0.0f };
+	};
+	ParametricConstants parametricConstants;
+
 	void CreateSwapChain(IDXGIFactory6* dxgiFactory6);
 
 
@@ -236,5 +242,7 @@ private:
 	float blendAnimation{ 0.5f };
 
 	std::unique_ptr<FullscreenQuad> bitBlockTransfer;
+
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShaders[8];
 };
 

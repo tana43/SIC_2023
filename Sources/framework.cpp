@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Shader.h"
 
 void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {
@@ -173,6 +174,17 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	bufferDesc.StructureByteStride = 0;
 	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+	//抽出成分の輝度の閾値を制御するためのバッファ
+	bufferDesc.ByteWidth = sizeof(parametricConstants);
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDesc.CPUAccessFlags = 0;
+	bufferDesc.MiscFlags = 0;
+	bufferDesc.StructureByteStride = 0;
+	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[1].GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
 	
 	//sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	//sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
@@ -196,6 +208,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 
 	frameBuffers[0] = std::make_unique<Framebuffer>(device.Get(), 1280, 720);
+	frameBuffers[1] = std::make_unique<Framebuffer>(device.Get(), 1280/2, 720/2);
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
@@ -206,11 +219,12 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		setting2DRasterizerState = rasterizerStates[0].Get();
 		setting3DRasterizerState = rasterizerStates[0].Get();
 	}
+
+	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/LuminanceExtractionPS.cso", pixelShaders[0].GetAddressOf());
 }
 
 bool Framework::Initialize()
 {
-
 	return true;
 }
 
@@ -426,7 +440,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
-	frameBuffers[0]->Clear(immediateContext.Get());
+	immediateContext->UpdateSubresource(constant)
+
+	frameBuffers[0]->Clear(immediateContext.Get(),1);
 	frameBuffers[0]->Activate(immediateContext.Get());
 
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
@@ -542,17 +558,24 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // 0
 		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
-		
-
-
 	frameBuffers[0]->Deactivate(immediateContext.Get());
 
-#if 0
+#if 1
 	immediateContext->RSSetState(rasterizerStates[4].Get());
 	immediateContext->OMSetDepthStencilState(depthStencilStates[3].Get(), 1);
+
+	frameBuffers[1]->Clear(immediateContext.Get());
+	frameBuffers[1]->Activate(immediateContext.Get());
 	bitBlockTransfer->Bilt(immediateContext.Get(),
-		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1);
+		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1,pixelShaders[0].Get());
+	frameBuffers[1]->Deactivate(immediateContext.Get());
 #endif // 1
+
+#if 1
+	bitBlockTransfer->Bilt(immediateContext.Get(),
+		frameBuffers[1]->shaderResourceViews[0].GetAddressOf(), 0, 1);
+#endif // 1
+
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());
