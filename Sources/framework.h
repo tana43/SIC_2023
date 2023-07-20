@@ -60,6 +60,7 @@ public:
 	struct ParametricConstants
 	{
 		float extractionThreshold{ 0.0f };
+		float dummy[3];
 	};
 	ParametricConstants parametricConstants;
 

@@ -175,7 +175,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	//抽出成分の輝度の閾値を制御するためのバッファ
+	//抽出輝度成分の輝度の閾値を制御するためのバッファ
 	bufferDesc.ByteWidth = sizeof(parametricConstants);
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -440,7 +440,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	
-	immediateContext->UpdateSubresource(constant)
+	immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
+	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());
 
 	frameBuffers[0]->Clear(immediateContext.Get(),1);
 	frameBuffers[0]->Activate(immediateContext.Get());
@@ -912,6 +913,13 @@ void Framework::DrawDebug()
 			ImGui::DragFloat("BoneTranslation",&boneTranslationX);
 
 			ImGui::SliderFloat("BlendAnimation",&blendAnimation,0.0f,1.0f);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("PostEffect"))
+		{
+			ImGui::SliderFloat("ExtractionThreshold", &parametricConstants.extractionThreshold,0,1);
 
 			ImGui::EndMenu();
 		}
