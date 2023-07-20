@@ -3,6 +3,10 @@
 cbuffer PARAMETRIC_CONSTANT_BUFFER : register(b2)
 {
     float extractionThreshold;
+    float gaussianSigma;
+    float bloomIntensity;
+    float exposure;
+
 }
 
 #define POINT 0 

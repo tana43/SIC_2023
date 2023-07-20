@@ -190,5 +190,8 @@
     <FxCompile Include="Sources\Shaders\LuminanceExtractionPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="Sources\Shaders\BlurPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

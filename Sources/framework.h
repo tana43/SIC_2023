@@ -60,7 +60,9 @@ public:
 	struct ParametricConstants
 	{
 		float extractionThreshold{ 0.0f };
-		float dummy[3];
+		float gaussianSigma{1.0f};
+		float bloomIntensity{1.0f};
+		float exposure{1.2f};
 	};
 	ParametricConstants parametricConstants;
 

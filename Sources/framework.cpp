@@ -221,6 +221,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	}
 
 	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/LuminanceExtractionPS.cso", pixelShaders[0].GetAddressOf());
+	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/BlurPS.cso", pixelShaders[1].GetAddressOf());
 }
 
 bool Framework::Initialize()
@@ -572,11 +573,16 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	frameBuffers[1]->Deactivate(immediateContext.Get());
 #endif // 1
 
-#if 1
+#if 0
 	bitBlockTransfer->Bilt(immediateContext.Get(),
 		frameBuffers[1]->shaderResourceViews[0].GetAddressOf(), 0, 1);
 #endif // 1
 
+	//シーン画像とブラーをかけた高輝度成分画像を合成
+	ID3D11ShaderResourceView* shaderResorceViews[2]{
+		frameBuffers[0]->shaderResourceViews[0].Get(),frameBuffers[1]->shaderResourceViews[0].Get() 
+	};
+	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResorceViews, 0, 2, pixelShaders[1].Get());
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());
@@ -920,6 +926,9 @@ void Framework::DrawDebug()
 		if (ImGui::BeginMenu("PostEffect"))
 		{
 			ImGui::SliderFloat("ExtractionThreshold", &parametricConstants.extractionThreshold,0,1);
+			ImGui::SliderFloat("GaussianSigma", &parametricConstants.gaussianSigma,0.001f,10);
+			ImGui::SliderFloat("BloomIntensity", &parametricConstants.bloomIntensity,0,5);
+			ImGui::SliderFloat("Exposure", &parametricConstants.exposure, 0.0f, 2.2f);
 
 			ImGui::EndMenu();
 		}
