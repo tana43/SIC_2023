@@ -3,6 +3,7 @@
 #include "../External/tinygltf-release/tiny_gltf.h"
 #include "misc.h"
 #include <stack>
+#include "Shader.h"
 
 bool NullLoadImageData(tinygltf::Image*, const int, std::string*, std::string*,
     int, int, const unsigned char*, int, void*)
@@ -37,7 +38,33 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
         scene.nodes = gltfModel.scenes.at(0).nodes;
     }
 
-    FetchMeshs(device,gltfModel);
+    FetchMeshs(device, gltfModel);
+
+    //シェーダーオブジェクトの生成
+    const std::map<std::string, BufferView>& vertexBufferViews{
+        meshes.at(0).primitives.at(0).vertexBufferViews
+    };
+    D3D11_INPUT_ELEMENT_DESC inputElementDesc[]
+    {
+        {"POSITION",0,vertexBufferViews.at("POSITION").format,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"NORMAL",0,vertexBufferViews.at("NORMAL").format,1,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"TANGENT",0,vertexBufferViews.at("TANGENT").format,2,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"TEXCOORD",0,vertexBufferViews.at("TEXCOORD").format,3,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"JOINTS",0,vertexBufferViews.at("JOINTS").format,4,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"WEIGHTS",0,vertexBufferViews.at("WEIGHTS").format,5,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+    };
+
+    Shader::CreateVSFromCso(device, "GltfModelVS.cso", vertexShader.ReleaseAndGetAddressOf(),
+        inputLayout.ReleaseAndGetAddressOf(), inputElementDesc, _countof(inputElementDesc));
+    Shader::CreatePSFromCso(device, "GltfModelPS.cso", pixelShader.ReleaseAndGetAddressOf());
+
+    D3D11_BUFFER_DESC bufferDesc{};
+    bufferDesc.ByteWidth = sizeof(PrimitiveConstants);
+    bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    HRESULT hr;
+    hr = device->CreateBuffer(&bufferDesc, nullptr, primitiveCbuffer.ReleaseAndGetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
 void GltfModel::CumulateTransforms(std::vector<Node>& nodes)

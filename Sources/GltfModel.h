@@ -66,5 +66,18 @@ private:
     void CumulateTransforms(std::vector<Node>& nodes);
     BufferView MakeBufferView(const tinygltf::Accessor& accessor);
     void FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfModel);
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+    struct PrimitiveConstants
+    {
+        DirectX::XMFLOAT4X4 world;
+        int material{ -1 };
+        int hasTangent{ 0 };
+        int skin{ -1 };
+        int pad;
+    };
+    Microsoft::WRL::ComPtr<ID3D11Buffer> primitiveCbuffer;
 };
 

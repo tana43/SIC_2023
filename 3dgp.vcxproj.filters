@@ -161,6 +161,9 @@
     <None Include="Sources\Shaders\FullscreenQuad.hlsli">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Sources\Shaders\GltfModel.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Sources\Shaders\SpriteVS.hlsl">
@@ -197,6 +200,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\BlurPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GltfModelVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GltfModelPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
