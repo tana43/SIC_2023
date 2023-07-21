@@ -91,9 +91,9 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 	D3D11_SAMPLER_DESC samplerDesc;
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
 	samplerDesc.MipLODBias = 0;
 	samplerDesc.MaxAnisotropy = 16;
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
@@ -161,8 +161,6 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		hr = device->CreateBlendState(&blendDesc, blendStates[0].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-
 	}
 
 	D3D11_BUFFER_DESC bufferDesc{};
@@ -390,9 +388,16 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	//ImGui::ShowDemoWindow();
 	
 }
+
 void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	HRESULT hr{ S_OK };
+
+	ID3D11RenderTargetView* nullRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+	immediateContext->OMSetRenderTargets(_countof(nullRenderTargetViews), nullRenderTargetViews, 0);
+	ID3D11ShaderResourceView* nullShaderResourcesViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+	immediateContext->VSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
+	immediateContext->PSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
 
 	FLOAT color[]{ 0.2f,0.2f,0.2f,1.0f };
 	immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);

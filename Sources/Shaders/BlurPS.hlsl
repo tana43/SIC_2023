@@ -34,7 +34,7 @@ float4 main(VS_OUT pin) : SV_TARGET
         [unroll]
         for (int y = -gaussianHalfKernakSize; y <= +gaussianHalfKernakSize; y += 1)
         {
-            float gaussianKernal = exp(-(x * x + y * y) / (2.0 * gaussianSigma)) /
+            float gaussianKernal = exp(-(x * x + y * y) / (2.0 * gaussianSigma * gaussianSigma)) /
             (2 * 3.14159265358979 * gaussianSigma * gaussianSigma);
             blurColor += textureMaps[1].Sample(samplerStates[LINEAR], pin.texcoord +
             float2(x * 1.0 / width, y * 1.0 / height)).rgb * gaussianKernal;
