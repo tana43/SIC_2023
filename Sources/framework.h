@@ -17,6 +17,7 @@
 #include "GeometricPrimitive.h"
 #include "StaticMesh.h"
 #include "SkinnedMesh.h"
+#include "GltfModel.h"
 
 #include "FrameBuffer.h"
 #include "FullscreenQuad.h"
@@ -218,6 +219,7 @@ private:
 	std::unique_ptr<StaticMesh> staticMeshes[8];
 	std::unique_ptr<SkinnedMesh> skinnedMeshes[8];
 	std::unique_ptr<Framebuffer> frameBuffers[8];
+	std::unique_ptr<GltfModel> gltfModels[8];
 
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];

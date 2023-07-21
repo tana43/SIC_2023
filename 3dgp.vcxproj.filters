@@ -76,6 +76,9 @@
     <ClCompile Include="Sources\FullscreenQuad.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\GltfModel.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Framework.h">
@@ -136,6 +139,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\FullscreenQuad.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GltfModel.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
