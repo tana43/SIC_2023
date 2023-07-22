@@ -220,6 +220,7 @@
     <ClCompile Include="Sources\SpriteBatch.cpp" />
     <ClCompile Include="Sources\StaticMesh.cpp" />
     <ClCompile Include="Sources\Texture.cpp" />
+    <ClCompile Include="Sources\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h" />
@@ -236,6 +237,7 @@
     <ClInclude Include="Sources\GeometricPrimitive.h" />
     <ClInclude Include="Sources\GltfModel.h" />
     <ClInclude Include="Sources\high_resolution_timer.h" />
+    <ClInclude Include="Sources\MathHelper.h" />
     <ClInclude Include="Sources\misc.h" />
     <ClInclude Include="Sources\Shader.h" />
     <ClInclude Include="Sources\SkinnedMesh.h" />
@@ -243,6 +245,7 @@
     <ClInclude Include="Sources\SpriteBatch.h" />
     <ClInclude Include="Sources\StaticMesh.h" />
     <ClInclude Include="Sources\Texture.h" />
+    <ClInclude Include="Sources\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\FullscreenQuad.hlsli" />

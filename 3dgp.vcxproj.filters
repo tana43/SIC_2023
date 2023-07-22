@@ -79,6 +79,9 @@
     <ClCompile Include="Sources\GltfModel.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Transform.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Framework.h">
@@ -142,6 +145,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\GltfModel.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Transform.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\MathHelper.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

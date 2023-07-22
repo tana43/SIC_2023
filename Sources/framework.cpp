@@ -567,6 +567,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // 0
 		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
+		gltfModels[0]->Render(immediateContext.Get());
+
 	frameBuffers[0]->Deactivate(immediateContext.Get());
 
 #if 1

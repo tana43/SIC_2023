@@ -61,6 +61,8 @@ public:
     };
     std::vector<Mesh> meshes;
 
+    void Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world);
+
 private:
     void FetchNodes(const tinygltf::Model& gltfModel);
     void CumulateTransforms(std::vector<Node>& nodes);

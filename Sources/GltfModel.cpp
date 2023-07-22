@@ -54,9 +54,9 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
         {"WEIGHTS",0,vertexBufferViews.at("WEIGHTS").format,5,0,D3D11_INPUT_PER_VERTEX_DATA,0},
     };
 
-    Shader::CreateVSFromCso(device, "GltfModelVS.cso", vertexShader.ReleaseAndGetAddressOf(),
+    Shader::CreateVSFromCso(device, "./Resources/Shader/GltfModelVS.cso", vertexShader.ReleaseAndGetAddressOf(),
         inputLayout.ReleaseAndGetAddressOf(), inputElementDesc, _countof(inputElementDesc));
-    Shader::CreatePSFromCso(device, "GltfModelPS.cso", pixelShader.ReleaseAndGetAddressOf());
+    Shader::CreatePSFromCso(device, "./Resources/Shader/GltfModelPS.cso", pixelShader.ReleaseAndGetAddressOf());
 
     D3D11_BUFFER_DESC bufferDesc{};
     bufferDesc.ByteWidth = sizeof(PrimitiveConstants);
@@ -249,6 +249,70 @@ void GltfModel::FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfMode
             }
         }
     }
+}
+
+void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world)
+{
+    using namespace DirectX;
+
+    immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
+    immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
+    immediateContext->IASetInputLayout(inputLayout.Get());
+    immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    
+    std::function<void(int)> Traverse{[&](int nodeIndex)->void {
+        const Node& node{ nodes.at(nodeIndex) };
+        if (node.mesh > -1)
+        {
+            const Mesh& mesh{ meshes.at(node.mesh) };
+            for (std::vector<Mesh::Primitive>::const_reference primitive : mesh.primitives)
+            {
+                ID3D11Buffer* vertexBuffers[]{
+                    primitive.vertexBufferViews.at("POSITION").buffer.Get(),
+                    primitive.vertexBufferViews.at(
+                        "NORMAL").buffer.Get(),
+                    primitive.vertexBufferViews.at("TANGENT").buffer.Get(),
+                    primitive.vertexBufferViews.at("TEXCOODE_0").buffer.Get(),
+                    primitive.vertexBufferViews.at("JOINTS_0").buffer.Get(),
+                    primitive.vertexBufferViews.at("WEIGHTS_0").buffer.Get(),
+                };
+
+                UINT strides[]{
+                    static_cast<UINT>(primitive.vertexBufferViews.at("POSITION").strideInBytes),
+                    static_cast<UINT>(primitive.vertexBufferViews.at("NORMAL").strideInBytes),
+                    static_cast<UINT>(primitive.vertexBufferViews.at("TANGENT").strideInBytes),
+                    static_cast<UINT>(primitive.vertexBufferViews.at("TEXCOODE_0").strideInBytes),
+                    static_cast<UINT>(primitive.vertexBufferViews.at("JOINTS_0").strideInBytes),
+                    static_cast<UINT>(primitive.vertexBufferViews.at("WEIGHTS_0").strideInBytes),
+                };
+                UINT offsets[_countof(vertexBuffers)]{ 0 };
+                immediateContext->IASetVertexBuffers(0, _countof(vertexBuffers), vertexBuffers, strides, offsets);
+                immediateContext->IASetIndexBuffer(primitive.indexBufferView.buffer.Get(),
+                    primitive.indexBufferView.format, 0);
+
+                PrimitiveConstants primitiveData{};
+                primitiveData.material = primitive.material;
+                primitiveData.hasTangent = primitive.vertexBufferViews.at("TANGENT").buffer != NULL;
+                primitiveData.skin = node.skin;
+                XMStoreFloat4x4(&primitiveData.world,
+                    XMLoadFloat4x4(&node.globalTransform) * XMLoadFloat4x4(&world));
+                immediateContext->UpdateSubresource(primitiveCbuffer.Get(), 0, 0, &primitiveData, 0, 0);
+                immediateContext->VSSetConstantBuffers(0, 1, primitiveCbuffer.GetAddressOf());
+                immediateContext->PSSetConstantBuffers(0, 1, primitiveCbuffer.GetAddressOf());
+
+                immediateContext->DrawIndexed(static_cast<UINT>(primitive.indexBufferView.Count()), 0, 0);
+            }
+        }
+        for (std::vector<int>::value_type childIndex : node.children)
+        {
+            Traverse(childIndex);
+        }
+    } };
+    for (std::vector<int>::value_type nodeIndex : scenes.at(0).nodes)
+    {
+        Traverse(nodeIndex);
+    }
+
 }
 
 void GltfModel::FetchNodes(const tinygltf::Model& gltfModel)
