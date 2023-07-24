@@ -42,6 +42,8 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
     FetchMeshs(device, gltfModel);
     FetchNodes(gltfModel);
 
+    FetchMaterials(device,gltfModel);
+
     //シェーダーオブジェクトの生成
     const std::map<std::string, BufferView>& vertexBufferViews{
         meshes.at(0).primitives.at(0).vertexBufferViews
@@ -261,13 +263,88 @@ void GltfModel::FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltf
 {
     for (std::vector<tinygltf::Material>::const_reference gltfMaterial : gltfModel.materials)
     {
+        std::vector<Material>::reference material = materials.emplace_back();
 
+        material.name = gltfMaterial.name;
+
+        material.data.emissiveFactor[0] = static_cast<float>(gltfMaterial.emissiveFactor.at(0));
+        material.data.emissiveFactor[1] = static_cast<float>(gltfMaterial.emissiveFactor.at(1));
+        material.data.emissiveFactor[2] = static_cast<float>(gltfMaterial.emissiveFactor.at(2));
+
+        material.data.alphaMode = gltfMaterial.alphaMode == "OPAQUE" ?
+            0 : gltfMaterial.alphaMode == "MASK" ? 1 : gltfMaterial.alphaMode == "BLEND" ? 2 : 0;
+        material.data.alphaCutoff = static_cast<float>(gltfMaterial.alphaCutoff);
+        material.data.doubleSiled = gltfMaterial.doubleSided ? 1 : 0;
+
+        material.data.pbrMetallicRoughness.basecolorFactor[0] =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.baseColorFactor.at(0));
+        material.data.pbrMetallicRoughness.basecolorFactor[1] =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.baseColorFactor.at(1));
+        material.data.pbrMetallicRoughness.basecolorFactor[2] =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.baseColorFactor.at(2));
+        material.data.pbrMetallicRoughness.basecolorFactor[3] =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.baseColorFactor.at(3));
+
+        material.data.pbrMetallicRoughness.basecolorTexture.index =
+            gltfMaterial.pbrMetallicRoughness.baseColorTexture.index;
+        material.data.pbrMetallicRoughness.basecolorTexture.texcoord =
+            gltfMaterial.pbrMetallicRoughness.baseColorTexture.texCoord;
+
+        material.data.pbrMetallicRoughness.metallicFactor =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicFactor);
+        material.data.pbrMetallicRoughness.roughnessFactor =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.roughnessFactor);
+        material.data.pbrMetallicRoughness.metalicRoughnessTexture.index =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index);
+        material.data.pbrMetallicRoughness.metalicRoughnessTexture.texcoord =
+            static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.texCoord);
+
+        material.data.normalTexture.index = gltfMaterial.normalTexture.index;
+        material.data.normalTexture.texcoord = gltfMaterial.normalTexture.texCoord;
+        material.data.normalTexture.scale = static_cast<float>(gltfMaterial.normalTexture.scale);
+
+        material.data.occlusionTexture.index = gltfMaterial.occlusionTexture.index;
+        material.data.occlusionTexture.texcoord = gltfMaterial.occlusionTexture.texCoord;
+        material.data.occlusionTexture.strength = static_cast<float>(gltfMaterial.occlusionTexture.strength);
+
+        material.data.emissiveTexture.index = gltfMaterial.emissiveTexture.index;
+        material.data.emissiveTexture.texcoord = gltfMaterial.emissiveTexture.texCoord;
     }
+
+    //GPU上のシェーダー・リソース・ビューとしてマテリアル・データを作成する
+    std::vector<Material::Cbuffer> materialData;
+    for (std::vector<Material>::const_reference material : materials)
+    {
+        materialData.emplace_back(material.data);
+    }
+
+    HRESULT hr;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> materialBuffer;
+    D3D11_BUFFER_DESC bufferDesc{};
+    bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Material::Cbuffer) * materialData.size());
+    bufferDesc.StructureByteStride = sizeof(Material::Cbuffer);
+    bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    D3D11_SUBRESOURCE_DATA subresourceData{};
+    subresourceData.pSysMem = materialData.data();
+    hr = device->CreateBuffer(&bufferDesc, &subresourceData, materialBuffer.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc{};
+    shaderResourceViewDesc.Format = DXGI_FORMAT_UNKNOWN;
+    shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    shaderResourceViewDesc.Buffer.NumElements = static_cast<UINT>(materialData.size());
+    hr = device->CreateShaderResourceView(materialBuffer.Get(), &shaderResourceViewDesc,
+        materialResourceView.GetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
 void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world)
 {
     using namespace DirectX;
+
+    immediateContext->PSSetShaderResources(0, 1, materialResourceView.GetAddressOf());
 
     immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
     immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);

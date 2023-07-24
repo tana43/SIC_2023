@@ -194,13 +194,13 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
 		GeometricPrimitive::MeshType::Cylinder, DirectX::XMFLOAT3(-1.5f, 0, 0), DirectX::XMFLOAT4(0.1f, 0.8f, 0.2f, 1.0f));
 
-	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/F-14A_Tomcat/F-14A_Tomcat.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
+	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/F-14A_Tomcat/F-14A_Tomcat.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
 	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
-	staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
+	//staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
+	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);

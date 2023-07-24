@@ -10,7 +10,7 @@ public:
         const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(1, 1, 1),
         const DirectX::XMFLOAT3& rotation = DirectX::XMFLOAT3(0,0,0),
         float scaleFactor = 1.0f, 
-        int coordinateSystem = 0)
+        int coordinateSystem = 1)
         : position(position), scale(scale), rotation(rotation), scaleFactor(scaleFactor), coordinateSystem(coordinateSystem)
     {}
     ~Transform() = default;

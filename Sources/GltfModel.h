@@ -92,7 +92,7 @@ public:
     struct Material
     {
         std::string name;
-        struct cbuffer
+        struct Cbuffer
         {
             float emissiveFactor[3] = { 0,0,0 };
             int alphaMode = 0;
@@ -105,7 +105,7 @@ public:
             OcclusionTextureInfo occlusionTexture;
             TextureInfo emissiveTexture;
         };
-        cbuffer data;
+        Cbuffer data;
     };
     std::vector<Material> materials;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> materialResourceView;
