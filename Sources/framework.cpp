@@ -401,7 +401,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->VSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
 	immediateContext->PSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
 
-	FLOAT color[]{ 0.2f,0.2f,0.2f,1.0f };
+
 	immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
@@ -451,7 +451,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
 	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());
 
-	frameBuffers[0]->Clear(immediateContext.Get(),1);
+	frameBuffers[0]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
 	frameBuffers[0]->Activate(immediateContext.Get());
 
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
@@ -508,9 +508,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 		//prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
 
-		spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
+		/*spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
 		spritesBatches[0]->Render(immediateContext.Get(), 0, 0, 1280, 720, 1, 1, 1, 1, 0);
-		spritesBatches[0]->End(immediateContext.Get());
+		spritesBatches[0]->End(immediateContext.Get());*/
 
 	}
 
@@ -575,7 +575,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->RSSetState(rasterizerStates[4].Get());
 	immediateContext->OMSetDepthStencilState(depthStencilStates[3].Get(), 1);
 
-	frameBuffers[1]->Clear(immediateContext.Get());
+	frameBuffers[1]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
 	frameBuffers[1]->Activate(immediateContext.Get());
 	bitBlockTransfer->Bilt(immediateContext.Get(),
 		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1,pixelShaders[0].Get());
@@ -805,6 +805,11 @@ void Framework::DrawDebug()
 				ImGui::TreePop();
 			}
 
+			if (ImGui::TreeNode("ClearColor"))
+			{
+				ImGui::ColorPicker4("color",color);
+				ImGui::TreePop();
+			}
 			ImGui::EndMenu();
 		}
 
@@ -946,13 +951,15 @@ void Framework::DrawDebug()
 	}
 	
 	//ImGui::End();
-	geometricPrimitive[0]->DrawDebug();
+	/*geometricPrimitive[0]->DrawDebug();
 	geometricPrimitive[1]->DrawDebug();
 
 	staticMeshes[0]->DrawDebug();
-	staticMeshes[1]->DrawDebug();
+	staticMeshes[1]->DrawDebug();*/
 
 	skinnedMeshes[0]->DrawDebug();
+
+	gltfModels[0]->DrawDebug();
 
 #endif
 }

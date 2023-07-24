@@ -4,6 +4,7 @@
 #include "misc.h"
 #include <stack>
 #include "Shader.h"
+#include "../imgui/imgui.h"
 
 bool NullLoadImageData(tinygltf::Image*, const int, std::string*, std::string*,
     int, int, const unsigned char*, int, void*)
@@ -39,6 +40,7 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
     }
 
     FetchMeshs(device, gltfModel);
+    FetchNodes(gltfModel);
 
     //シェーダーオブジェクトの生成
     const std::map<std::string, BufferView>& vertexBufferViews{
@@ -49,9 +51,9 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
         {"POSITION",0,vertexBufferViews.at("POSITION").format,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
         {"NORMAL",0,vertexBufferViews.at("NORMAL").format,1,0,D3D11_INPUT_PER_VERTEX_DATA,0},
         {"TANGENT",0,vertexBufferViews.at("TANGENT").format,2,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-        {"TEXCOORD",0,vertexBufferViews.at("TEXCOORD").format,3,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-        {"JOINTS",0,vertexBufferViews.at("JOINTS").format,4,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-        {"WEIGHTS",0,vertexBufferViews.at("WEIGHTS").format,5,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"TEXCOORD",0,vertexBufferViews.at("TEXCOORD_0").format,3,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"JOINTS",0,vertexBufferViews.at("JOINTS_0").format,4,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"WEIGHTS",0,vertexBufferViews.at("WEIGHTS_0").format,5,0,D3D11_INPUT_PER_VERTEX_DATA,0},
     };
 
     Shader::CreateVSFromCso(device, "./Resources/Shader/GltfModelVS.cso", vertexShader.ReleaseAndGetAddressOf(),
@@ -91,7 +93,11 @@ void GltfModel::CumulateTransforms(std::vector<Node>& nodes)
     };
     for (std::vector<int>::value_type nodeIndex : scenes.at(0).nodes)
     {
-        parentGlobalTransforms.push({ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 });
+        parentGlobalTransforms.push({ 
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            0,0,0,1 });
         traverse(nodeIndex);
         parentGlobalTransforms.pop();
     }
@@ -251,6 +257,14 @@ void GltfModel::FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfMode
     }
 }
 
+void GltfModel::FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltfModel)
+{
+    for (std::vector<tinygltf::Material>::const_reference gltfMaterial : gltfModel.materials)
+    {
+
+    }
+}
+
 void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world)
 {
     using namespace DirectX;
@@ -269,10 +283,9 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
             {
                 ID3D11Buffer* vertexBuffers[]{
                     primitive.vertexBufferViews.at("POSITION").buffer.Get(),
-                    primitive.vertexBufferViews.at(
-                        "NORMAL").buffer.Get(),
+                    primitive.vertexBufferViews.at("NORMAL").buffer.Get(),
                     primitive.vertexBufferViews.at("TANGENT").buffer.Get(),
-                    primitive.vertexBufferViews.at("TEXCOODE_0").buffer.Get(),
+                    primitive.vertexBufferViews.at("TEXCOORD_0").buffer.Get(),
                     primitive.vertexBufferViews.at("JOINTS_0").buffer.Get(),
                     primitive.vertexBufferViews.at("WEIGHTS_0").buffer.Get(),
                 };
@@ -281,7 +294,7 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
                     static_cast<UINT>(primitive.vertexBufferViews.at("POSITION").strideInBytes),
                     static_cast<UINT>(primitive.vertexBufferViews.at("NORMAL").strideInBytes),
                     static_cast<UINT>(primitive.vertexBufferViews.at("TANGENT").strideInBytes),
-                    static_cast<UINT>(primitive.vertexBufferViews.at("TEXCOODE_0").strideInBytes),
+                    static_cast<UINT>(primitive.vertexBufferViews.at("TEXCOORD_0").strideInBytes),
                     static_cast<UINT>(primitive.vertexBufferViews.at("JOINTS_0").strideInBytes),
                     static_cast<UINT>(primitive.vertexBufferViews.at("WEIGHTS_0").strideInBytes),
                 };
@@ -312,7 +325,24 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
     {
         Traverse(nodeIndex);
     }
+}
 
+void GltfModel::Render(ID3D11DeviceContext* immediateContext)
+{
+    auto World{ transform.CalcWorldMatrix() };
+    DirectX::XMFLOAT4X4 world;
+    DirectX::XMStoreFloat4x4(&world, World);
+
+    Render(immediateContext, world);
+}
+
+void GltfModel::DrawDebug()
+{
+    ImGui::Begin("GLTF Model");
+
+    transform.DrawDebug();
+
+    ImGui::End();
 }
 
 void GltfModel::FetchNodes(const tinygltf::Model& gltfModel)

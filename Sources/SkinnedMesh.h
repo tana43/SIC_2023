@@ -13,6 +13,8 @@
 #include <cereal/types/set.hpp>
 #include <cereal/types/unordered_map.hpp>
 
+#include "Transform.h"
+
 struct Scene
 {
     struct Node
@@ -271,6 +273,8 @@ protected:
     void FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t, Material>& materials);
     void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
     void FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& animationClips, float samplingRate);
+
+    TransformEuler transform;
 };
 
 //serializeテンプレート関数

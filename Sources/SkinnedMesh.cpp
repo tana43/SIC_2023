@@ -658,23 +658,26 @@ void SkinnedMesh::CreateComObjects(ID3D11Device* device, const char* fbxFilename
 
 void SkinnedMesh::Render(ID3D11DeviceContext* immediateContext, const Animation::Keyframe* keyframe)
 {
-    const DirectX::XMFLOAT4X4 coordinateSystemTransforms[]{
-        { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 0:RHS Y-UP
-        { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 1:LHS Y-UP
-        { -1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 2:RHS Z-UP
-        { 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 3:LHS Z-UP
-    };
+    //const DirectX::XMFLOAT4X4 coordinateSystemTransforms[]{
+    //    { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 0:RHS Y-UP
+    //    { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }, // 1:LHS Y-UP
+    //    { -1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 2:RHS Z-UP
+    //    { 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 }, // 3:LHS Z-UP
+    //};
 
-    DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[0]),
-        DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
+    //DirectX::XMMATRIX C{DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&coordinateSystemTransforms[0]),
+    //    DirectX::XMMatrixScaling(scaleFactor, scaleFactor, scaleFactor))};
 
-    DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-    DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z);
-    DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x,position.y,position.z);
+    //DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+    //DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z);
+    //DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x,position.y,position.z);
 
+    //DirectX::XMFLOAT4X4 world;
+    //DirectX::XMStoreFloat4x4(&world,C * S * R * T);
+
+    auto World{ transform.CalcWorldMatrix() };
     DirectX::XMFLOAT4X4 world;
-    DirectX::XMStoreFloat4x4(&world,C * S * R * T);
-
+    DirectX::XMStoreFloat4x4(&world, World);
     Render(immediateContext,world,color,keyframe);
 }
 
@@ -758,10 +761,13 @@ void SkinnedMesh::DrawDebug()
 
     ImGui::Checkbox("RenderActive", &renderActive);
 
-    ImGui::DragFloat3("Position", &position.x, 0.1f);
+    /*ImGui::DragFloat3("Position", &position.x, 0.1f);
     ImGui::DragFloat3("Scale", &scale.x, 0.01f);
     ImGui::DragFloat3("Angle", &angle.x, 0.01f);
-    ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);
+    ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);*/
+
+    transform.DrawDebug();
+
     ImGui::ColorEdit4("Color", &color.x);
 
     /*if (ImGui::TreeNode("Material"))

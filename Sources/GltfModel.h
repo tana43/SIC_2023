@@ -8,6 +8,8 @@
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include "../External/tinygltf-release/tiny_gltf.h"
 
+#include "Transform.h"
+
 class GltfModel
 {
     std::string filename;
@@ -61,13 +63,65 @@ public:
     };
     std::vector<Mesh> meshes;
 
+    
+    struct TextureInfo
+    {
+        int index = -1;
+        int texcoord = 0;
+    };
+    struct NormalTextureInfo
+    {
+        int index = -1;
+        int texcoord = 0;
+        float scale = 1;
+    };
+    struct OcclusionTextureInfo
+    {
+        int index = -1;
+        int texcoord = 0;
+        float strength = 1;
+    };
+    struct PbrMetalicRoughness
+    {
+        float basecolorFactor[4] = { 1,1,1,1 };
+        TextureInfo basecolorTexture;
+        float metallicFactor = 1;
+        float roughnessFactor = 1;
+        TextureInfo metalicRoughnessTexture;
+    };
+    struct Material
+    {
+        std::string name;
+        struct cbuffer
+        {
+            float emissiveFactor[3] = { 0,0,0 };
+            int alphaMode = 0;
+            float alphaCutoff = 0.5f;
+            bool doubleSiled = false;
+
+            PbrMetalicRoughness pbrMetallicRoughness;
+
+            NormalTextureInfo normalTexture;
+            OcclusionTextureInfo occlusionTexture;
+            TextureInfo emissiveTexture;
+        };
+        cbuffer data;
+    };
+    std::vector<Material> materials;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> materialResourceView;
+    
+
     void Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world);
+    void Render(ID3D11DeviceContext* immediateContext);
+
+    void DrawDebug();
 
 private:
     void FetchNodes(const tinygltf::Model& gltfModel);
     void CumulateTransforms(std::vector<Node>& nodes);
     BufferView MakeBufferView(const tinygltf::Accessor& accessor);
     void FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfModel);
+    void FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltfModel);
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
@@ -81,5 +135,7 @@ private:
         int pad;
     };
     Microsoft::WRL::ComPtr<ID3D11Buffer> primitiveCbuffer;
+
+    TransformEuler transform;
 };
 

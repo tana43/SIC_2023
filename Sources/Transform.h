@@ -3,7 +3,7 @@
 #include "MathHelper.h"
 #include <string>
 
-class Transform final
+class Transform
 {
 public:
     Transform(const DirectX::XMFLOAT3& position = DirectX::XMFLOAT3(0,0,0), 
@@ -19,11 +19,10 @@ public:
     Transform& operator=(const Transform&) = delete;
     Transform& operator=(const Transform&&) = delete;
 
-    void DrawDebug();
+    virtual void DrawDebug();
     void Reset();
 
     DirectX::XMMATRIX CalcWorldMatrix();
-    DirectX::XMMATRIX CalcLocalMatrix();
 
     DirectX::XMFLOAT3 GetPosition() const { return position; }
     DirectX::XMFLOAT3 GetScale() const { return scale; }
@@ -48,13 +47,13 @@ public:
 
 
     //正規化済み前ベクトルを返す
-    DirectX::XMFLOAT3 CalcForward() const;
+    virtual DirectX::XMFLOAT3 CalcForward() const;
     //正規化済み上ベクトルを返す
-    DirectX::XMFLOAT3 CalcUp() const;
+    virtual DirectX::XMFLOAT3 CalcUp() const;
     //正規化済み右ベクトルを返す
-    DirectX::XMFLOAT3 CalcRight() const;
+    virtual DirectX::XMFLOAT3 CalcRight() const;
 
-private:
+protected:
     DirectX::XMFLOAT3 position;
     DirectX::XMFLOAT3 scale;
     DirectX::XMFLOAT3 rotation;
@@ -78,5 +77,52 @@ private:
     };
 
     bool ImGuiCoordinateComboUI();
+
+    virtual DirectX::XMMATRIX MatrixRotation() = 0;
 };
 
+//オイラー角による回転制御を使ったTransform
+class TransformEuler final : public Transform
+{
+public:
+    TransformEuler(const DirectX::XMFLOAT3& position = DirectX::XMFLOAT3(0, 0, 0),
+        const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(1, 1, 1),
+        const DirectX::XMFLOAT3& rotation = DirectX::XMFLOAT3(0, 0, 0),
+        float scaleFactor = 1.0f,
+        int coordinateSystem = 0) :
+        Transform(position, scale, rotation, scaleFactor, coordinateSystem)
+    {}
+    ~TransformEuler() {}
+
+private:
+    DirectX::XMMATRIX MatrixRotation() override;
+};
+
+//クォータニオンによる回転制御を使ったTransform
+//todo:なんか出来やんから後回し
+class TransformQuaternion final : public Transform
+{
+public:
+    TransformQuaternion(const DirectX::XMFLOAT3& position = DirectX::XMFLOAT3(0, 0, 0),
+        const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(1, 1, 1),
+        const DirectX::XMFLOAT3& rotation = DirectX::XMFLOAT3(0, 0, 0),
+        float scaleFactor = 1.0f,
+        int coordinateSystem = 0);
+    ~TransformQuaternion() {}
+
+    void DrawDebug() override;
+
+    //正規化済み前ベクトルを返す
+    DirectX::XMFLOAT3 CalcForward()const override;
+    //正規化済み上ベクトルを返す
+    DirectX::XMFLOAT3 CalcUp()const override;
+    //正規化済み右ベクトルを返す
+    DirectX::XMFLOAT3 CalcRight()const override;
+
+private:
+    DirectX::XMMATRIX MatrixRotation() override;
+
+    DirectX::XMFLOAT4 orientation;
+
+    float angle;
+};

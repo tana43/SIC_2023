@@ -185,6 +185,8 @@ private:
 	void DrawDebug();
 
 private:
+	float color[4] = { 0.1f,0.1f,0.1f,1.0f };
+
 	high_resolution_timer tictoc;
 	uint32_t frames{ 0 };
 	float elapsed_time{ 0.0f };
