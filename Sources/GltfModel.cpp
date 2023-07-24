@@ -1,10 +1,13 @@
 #include "GltfModel.h"
+
 #define TINYGLTF_IMPLEMENTATION
 #include "../External/tinygltf-release/tiny_gltf.h"
 #include "misc.h"
-#include <stack>
-#include "Shader.h"
 #include "../imgui/imgui.h"
+#include <stack>
+
+#include "Shader.h"
+#include "Texture.h"
 
 bool NullLoadImageData(tinygltf::Image*, const int, std::string*, std::string*,
     int, int, const unsigned char*, int, void*)
@@ -12,7 +15,7 @@ bool NullLoadImageData(tinygltf::Image*, const int, std::string*, std::string*,
     return true;
 }
 
-GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
+GltfModel::GltfModel(ID3D11Device* device, const std::string& filename) : filename(filename)
 {
     tinygltf::TinyGLTF tinyGltf;
     tinyGltf.SetImageLoader(NullLoadImageData, nullptr);
@@ -43,6 +46,7 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename)
     FetchNodes(gltfModel);
 
     FetchMaterials(device,gltfModel);
+    FetchTextures(device, gltfModel);
 
     //シェーダーオブジェクトの生成
     const std::map<std::string, BufferView>& vertexBufferViews{
@@ -340,6 +344,59 @@ void GltfModel::FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltf
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
+void GltfModel::FetchTextures(ID3D11Device* device, const tinygltf::Model& gltfModel)
+{
+    HRESULT hr{ S_OK };
+    for (const tinygltf::Texture& gltfTexture : gltfModel.textures)
+    {
+        Texture& texture{ textures.emplace_back() };
+        texture.name = gltfTexture.name;
+        texture.source = gltfTexture.source;
+    }
+    for (const tinygltf::Image& gltfImage : gltfModel.images)
+    {
+        Image& image{ images.emplace_back() };
+        image.name = gltfImage.name;
+        image.width = gltfImage.width;
+        image.height = gltfImage.height;
+        image.component = gltfImage.component;
+        image.bits = gltfImage.bits;
+        image.pixelType = gltfImage.pixel_type;
+        image.bufferView = gltfImage.bufferView;
+        image.mimeType = gltfImage.mimeType;
+        image.uri = gltfImage.uri;
+        image.asIs = gltfImage.as_is;
+
+        if (gltfImage.bufferView > -1)
+        {
+            const tinygltf::BufferView& bufferView{ gltfModel.bufferViews.at(gltfImage.bufferView) };
+            const tinygltf::Buffer& buffer{ gltfModel.buffers.at(bufferView.buffer) };
+            const byte* data = buffer.data.data() + bufferView.byteOffset;
+
+            ID3D11ShaderResourceView* textureResourceView{};
+            hr = LoadTextureFromMemory(device, data, bufferView.byteLength, &textureResourceView);
+            if (hr == S_OK)
+            {
+                textureResourceViews.emplace_back().Attach(textureResourceView);
+            }
+        }
+        else
+        {
+            const std::filesystem::path path(filename);
+            ID3D11ShaderResourceView* shaderResourceView{};
+            D3D11_TEXTURE2D_DESC texture2dDesc;
+            std::wstring filename{
+                path.parent_path().concat(L"/").wstring() +
+                std::wstring(gltfImage.uri.begin(),gltfImage.uri.end()) };
+            hr = LoadTextureFromFile(device, filename.c_str(), &shaderResourceView, &texture2dDesc);
+            if (hr == S_OK)
+            {
+                textureResourceViews.emplace_back().Attach(shaderResourceView);
+            }
+        }
+    }
+}
+
 void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world)
 {
     using namespace DirectX;
@@ -379,6 +436,27 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
                 immediateContext->IASetVertexBuffers(0, _countof(vertexBuffers), vertexBuffers, strides, offsets);
                 immediateContext->IASetIndexBuffer(primitive.indexBufferView.buffer.Get(),
                     primitive.indexBufferView.format, 0);
+
+                //textureResourceViewsオブジェクトをバインド
+                const Material& material{ materials.at(primitive.material) };
+                const int textureIndices[]
+                {
+                    material.data.pbrMetallicRoughness.basecolorTexture.index,
+                    material.data.pbrMetallicRoughness.metalicRoughnessTexture.index,
+                    material.data.normalTexture.index,
+                    material.data.emissiveTexture.index,
+                    material.data.occlusionTexture.index,
+                };
+                ID3D11ShaderResourceView* nullShaderResourceView{};
+                std::vector<ID3D11ShaderResourceView*> shaderResourceViews(_countof(textureIndices));
+                for (int textureIndex = 0; textureIndex < shaderResourceViews.size(); ++textureIndex)
+                {
+                    shaderResourceViews.at(textureIndex) = textureIndices[textureIndex] > -1 ?
+                        textureResourceViews.at(textures.at(textureIndices[textureIndex]).source).Get() :
+                        nullShaderResourceView;
+                }
+                immediateContext->PSSetShaderResources(1, static_cast<UINT>(shaderResourceViews.size()),
+                shaderResourceViews.data());
 
                 PrimitiveConstants primitiveData{};
                 primitiveData.material = primitive.material;

@@ -210,7 +210,10 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
-	gltfModels[0] = std::make_unique<GltfModel>(device.Get(), "./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf");
+	gltfModels[0] = std::make_unique<GltfModel>(device.Get(), 
+		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
+		"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+	);
 
 	//各種ステートオブジェクトセット
 	{

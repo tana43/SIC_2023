@@ -86,6 +86,22 @@ HRESULT MakeDummyTexture(ID3D11Device* device, ID3D11ShaderResourceView** shader
 
     return hr;
 }
+HRESULT LoadTextureFromMemory(ID3D11Device* device, const void* data, size_t size, ID3D11ShaderResourceView** shaderResourceView)
+{
+    HRESULT hr{ S_OK };
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+
+    hr = DirectX::CreateDDSTextureFromMemory(device, reinterpret_cast<const uint8_t*>(data),
+        size, resource.GetAddressOf(), shaderResourceView);
+    if (hr != S_OK)
+    {
+        hr = DirectX::CreateWICTextureFromMemory(device,reinterpret_cast<const uint8_t*>(data),
+            size, resource.GetAddressOf(), shaderResourceView);
+        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    }
+
+    return hr;
+}
 void ReleaseAllTextures()
 {
     resources.clear();

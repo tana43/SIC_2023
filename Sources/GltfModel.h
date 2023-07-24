@@ -109,8 +109,29 @@ public:
     };
     std::vector<Material> materials;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> materialResourceView;
-    
 
+    struct Texture
+    {
+        std::string name;
+        int source{ -1 };
+    };
+    std::vector<Texture> textures;
+    struct Image
+    {
+        std::string name;
+        int width{ -1 };
+        int height{ -1 };
+        int component{ -1 };
+        int bits{ -1 };
+        int pixelType{ -1 };
+        int bufferView;
+        std::string mimeType;
+        std::string uri;
+        bool asIs{ false };
+    };
+    std::vector<Image> images;
+    std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> textureResourceViews;
+        
     void Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world);
     void Render(ID3D11DeviceContext* immediateContext);
 
@@ -122,6 +143,7 @@ private:
     BufferView MakeBufferView(const tinygltf::Accessor& accessor);
     void FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfModel);
     void FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltfModel);
+    void FetchTextures(ID3D11Device* device, const tinygltf::Model& gltfModel);
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;

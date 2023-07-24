@@ -89,7 +89,7 @@ public:
         const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(1, 1, 1),
         const DirectX::XMFLOAT3& rotation = DirectX::XMFLOAT3(0, 0, 0),
         float scaleFactor = 1.0f,
-        int coordinateSystem = 0) :
+        int coordinateSystem = 1) :
         Transform(position, scale, rotation, scaleFactor, coordinateSystem)
     {}
     ~TransformEuler() {}
@@ -107,7 +107,7 @@ public:
         const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(1, 1, 1),
         const DirectX::XMFLOAT3& rotation = DirectX::XMFLOAT3(0, 0, 0),
         float scaleFactor = 1.0f,
-        int coordinateSystem = 0);
+        int coordinateSystem = 1);
     ~TransformQuaternion() {}
 
     void DrawDebug() override;
