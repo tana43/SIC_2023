@@ -299,9 +299,9 @@ void GltfModel::FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltf
         material.data.pbrMetallicRoughness.roughnessFactor =
             static_cast<float>(gltfMaterial.pbrMetallicRoughness.roughnessFactor);
         material.data.pbrMetallicRoughness.metalicRoughnessTexture.index =
-            static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index);
+            gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index;
         material.data.pbrMetallicRoughness.metalicRoughnessTexture.texcoord =
-            static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.texCoord);
+            gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.texCoord;
 
         material.data.normalTexture.index = gltfMaterial.normalTexture.index;
         material.data.normalTexture.texcoord = gltfMaterial.normalTexture.texCoord;
@@ -437,6 +437,18 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
                 immediateContext->IASetIndexBuffer(primitive.indexBufferView.buffer.Get(),
                     primitive.indexBufferView.format, 0);
 
+                
+
+                PrimitiveConstants primitiveData{};
+                primitiveData.material = primitive.material;
+                primitiveData.hasTangent = primitive.vertexBufferViews.at("TANGENT").buffer != NULL;
+                primitiveData.skin = node.skin;
+                XMStoreFloat4x4(&primitiveData.world,
+                    XMLoadFloat4x4(&node.globalTransform) * XMLoadFloat4x4(&world));
+                immediateContext->UpdateSubresource(primitiveCbuffer.Get(), 0, 0, &primitiveData, 0, 0);
+                immediateContext->VSSetConstantBuffers(0, 1, primitiveCbuffer.GetAddressOf());
+                immediateContext->PSSetConstantBuffers(0, 1, primitiveCbuffer.GetAddressOf());
+
                 //textureResourceViewsオブジェクトをバインド
                 const Material& material{ materials.at(primitive.material) };
                 const int textureIndices[]
@@ -456,17 +468,7 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
                         nullShaderResourceView;
                 }
                 immediateContext->PSSetShaderResources(1, static_cast<UINT>(shaderResourceViews.size()),
-                shaderResourceViews.data());
-
-                PrimitiveConstants primitiveData{};
-                primitiveData.material = primitive.material;
-                primitiveData.hasTangent = primitive.vertexBufferViews.at("TANGENT").buffer != NULL;
-                primitiveData.skin = node.skin;
-                XMStoreFloat4x4(&primitiveData.world,
-                    XMLoadFloat4x4(&node.globalTransform) * XMLoadFloat4x4(&world));
-                immediateContext->UpdateSubresource(primitiveCbuffer.Get(), 0, 0, &primitiveData, 0, 0);
-                immediateContext->VSSetConstantBuffers(0, 1, primitiveCbuffer.GetAddressOf());
-                immediateContext->PSSetConstantBuffers(0, 1, primitiveCbuffer.GetAddressOf());
+                    shaderResourceViews.data());
 
                 immediateContext->DrawIndexed(static_cast<UINT>(primitive.indexBufferView.Count()), 0, 0);
             }

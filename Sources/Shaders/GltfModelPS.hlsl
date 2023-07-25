@@ -12,7 +12,7 @@ struct NormalTextureInfo
     float scale;
 };
 struct OcclusionTextureInfo
-{
+{  
     int index;
     int texcoord;
     float strength;
@@ -70,7 +70,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     //return float4(color, 1);
     //float3 color = max(0, dot(N, L)) * m.pbrMetallicRoughness.basecolorFactor.rgb;
     
-    float3 color = max(0, dot(N, L)) * basecolor.rgb + emmisive;
+    float3 color = max(0, dot(N, L)) * basecolor.rgb + emmisive.rgb;
     return float4(color, basecolor.a);
     
 
