@@ -131,6 +131,40 @@ public:
     };
     std::vector<Image> images;
     std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> textureResourceViews;
+
+    struct Skin
+    {
+        std::vector<DirectX::XMFLOAT4X4> inverseBindMatrices;
+        std::vector<int> joints;
+    };
+    std::vector<Skin> skins;
+
+    struct Animation
+    {
+        std::string name;
+
+        struct Channel
+        {
+            int sampler{ -1 };
+            int targetNode{ -1 };
+            std::string targetPath;
+        };
+        std::vector<Channel> channels;
+
+        struct Sampler
+        {
+            int input{ -1 };
+            int output{ -1 };
+            std::string interpolation;
+        };
+        std::vector<Sampler> samplers;
+
+        std::unordered_map<int, std::vector<float>> timelines;
+        std::unordered_map<int, std::vector<DirectX::XMFLOAT3>> scales;
+        std::unordered_map<int, std::vector<DirectX::XMFLOAT4>> rotations;
+        std::unordered_map<int, std::vector<DirectX::XMFLOAT3>> ktranslations;
+    };
+    std::vector<Animation> animations;
         
     void Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world);
     void Render(ID3D11DeviceContext* immediateContext);
@@ -144,6 +178,7 @@ private:
     void FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfModel);
     void FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltfModel);
     void FetchTextures(ID3D11Device* device, const tinygltf::Model& gltfModel);
+    void FeachAnimations(const tinygltf::Model& gltfModel);
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;

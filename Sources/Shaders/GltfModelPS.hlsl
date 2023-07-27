@@ -56,6 +56,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     MaterialConstants m = materials[material];
     
+    //‚È‚ñ‚©texcoord‚Ìy‚ª‚P‚¾‚¯‘å‚«‚­‚È‚Á‚Ä‚½‚©‚çƒSƒŠ‰Ÿ‚µ‚Åˆø‚¢‚½
     float2 texcoord0 = pin.texcoord;
     texcoord0.y -= 1;
     float4 basecolor = m.pbrMetallicRoughness.basecolorTexture.index > -1 ?

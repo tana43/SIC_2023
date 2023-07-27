@@ -364,6 +364,34 @@ void GltfModel::FetchTextures(ID3D11Device* device, const tinygltf::Model& gltfM
     }
 }
 
+void GltfModel::FeachAnimations(const tinygltf::Model& gltfModel)
+{
+    using namespace std;
+    using namespace DirectX;
+
+    //ƒWƒ‡ƒCƒ“ƒgŽæ“¾
+    for (vector<tinygltf::Skin>::const_reference transmissionSkin : gltfModel.skins)
+    {
+        Skin& skin{ skins.emplace_back() };
+        const tinygltf::Accessor& gltfAccessor{ gltfModel.accessors.at(transmissionSkin.inverseBindMatrices) };
+        const tinygltf::BufferView& gltfBufferView{ gltfModel.bufferViews.at(gltfAccessor.bufferView) };
+        skin.inverseBindMatrices.resize(gltfAccessor.count); 
+        memcpy(skin.inverseBindMatrices.data(), gltfModel.buffers.at(gltfBufferView.buffer).data.data() +
+            gltfBufferView.byteOffset + gltfAccessor.byteOffset, gltfAccessor.count * sizeof(XMFLOAT4X4));
+        skin.joints = transmissionSkin.joints;
+    }
+
+    for (vector<tinygltf::Animation>::const_reference gltfAnimation : gltfModel.animations)
+    {
+        Animation& animation{ animations.emplace_back() };
+        animation.name = gltfAnimation.name;
+        for (vector<tinygltf::AnimationSampler>::const_reference gltfSampler : gltfAnimation.samplers)
+        {
+
+        }
+    }
+}
+
 void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world)
 {
     using namespace DirectX;
