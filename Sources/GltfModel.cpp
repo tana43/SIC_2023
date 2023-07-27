@@ -18,7 +18,7 @@ bool NullLoadImageData(tinygltf::Image*, const int, std::string*, std::string*,
 GltfModel::GltfModel(ID3D11Device* device, const std::string& filename) : filename(filename)
 {
     tinygltf::TinyGLTF tinyGltf;
-    tinyGltf.SetImageLoader(NullLoadImageData, nullptr);
+    //tinyGltf.SetImageLoader(NullLoadImageData, nullptr);
 
     tinygltf::Model gltfModel;
     std::string error, warning;
@@ -42,8 +42,8 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename) : filena
         scene.nodes = gltfModel.scenes.at(0).nodes;
     }
 
-    FetchMeshs(device, gltfModel);
     FetchNodes(gltfModel);
+    FetchMeshs(device, gltfModel);
 
     FetchMaterials(device,gltfModel);
     FetchTextures(device, gltfModel);
@@ -73,40 +73,6 @@ GltfModel::GltfModel(ID3D11Device* device, const std::string& filename) : filena
     HRESULT hr;
     hr = device->CreateBuffer(&bufferDesc, nullptr, primitiveCbuffer.ReleaseAndGetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-}
-
-void GltfModel::CumulateTransforms(std::vector<Node>& nodes)
-{
-    using namespace DirectX;
-
-    std::stack<XMFLOAT4X4> parentGlobalTransforms;
-    std::function<void(int)> traverse{[&](int nodeIndex)->void
-        {
-            Node& node{ nodes.at(nodeIndex) };
-            XMMATRIX S{ XMMatrixScaling(node.scale.x,node.scale.y,node.scale.z) };
-            XMMATRIX R{ XMMatrixRotationQuaternion(
-            XMVectorSet(node.rotation.x,node.rotation.y,node.rotation.z,node.rotation.w)
-            ) };
-            XMMATRIX T{ XMMatrixTranslation(node.translation.x,node.translation.y,node.translation.z) };
-            XMStoreFloat4x4(&node.globalTransform, S * R * T * XMLoadFloat4x4(&parentGlobalTransforms.top()));
-            for (int childIndex : node.children)
-            {
-                parentGlobalTransforms.push(node.globalTransform);
-                traverse(childIndex);
-                parentGlobalTransforms.pop();
-            }
-        }
-    };
-    for (std::vector<int>::value_type nodeIndex : scenes.at(0).nodes)
-    {
-        parentGlobalTransforms.push({ 
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1 });
-        traverse(nodeIndex);
-        parentGlobalTransforms.pop();
-    }
 }
 
 GltfModel::BufferView GltfModel::MakeBufferView(const tinygltf::Accessor& accessor)
@@ -298,6 +264,7 @@ void GltfModel::FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltf
             static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicFactor);
         material.data.pbrMetallicRoughness.roughnessFactor =
             static_cast<float>(gltfMaterial.pbrMetallicRoughness.roughnessFactor);
+
         material.data.pbrMetallicRoughness.metalicRoughnessTexture.index =
             gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index;
         material.data.pbrMetallicRoughness.metalicRoughnessTexture.texcoord =
@@ -555,4 +522,37 @@ void GltfModel::FetchNodes(const tinygltf::Model& gltfModel)
         }
     }
     CumulateTransforms(nodes);
+}
+void GltfModel::CumulateTransforms(std::vector<Node>& nodes)
+{
+    using namespace DirectX;
+
+    std::stack<XMFLOAT4X4> parentGlobalTransforms;
+    std::function<void(int)> traverse{[&](int nodeIndex)->void
+        {
+            Node& node{ nodes.at(nodeIndex) };
+            XMMATRIX S{ XMMatrixScaling(node.scale.x,node.scale.y,node.scale.z) };
+            XMMATRIX R{ XMMatrixRotationQuaternion(
+            XMVectorSet(node.rotation.x,node.rotation.y,node.rotation.z,node.rotation.w)
+            ) };
+            XMMATRIX T{ XMMatrixTranslation(node.translation.x,node.translation.y,node.translation.z) };
+            XMStoreFloat4x4(&node.globalTransform, S * R * T * XMLoadFloat4x4(&parentGlobalTransforms.top()));
+            for (int childIndex : node.children)
+            {
+                parentGlobalTransforms.push(node.globalTransform);
+                traverse(childIndex);
+                parentGlobalTransforms.pop();
+            }
+    }
+    };
+    for (std::vector<int>::value_type nodeIndex : scenes.at(0).nodes)
+    {
+        parentGlobalTransforms.push({
+            1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            0,0,0,1 });
+        traverse(nodeIndex);
+        parentGlobalTransforms.pop();
+    }
 }

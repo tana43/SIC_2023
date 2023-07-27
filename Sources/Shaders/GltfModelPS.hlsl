@@ -12,7 +12,7 @@ struct NormalTextureInfo
     float scale;
 };
 struct OcclusionTextureInfo
-{  
+{
     int index;
     int texcoord;
     float strength;
@@ -28,7 +28,7 @@ struct PbrMetallicRoughness
 struct MaterialConstants
 {
     float3 emissiveFactor;
-    int alphaMode;// "OPAQUE" : 0, "MASK" : 1, "BLEND" : 2
+    int alphaMode; // "OPAQUE" : 0, "MASK" : 1, "BLEND" : 2
     float alphaCutoff;
     bool doubleSided;
     
@@ -56,12 +56,16 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     MaterialConstants m = materials[material];
     
+    float2 texcoord0 = pin.texcoord;
+    texcoord0.y -= 1;
     float4 basecolor = m.pbrMetallicRoughness.basecolorTexture.index > -1 ?
-    materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord) :
+    //materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord) :
+    materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], texcoord0) :
     m.pbrMetallicRoughness.basecolorFactor;
     
     float3 emmisive = m.emissiveTexture.index > -1 ?
-    materialTextures[EMISSIVE_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord).rgb :
+    //materialTextures[EMISSIVE_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord).rgb :
+    materialTextures[EMISSIVE_TEXTURE].Sample(samplerStates[ANISOTROPIC], texcoord0).rgb :
     m.emissiveFactor;
     
     float3 N = normalize(pin.wNormal.xyz);

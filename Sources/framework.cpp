@@ -213,6 +213,7 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	gltfModels[0] = std::make_unique<GltfModel>(device.Get(), 
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
 		"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
 	);
 
 	//各種ステートオブジェクトセット
