@@ -11,7 +11,7 @@ VS_OUT main(VS_IN vin)
             vin.weights.y * jointMatrices[vin.joints.y] +
             vin.weights.z * jointMatrices[vin.joints.z] +
             vin.weights.w * jointMatrices[vin.joints.w];
-        //vin.position = mul(float4(vin.position.xyz, 1), skinMatrix);
+        vin.position = mul(float4(vin.position.xyz, 1), skinMatrix);
         vin.normal = normalize(mul(float4(vin.normal.xyz, 0), skinMatrix));
         vin.tangent = normalize(mul(float4(vin.tangent.xyz, 0), skinMatrix));
     }

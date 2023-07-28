@@ -505,7 +505,7 @@ void GltfModel::Animate(size_t animationIndex, float time, std::vector<Node>& an
                     break;
                 }
             }
-            //                                                      なんで+0するん？
+            //存在しないキーフレームは補間する
             interpolationFactor = (time - timelines.at(keyframeIndex + 0)) /
                 (timelines.at(keyframeIndex + 1) - timelines.at(keyframeIndex + 0));
             return keyframeIndex;
@@ -569,6 +569,23 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
         const Node& node{ nodes.at(nodeIndex) };
         if (node.mesh > -1)
         {
+            //各ジョイントに現在のアニメーションを適用
+            if (node.skin > -1)
+            {
+                const Skin& skin{ skins.at(node.skin) };
+                PrimitiveJointConstants primitiveJointData{};
+                for (size_t jointIndex = 0; jointIndex < skin.joints.size(); ++jointIndex)
+                {
+                    XMStoreFloat4x4(&primitiveJointData.matrices[jointIndex],
+                        XMLoadFloat4x4(&skin.inverseBindMatrices.at(jointIndex)) *
+                        XMLoadFloat4x4(&animatedNodes.at(skin.joints.at(jointIndex)).globalTransform) *
+                        XMMatrixInverse(NULL, XMLoadFloat4x4(&node.globalTransform))
+                    );
+                }
+                immediateContext->UpdateSubresource(primitiveJointCbuffer.Get(), 0, 0, &primitiveJointData, 0, 0);
+                immediateContext->VSSetConstantBuffers(2, 1, primitiveJointCbuffer.GetAddressOf());
+            }
+
             const Mesh& mesh{ meshes.at(node.mesh) };
             for (std::vector<Mesh::Primitive>::const_reference primitive : mesh.primitives)
             {
@@ -626,23 +643,6 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
                 }
                 immediateContext->PSSetShaderResources(1, static_cast<UINT>(shaderResourceViews.size()),
                     shaderResourceViews.data());
-
-                //各ジョイントに現在のアニメーションを適用
-                if (node.skin > -1)
-                {
-                    const Skin& skin{ skins.at(node.skin) };
-                    PrimitiveJointConstants primitiveJointData{};
-                    for (size_t jointIndex = 0; jointIndex < skin.joints.size(); ++jointIndex)
-                    {
-                        XMStoreFloat4x4(&primitiveJointData.matrices[jointIndex],
-                            XMLoadFloat4x4(&skin.inverseBindMatrices.at(jointIndex)) *
-                            XMLoadFloat4x4(&animatedNodes.at(skin.joints.at(jointIndex)).globalTransform) *
-                            XMMatrixInverse(NULL, XMLoadFloat4x4(&node.globalTransform))
-                        );
-                    }
-                    immediateContext->UpdateSubresource(primitiveJointCbuffer.Get(), 0, 0, &primitiveJointData, 0, 0);
-                    immediateContext->VSSetConstantBuffers(2, 1, primitiveJointCbuffer.GetAddressOf());
-                }
                 
 
                 immediateContext->DrawIndexed(static_cast<UINT>(primitive.indexBufferView.Count()), 0, 0);
