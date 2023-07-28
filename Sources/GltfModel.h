@@ -2,13 +2,15 @@
 #define NOMINMAX
 #include <d3d11.h>
 #include <wrl.h>
-#include <DirectXMath.h>
+//#include <DirectXMath.h>
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include "../External/tinygltf-release/tiny_gltf.h"
+#include <unordered_map>
 
 #include "Transform.h"
+
 
 class GltfModel
 {
@@ -162,15 +164,23 @@ public:
         std::unordered_map<int, std::vector<float>> timelines;
         std::unordered_map<int, std::vector<DirectX::XMFLOAT3>> scales;
         std::unordered_map<int, std::vector<DirectX::XMFLOAT4>> rotations;
-        std::unordered_map<int, std::vector<DirectX::XMFLOAT3>> ktranslations;
+        std::unordered_map<int, std::vector<DirectX::XMFLOAT3>> translations;
     };
     std::vector<Animation> animations;
+
+    static const size_t PRIMITIVE_MAX_JOINTS = 512;
+    struct PrimitiveJointConstants
+    {
+        DirectX::XMFLOAT4X4 matrices[PRIMITIVE_MAX_JOINTS];
+    };
+    Microsoft::WRL::ComPtr<ID3D11Buffer> primitiveJointCbuffer;
         
-    void Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world);
-    void Render(ID3D11DeviceContext* immediateContext);
+    void Render(ID3D11DeviceContext* immediateContext, const DirectX::XMFLOAT4X4& world,const std::vector<Node>& animatedNodes);
+    void Render(ID3D11DeviceContext* immediateContext, const std::vector<Node>& animatedNodes);
 
     void DrawDebug();
 
+    void Animate(size_t aniamtionIndex, float time, std::vector<Node>& animatedNodes, bool loopback = true);
 private:
     void FetchNodes(const tinygltf::Model& gltfModel);
     void CumulateTransforms(std::vector<Node>& nodes);
@@ -179,6 +189,7 @@ private:
     void FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltfModel);
     void FetchTextures(ID3D11Device* device, const tinygltf::Model& gltfModel);
     void FeachAnimations(const tinygltf::Model& gltfModel);
+
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;

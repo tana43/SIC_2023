@@ -212,8 +212,9 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 	gltfModels[0] = std::make_unique<GltfModel>(device.Get(), 
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
-		"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+		//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
+		"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
 	);
 
 	//各種ステートオブジェクトセット
@@ -571,7 +572,10 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // 0
 		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
-		gltfModels[0]->Render(immediateContext.Get());
+		static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
+		static float time{ 0 };
+		gltfModels[0]->Animate(0, time += elapsedTime, animatedNodes);
+		gltfModels[0]->Render(immediateContext.Get(),animatedNodes);
 
 	frameBuffers[0]->Deactivate(immediateContext.Get());
 

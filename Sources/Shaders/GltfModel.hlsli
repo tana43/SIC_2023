@@ -32,3 +32,9 @@ cbuffer SCENE_CONSTANT_BUFFER : register(b1)
     float4 lightDirection;
     float4 cameraPosition;
 }
+
+static const uint PRIMITIVE_MAX_JOINTS = 512;
+cbuffer PRIMITIVE_JOINT_CONSTANTS : register(b2)
+{
+    row_major float4x4 jointMatrices[PRIMITIVE_MAX_JOINTS];
+};

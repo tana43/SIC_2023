@@ -57,16 +57,14 @@ float4 main(VS_OUT pin) : SV_TARGET
     MaterialConstants m = materials[material];
     
     //‚È‚ñ‚©texcoord‚Ìy‚ª‚P‚¾‚¯‘å‚«‚­‚È‚Á‚Ä‚½‚©‚çƒSƒŠ‰Ÿ‚µ‚Åˆø‚¢‚½
-    float2 texcoord0 = pin.texcoord;
-    texcoord0.y -= 1;
+    //pin.texcoord.y -= 1;
+
     float4 basecolor = m.pbrMetallicRoughness.basecolorTexture.index > -1 ?
-    //materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord) :
-    materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], texcoord0) :
+    materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord) :
     m.pbrMetallicRoughness.basecolorFactor;
     
     float3 emmisive = m.emissiveTexture.index > -1 ?
-    //materialTextures[EMISSIVE_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord).rgb :
-    materialTextures[EMISSIVE_TEXTURE].Sample(samplerStates[ANISOTROPIC], texcoord0).rgb :
+    materialTextures[EMISSIVE_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord).rgb :
     m.emissiveFactor;
     
     float3 N = normalize(pin.wNormal.xyz);
