@@ -395,9 +395,11 @@ void GltfModel::FeachAnimations(const tinygltf::Model& gltfModel)
         Skin& skin{ skins.emplace_back() };
         const tinygltf::Accessor& gltfAccessor{ gltfModel.accessors.at(transmissionSkin.inverseBindMatrices) };
         const tinygltf::BufferView& gltfBufferView{ gltfModel.bufferViews.at(gltfAccessor.bufferView) };
+
         skin.inverseBindMatrices.resize(gltfAccessor.count); 
         memcpy(skin.inverseBindMatrices.data(), gltfModel.buffers.at(gltfBufferView.buffer).data.data() +
             gltfBufferView.byteOffset + gltfAccessor.byteOffset, gltfAccessor.count * sizeof(XMFLOAT4X4));
+
         skin.joints = transmissionSkin.joints;
     }
 
@@ -415,6 +417,7 @@ void GltfModel::FeachAnimations(const tinygltf::Model& gltfModel)
 
             const tinygltf::Accessor& gltfAccessor{gltfModel.accessors.at(gltfSampler.input)};
             const tinygltf::BufferView& gltfBufferView{gltfModel.bufferViews.at(gltfAccessor.bufferView)};
+
             pair<unordered_map<int, vector<float>>::iterator, bool>& timelines{
                 animation.timelines.emplace(gltfSampler.input, gltfAccessor.count)
             };
@@ -569,7 +572,7 @@ void GltfModel::Render(ID3D11DeviceContext* immediateContext, const DirectX::XMF
         const Node& node{ nodes.at(nodeIndex) };
         if (node.mesh > -1)
         {
-            //各ジョイントに現在のアニメーションを適用
+            //各ジョイントに現在のアニメーションを適用、ここから頂点シェーダーを使って座標移動を行う
             if (node.skin > -1)
             {
                 const Skin& skin{ skins.at(node.skin) };
