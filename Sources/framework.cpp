@@ -214,7 +214,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
-		"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
+		//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
+		"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
 	);
 
 	//各種ステートオブジェクトセット

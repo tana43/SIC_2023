@@ -121,7 +121,7 @@ GltfModel::BufferView GltfModel::MakeBufferView(const tinygltf::Accessor& access
         {
         case TINYGLTF_COMPONENT_TYPE_FLOAT:
             bufferView.format = DXGI_FORMAT_R32G32_FLOAT;
-            bufferView.strideInBytes = sizeof(FLOAT) * 2;
+            bufferView.strideInBytes = sizeof(FLOAT) * 2; 
             break;
 
         default:
@@ -159,7 +159,7 @@ GltfModel::BufferView GltfModel::MakeBufferView(const tinygltf::Accessor& access
 
         case TINYGLTF_COMPONENT_TYPE_FLOAT:
             bufferView.format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-            bufferView.strideInBytes = sizeof(USHORT) * 4;
+            bufferView.strideInBytes = sizeof(FLOAT) * 4;
             break;
 
         default:
@@ -249,7 +249,7 @@ void GltfModel::FetchMeshs(ID3D11Device* device, const tinygltf::Model& gltfMode
 
 void GltfModel::FetchMaterials(ID3D11Device* device, const tinygltf::Model& gltfModel)
 {
-    //実際のモデル情報をバッファー用のデータに渡していく
+    //実際のマテリアル情報をバッファー用のデータに渡していく
     for (std::vector<tinygltf::Material>::const_reference gltfMaterial : gltfModel.materials)
     {
         std::vector<Material>::reference material = materials.emplace_back();
