@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Shader.h"
+#include "Texture.h"
 
 void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {
@@ -182,8 +183,10 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	bufferDesc.StructureByteStride = 0;
 	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[1].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+}
 
-	
+bool Framework::Initialize()
+{
 	//sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	//sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
 	//sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
@@ -206,11 +209,11 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 
 	frameBuffers[0] = std::make_unique<Framebuffer>(device.Get(), 1280, 720);
-	frameBuffers[1] = std::make_unique<Framebuffer>(device.Get(), 1280/2, 720/2);
+	frameBuffers[1] = std::make_unique<Framebuffer>(device.Get(), 1280 / 2, 720 / 2);
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
-	gltfModels[0] = std::make_unique<GltfModel>(device.Get(), 
+	gltfModels[0] = std::make_unique<GltfModel>(device.Get(),
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
 		"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
@@ -228,10 +231,17 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/LuminanceExtractionPS.cso", pixelShaders[0].GetAddressOf());
 	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/BlurPS.cso", pixelShaders[1].GetAddressOf());
-}
 
-bool Framework::Initialize()
-{
+	D3D11_TEXTURE2D_DESC texture2dDesc;
+	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/sunset_jhbcentral_4k.dds", 
+		shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
+	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/deffuse_iem.dds",
+		shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
+	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/specular_pmrem.dds",
+		shaderResourceViews[2].GetAddressOf(), &texture2dDesc);
+	LoadTextureFromFile(device.Get(), L"./Resources/environments/lut_ggx.dds",
+		shaderResourceViews[3].GetAddressOf(), &texture2dDesc);
+
 	return true;
 }
 
@@ -411,6 +421,12 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+
+	//テクスチャバインド
+	immediateContext->PSSetShaderResources(32, 1, shaderResourceViews[0].GetAddressOf());
+	immediateContext->PSSetShaderResources(33, 1, shaderResourceViews[1].GetAddressOf());
+	immediateContext->PSSetShaderResources(34, 1, shaderResourceViews[2].GetAddressOf());
+	immediateContext->PSSetShaderResources(35, 1, shaderResourceViews[3].GetAddressOf());
 
 	//サンプラーステートオブジェクトをバインド
 	immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());

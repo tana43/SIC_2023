@@ -1,10 +1,13 @@
 #ifndef __BIDIRECTIONAL_REFLECTANCE_DISTRIBUTION_FUNCTION_HLSL__
 #define __BIDIRECTIONAL_REFLECTANCE_DISTRIBUTION_FUNCTION_HLSL__
 
+#include "ImageBasedLighting.hlsli"
+
 float3 FSchlick(float3 f0,float3 f90,float VoH)
 {
     return f0 + (f90 - f0) * pow(clamp(1.0 - VoH, 0.0, 1.0), 5.0);
 }
+
 float Vggx(float NoL, float NoV, float alphaRoughness)
 {
     float alphaRoughnessSq = alphaRoughness * alphaRoughness;
@@ -15,6 +18,7 @@ float Vggx(float NoL, float NoV, float alphaRoughness)
     float ggx = ggxv + ggxl;
     return (ggx > 0.0) ? 0.5 / ggx : 0.0;
 }
+
 float Dggx(float NoH,float alphaRoughness)
 {
     const float PI = 3.14159265358979;
@@ -22,11 +26,13 @@ float Dggx(float NoH,float alphaRoughness)
     float f = (NoH * NoH) * (alphaRoughnessSq - 1.0) + 1.0;
     return alphaRoughnessSq / (PI * f * f);
 }
+
 float3 BrdfLambertian(float3 f0,float3 f90,float3 diffuseColor,float VoH)
 {
     const float PI = 3.14159265358979;
     return (1.0 - FSchlick(f0, f90, VoH)) * (diffuseColor / PI);
 }
+
 float3 BrdfSpecularGgx(float3 f0,float3 f90,float alphaRoughness,
 float VoH,float NoL,float NoV,float NoH)
 {
@@ -35,6 +41,44 @@ float VoH,float NoL,float NoV,float NoH)
     float D = Dggx(NoH, alphaRoughness);
     
     return F * Vis * D;
+}
+
+float3 IblRadianceLambertian(float3 N,float3 V,float roughness,float3 diffuseColor,float3 f0)
+{
+    float NoV = clamp(dot(N, V), 0.0, 1.0);
+    
+    float2 brdfSamplePoint = clamp(float2(NoV, roughness), 0.0, 1.0);
+    float2 fAb = SampleLutGgx(brdfSamplePoint).rg;
+
+    float3 irradiance = SampleDiffuseIem(N).rgb;
+    
+    float3 fr = max(1.0 - roughness, f0) - f0;
+    float3 kS = f0 + fr * pow(1.0 - NoV, 5.0);
+    float3 fssEss = kS * fAb.x + fAb.y;
+    
+    float ems = (1.0 - (fAb.x + fAb.y));
+    float3 fAvg = (f0 + (1.0 - f0) / 21.0);
+    float3 fmsEms = ems * fssEss * fAvg / (1.0 - fAvg * ems);
+    float3 kD = diffuseColor * (1.0 - fssEss + fssEss);
+    
+    return (fmsEms + kD) * irradiance;
+}
+
+float3 IblRadianceGgx(float3 N,float3 V,float roughness,float3 f0)
+{
+    float NoV = clamp(dot(N, V), 0.0, 1.0);
+    
+    float2 brdfSamplePoint = clamp(float2(NoV, roughness), 0.0, 1.0);
+    float2 fAb = SampleLutGgx(brdfSamplePoint).rg;
+    
+    float3 R = normalize(reflect(-V, N));
+    float3 specularLight = SampleSpecularPmrem(R, roughness).rgb;
+    
+    float3 fr = max(1.0 - roughness, f0) - f0;
+    float3 kS = f0 + fr * pow(1.0 - NoV, 5.0);
+    float3 fssEss = kS * fAb.x + fAb.y;
+    
+    return specularLight * fssEss;
 }
 
 #endif

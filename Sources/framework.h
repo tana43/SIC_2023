@@ -251,5 +251,7 @@ private:
 	std::unique_ptr<FullscreenQuad> bitBlockTransfer;
 
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShaders[8];
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[8];
 };
 
