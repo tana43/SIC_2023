@@ -248,6 +248,7 @@
     <ClInclude Include="Sources\Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli" />
     <None Include="Sources\Shaders\FullscreenQuad.hlsli" />
     <None Include="Sources\Shaders\GeometricPrimitive.hlsli" />
     <None Include="Sources\Shaders\GltfModel.hlsli" />
