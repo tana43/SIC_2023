@@ -176,6 +176,9 @@
     <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Sources\Shaders\ImageBasedLighting.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Sources\Shaders\SpriteVS.hlsl">

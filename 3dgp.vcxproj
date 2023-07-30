@@ -252,6 +252,7 @@
     <None Include="Sources\Shaders\FullscreenQuad.hlsli" />
     <None Include="Sources\Shaders\GeometricPrimitive.hlsli" />
     <None Include="Sources\Shaders\GltfModel.hlsli" />
+    <None Include="Sources\Shaders\ImageBasedLighting.hlsli" />
     <None Include="Sources\Shaders\SkinnedMesh.hlsli" />
     <None Include="Sources\Shaders\Sprite.hlsli" />
     <None Include="Sources\Shaders\StaticMesh.hlsli" />
