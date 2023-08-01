@@ -1,5 +1,5 @@
-#include "GltfModel.hlsli"
 #include "BidirectionalReflectanceDistributionFunction.hlsli"
+#include "GltfModel.hlsli"
 
 struct TextureInfo
 {
@@ -48,10 +48,10 @@ StructuredBuffer<MaterialConstants> materials : register(t0);
 #define OCCLUSION_TEXTURE 4
 Texture2D<float4> materialTextures[5] : register(t1);
 
-#define POINT 0
-#define LINEAR 1
-#define ANISOTROPIC 2
-SamplerState samplerStates[3] : register(s0);
+//#define POINT 0
+//#define LINEAR 1
+//#define ANISOTROPIC 2
+//SamplerState samplerStates[3] : register(s0);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
@@ -60,7 +60,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     const MaterialConstants m = materials[material];
     
     //‚È‚ñ‚©texcoord‚Ìy‚ª‚P‚¾‚¯‘å‚«‚­‚È‚Á‚Ä‚½‚©‚çƒSƒŠ‰Ÿ‚µ‚Åˆø‚¢‚½
-    pin.texcoord.y -= 1;
+    //pin.texcoord.y -= 1;
 
     //float4 basecolor = m.pbrMetallicRoughness.basecolorTexture.index > -1 ?
     //materialTextures[BASECOLOR_TEXTURE].Sample(samplerStates[ANISOTROPIC], pin.texcoord) :

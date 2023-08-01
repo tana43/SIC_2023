@@ -215,9 +215,9 @@ bool Framework::Initialize()
 
 	gltfModels[0] = std::make_unique<GltfModel>(device.Get(),
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
-		"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+		//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
-		//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
+		"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
 	);
 
@@ -235,7 +235,7 @@ bool Framework::Initialize()
 	D3D11_TEXTURE2D_DESC texture2dDesc;
 	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/sunset_jhbcentral_4k.dds", 
 		shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
-	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/deffuse_iem.dds",
+	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/diffuse_iem.dds",
 		shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
 	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/specular_pmrem.dds",
 		shaderResourceViews[2].GetAddressOf(), &texture2dDesc);

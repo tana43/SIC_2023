@@ -1,12 +1,10 @@
 #ifndef __IMAGE_BASED_LIGHTING__
 #define __IMAGE_BASED_LIGHTING__
 
-
-#include "GltfModelPS.hlsl"
-//#define POINT 0
-//#define LINEAR 1
-//#define ANISOTROPIC 2
-//SamplerState samplerStates[3] : register(s0);
+#define POINT 0
+#define LINEAR 1
+#define ANISOTROPIC 2
+SamplerState samplerStates[3] : register(s0);
 
 Texture2D skybox : register(t32);
 TextureCube diffuseIem : register(t33);
