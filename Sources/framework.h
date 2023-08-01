@@ -206,7 +206,7 @@ private:
 	}
 
 	BOOL fullscreenMode{ FALSE };
-	BOOL vsync{ TRUE };//‚’¼“¯Šú
+	BOOL vsync{ FALSE };//‚’¼“¯Šú
 	BOOL tearingSupported{ FALSE };
 
 	RECT windowedRect;

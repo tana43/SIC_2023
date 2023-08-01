@@ -217,8 +217,10 @@ bool Framework::Initialize()
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
-		"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
+		//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
+		"./Resources/deathwing/scene.gltf"
+		//"./Resources/Crunch.gltf"
 	);
 
 	//各種ステートオブジェクトセット
