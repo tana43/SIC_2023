@@ -20,6 +20,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{5d2ed881-4062-49d0-a1ce-86240074d016}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\PostEffect">
+      <UniqueIdentifier>{45979160-8473-4d1a-8de5-f039eab00feb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Framework.cpp">
@@ -70,7 +73,7 @@
     <ClCompile Include="Sources\SkinnedMesh.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\FrameBuffer.cpp">
+    <ClCompile Include="Sources\Framebuffer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\FullscreenQuad.cpp">
@@ -80,6 +83,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Transform.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Bloom.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -138,7 +144,7 @@
     <ClInclude Include="Sources\SkinnedMesh.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\FrameBuffer.h">
+    <ClInclude Include="Sources\Framebuffer.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\FullscreenQuad.h">
@@ -151,6 +157,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\MathHelper.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Bloom.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -178,6 +187,9 @@
     </None>
     <None Include="Sources\Shaders\ImageBasedLighting.hlsli">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\Bloom.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +234,24 @@
     </FxCompile>
     <FxCompile Include="Sources\Shaders\GltfModelPS.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurDownsamplingPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurHorizontalPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurUpsamplingPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurVerticalPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\FinalPassPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GlowExtractionPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

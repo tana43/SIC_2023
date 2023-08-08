@@ -21,6 +21,7 @@
 
 #include "FrameBuffer.h"
 #include "FullscreenQuad.h"
+#include "Bloom.h"
 
 #ifdef USE_IMGUI
 #include "../imgui/imgui.h"
@@ -220,16 +221,18 @@ private:
 	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
 	std::unique_ptr<StaticMesh> staticMeshes[8];
 	std::unique_ptr<SkinnedMesh> skinnedMeshes[8];
-	std::unique_ptr<Framebuffer> frameBuffers[8];
+	std::unique_ptr<Framebuffer> framebuffers[8];
 	std::unique_ptr<GltfModel> gltfModels[8];
 
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
+	enum class DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
 	ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[0].Get() };
 	ID3D11DepthStencilState* setting3DDepthStencilState{ depthStencilStates[0].Get() };
 
+	enum class BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
@@ -241,6 +244,7 @@ private:
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
+	enum class RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE};
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[5];
 	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get()};
 	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get()};
@@ -253,5 +257,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShaders[8];
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[8];
+
+	std::unique_ptr<Bloom> bloomer;
 };
 

@@ -2,6 +2,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+//オフスクリーンレンダリング無効
+//#define DISABLE_OFFSCREENRENDERING 
+
 void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {
 	HRESULT hr{ S_OK };
@@ -149,18 +152,57 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	
 		//ブレンディングステートオブジェクト作成
 	{
-		D3D11_BLEND_DESC blendDesc{};
-		blendDesc.AlphaToCoverageEnable = FALSE;
-		blendDesc.IndependentBlendEnable                = FALSE;
-		blendDesc.RenderTarget[0].BlendEnable           = TRUE;
-		blendDesc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
-		blendDesc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
-		blendDesc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
-		blendDesc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		hr = device->CreateBlendState(&blendDesc, blendStates[0].GetAddressOf());
+		D3D11_BLEND_DESC blend_desc{};
+		blend_desc.AlphaToCoverageEnable                 = FALSE;
+		blend_desc.IndependentBlendEnable                = FALSE;
+		blend_desc.RenderTarget[0].BlendEnable           = FALSE;
+		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ONE;
+		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_ZERO;
+		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::NONE)].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		blend_desc.AlphaToCoverageEnable                 = FALSE;
+		blend_desc.IndependentBlendEnable                = FALSE;
+		blend_desc.RenderTarget[0].BlendEnable           = TRUE;
+		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
+		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
+		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_INV_SRC_ALPHA;
+		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		blend_desc.AlphaToCoverageEnable                 = FALSE;
+		blend_desc.IndependentBlendEnable                = FALSE;
+		blend_desc.RenderTarget[0].BlendEnable           = TRUE;
+		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA; //D3D11_BLEND_ONE D3D11_BLEND_SRC_ALPHA
+		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_ONE;
+		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ZERO;
+		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ONE;
+		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ADD)].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		blend_desc.AlphaToCoverageEnable                 = FALSE;
+		blend_desc.IndependentBlendEnable                = FALSE;
+		blend_desc.RenderTarget[0].BlendEnable           = TRUE;
+		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ZERO; //D3D11_BLEND_DEST_COLOR
+		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_SRC_COLOR; //D3D11_BLEND_SRC_COLOR
+		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_DEST_ALPHA;
+		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::MULTIPLY)].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	}
 
@@ -208,8 +250,8 @@ bool Framework::Initialize()
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 
-	frameBuffers[0] = std::make_unique<Framebuffer>(device.Get(), 1280, 720);
-	frameBuffers[1] = std::make_unique<Framebuffer>(device.Get(), 1280 / 2, 720 / 2);
+	framebuffers[0] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy);
+	framebuffers[1] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx / 2, framebufferDimensions.cy / 2);
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
@@ -243,6 +285,9 @@ bool Framework::Initialize()
 		shaderResourceViews[2].GetAddressOf(), &texture2dDesc);
 	LoadTextureFromFile(device.Get(), L"./Resources/environments/lut_ggx.dds",
 		shaderResourceViews[3].GetAddressOf(), &texture2dDesc);
+
+	bloomer = std::make_unique<Bloom>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy);
+	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/FinalPassPS.cso", pixelShaders[0].ReleaseAndGetAddressOf());
 
 	return true;
 }
@@ -436,7 +481,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->PSSetSamplers(2, 1, samplerStates[2].GetAddressOf());
 
 	//ブレンディングステートオブジェクトセット
-	immediateContext->OMSetBlendState(blendStates[0].Get(), nullptr, 0xFFFFFFFF);
+	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].Get(), nullptr, 0xFFFFFFFF);
 
 	//ビュー・プロジェクション交換行列を計算
 	D3D11_VIEWPORT viewport;
@@ -474,9 +519,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	
 	immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
 	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());
+#ifndef DISABLE_OFFSCREENRENDERING
+	framebuffers[0]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
+	framebuffers[0]->Activate(immediateContext.Get());
+#endif // !ENABLE_OFFSCREENRENDERING
 
-	frameBuffers[0]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
-	frameBuffers[0]->Activate(immediateContext.Get());
 
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
 
@@ -589,6 +636,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		skinnedMeshes[0]->UpdateAnimation(keyframe);
 
 #endif // 0
+
 		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
 		static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
@@ -596,36 +644,54 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		gltfModels[0]->Animate(0, time += elapsedTime, animatedNodes);
 		gltfModels[0]->Render(immediateContext.Get(),animatedNodes);
 
-	frameBuffers[0]->Deactivate(immediateContext.Get());
+#ifndef DISABLE_OFFSCREENRENDERING
+	framebuffers[0]->Deactivate(immediateContext.Get());
 
-#if 1
+
+#if 0//先生の方のブルームに切り替え
 	immediateContext->RSSetState(rasterizerStates[4].Get());
 	immediateContext->OMSetDepthStencilState(depthStencilStates[3].Get(), 1);
 
-	frameBuffers[1]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
-	frameBuffers[1]->Activate(immediateContext.Get());
+	framebuffers[1]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
+	framebuffers[1]->Activate(immediateContext.Get());
 	bitBlockTransfer->Bilt(immediateContext.Get(),
-		frameBuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1,pixelShaders[0].Get());
-	frameBuffers[1]->Deactivate(immediateContext.Get());
+		framebuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1,pixelShaders[0].Get());
+	framebuffers[1]->Deactivate(immediateContext.Get());
 #endif // 1
 
 #if 0
 	bitBlockTransfer->Bilt(immediateContext.Get(),
-		frameBuffers[1]->shaderResourceViews[0].GetAddressOf(), 0, 1);
+		framebuffers[1]->shaderResourceViews[0].GetAddressOf(), 0, 1);
 #endif // 1
 
+#if 0
 	//シーン画像とブラーをかけた高輝度成分画像を合成
 	ID3D11ShaderResourceView* shaderResorceViews[2]{
-		frameBuffers[0]->shaderResourceViews[0].Get(),frameBuffers[1]->shaderResourceViews[0].Get() 
+		framebuffers[0]->shaderResourceViews[0].Get(),framebuffers[1]->shaderResourceViews[0].Get()
 	};
 	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResorceViews, 0, 2, pixelShaders[1].Get());
+#endif // 0
+
+	//ブルーム
+	bloomer->Make(immediateContext.Get(), framebuffers[0]->shaderResourceViews[0].Get());
+
+	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_OFF_ZW_OFF)].Get(), 0);
+	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
+	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].Get(), nullptr, 0xFFFFFFFF);
+	ID3D11ShaderResourceView* shaderResourceViews[] =
+	{
+		framebuffers[0]->shaderResourceViews[0].Get(),
+		bloomer->ShaderResourceView(),
+	};
+	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResourceViews, 0, 2, pixelShaders[0].Get());
+	
+#endif // !DISABLE_OFFSCREENRENDERING
 
 #ifdef _DEBUG
 		immediateContext->RSSetState(rasterizerStates[1].Get());
 		//staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
 		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
 #endif // _DEBUG
-
 	}
 
 	
@@ -966,10 +1032,12 @@ void Framework::DrawDebug()
 
 		if (ImGui::BeginMenu("PostEffect"))
 		{
-			ImGui::SliderFloat("ExtractionThreshold", &parametricConstants.extractionThreshold,0,1);
+			/*ImGui::SliderFloat("ExtractionThreshold", &parametricConstants.extractionThreshold,0,1);
 			ImGui::SliderFloat("GaussianSigma", &parametricConstants.gaussianSigma,0.001f,10);
 			ImGui::SliderFloat("BloomIntensity", &parametricConstants.bloomIntensity,0,5);
-			ImGui::SliderFloat("Exposure", &parametricConstants.exposure, 0.0f, 2.2f);
+			ImGui::SliderFloat("Exposure", &parametricConstants.exposure, 0.0f, 2.2f);*/
+
+			bloomer->DrawDebug();
 
 			ImGui::EndMenu();
 		}
