@@ -11,11 +11,11 @@ Bloom::Bloom(ID3D11Device* device, uint32_t width, uint32_t height)
 {
     bitBlockTransfer = std::make_unique<FullscreenQuad>(device);
 
-    glowExtraction = std::make_unique<Framebuffer>(device, width, height);
+    glowExtraction = std::make_unique<Framebuffer>(device, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
     for (size_t downsampledIndex = 0; downsampledIndex < downsampledCount; downsampledIndex++)
     {
-        gaussianBlur[downsampledIndex][0] = std::make_unique<Framebuffer>(device, width >> downsampledIndex, height >> downsampledIndex);
-        gaussianBlur[downsampledIndex][1] = std::make_unique<Framebuffer>(device, width >> downsampledIndex, height >> downsampledIndex);
+        gaussianBlur[downsampledIndex][0] = std::make_unique<Framebuffer>(device, width >> downsampledIndex, height >> downsampledIndex, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
+        gaussianBlur[downsampledIndex][1] = std::make_unique<Framebuffer>(device, width >> downsampledIndex, height >> downsampledIndex, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
     }
     Shader::CreatePSFromCso(device, "./Resources/Shader/GlowExtractionPS.cso", glowExtractionPs.GetAddressOf());
     Shader::CreatePSFromCso(device, "./Resources/Shader/GaussianBlurDownsamplingPS.cso", gaussianBlurDownsamplingPs.GetAddressOf());

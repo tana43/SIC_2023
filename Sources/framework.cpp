@@ -250,8 +250,8 @@ bool Framework::Initialize()
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 
-	framebuffers[0] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy);
-	framebuffers[1] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx / 2, framebufferDimensions.cy / 2);
+	framebuffers[0] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy,DXGI_FORMAT_R16G16B16A16_FLOAT,true);
+	framebuffers[1] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx / 2, framebufferDimensions.cy / 2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
 
