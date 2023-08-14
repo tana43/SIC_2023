@@ -299,10 +299,7 @@
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="Sources\SkyBoxEffect.cpp">
-      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pch</PrecompiledHeaderOutputFile>
-      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
+    <ClCompile Include="Sources\SkyBoxShader.cpp" />
     <ClCompile Include="Sources\Sprite.cpp">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch</PrecompiledHeaderOutputFile>
@@ -341,11 +338,11 @@
     <ClInclude Include="Sources\GltfModel.h" />
     <ClInclude Include="Sources\high_resolution_timer.h" />
     <ClInclude Include="Sources\MathHelper.h" />
-    <ClInclude Include="Sources\misc.h" />
+    <ClInclude Include="Sources\Misc.h" />
     <ClInclude Include="Sources\ReadData.h" />
     <ClInclude Include="Sources\Shader.h" />
     <ClInclude Include="Sources\SkinnedMesh.h" />
-    <ClInclude Include="Sources\SkyBoxEffect.h" />
+    <ClInclude Include="Sources\SkyBoxShader.h" />
     <ClInclude Include="Sources\Sprite.h" />
     <ClInclude Include="Sources\SpriteBatch.h" />
     <ClInclude Include="Sources\StaticMesh.h" />
@@ -360,7 +357,6 @@
     <None Include="Sources\Shaders\GltfModel.hlsli" />
     <None Include="Sources\Shaders\ImageBasedLighting.hlsli" />
     <None Include="Sources\Shaders\SkinnedMesh.hlsli" />
-    <None Include="Sources\Shaders\SkyBoxEffect.hlsli" />
     <None Include="Sources\Shaders\Sprite.hlsli" />
     <None Include="Sources\Shaders\StaticMesh.hlsli" />
   </ItemGroup>
@@ -456,18 +452,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\SkinnedMeshVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\SkyBoxEffectPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\SkyBoxEffectVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
