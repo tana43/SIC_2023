@@ -27,3 +27,25 @@ void SkyBoxEffect::SetTexture(ID3D11ShaderResourceView* value)
 {
     texture = value;
 }
+
+void XM_CALLCONV SkyBoxEffect::SetWorld(DirectX::FXMMATRIX value)
+{
+    //スカイボックスはデザイン上ワールド行列を使用しない
+}
+
+void XM_CALLCONV SkyBoxEffect::SetView(DirectX::FXMMATRIX value)
+{
+    view = value;
+}
+
+void XM_CALLCONV SkyBoxEffect::SetProjection(DirectX::FXMMATRIX value)
+{
+    proj = value;
+}
+
+void XM_CALLCONV SkyBoxEffect::SetMatrices(DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
+{
+    //スカイボックスはデザイン上ワールド行列を使用しない
+    this->view = view;
+    proj = projection;
+}

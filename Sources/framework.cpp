@@ -602,9 +602,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		//staticMeshes[0]->Render(immediateContext.Get());
 		//staticMeshes[1]->Render(immediateContext.Get());
 
-
-
-
 #if 0
 		int clipIndex{ 0 };
 		int frameIndex{ 0 };

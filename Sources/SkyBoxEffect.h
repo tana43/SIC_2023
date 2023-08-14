@@ -4,7 +4,8 @@
 #include <vector>
 #include <wrl.h>
 
-#include <DirectXMath.h>
+#include "SimpleMath.h"
+#include <BufferHelpers.h>
 
 class SkyBoxEffect : public DirectX::IEffect, public DirectX::IEffectMatrices
 {
@@ -28,5 +29,18 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture;
     std::vector<uint8_t> vsBlob;
+
+    DirectX::SimpleMath::Matrix view;
+    DirectX::SimpleMath::Matrix proj;
+    DirectX::SimpleMath::Matrix worldViewProj;
+
+    uint32_t dirtyFlags;
+
+    struct __declspec(align(16)) SkyboxEffectConstants
+    {
+        DirectX::XMMATRIX worldViewProj;
+    };
+
+    DirectX::ConstantBuffer<>
 };
 
