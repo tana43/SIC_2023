@@ -23,6 +23,9 @@
     <Filter Include="Shaders\PostEffect">
       <UniqueIdentifier>{45979160-8473-4d1a-8de5-f039eab00feb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Model">
+      <UniqueIdentifier>{ba2ade6b-ab0a-4e2c-9a5c-0935adf0507c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Framework.cpp">
@@ -86,6 +89,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Bloom.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\SkyBoxEffect.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -162,6 +168,12 @@
     <ClInclude Include="Sources\Bloom.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\SkyBoxEffect.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\ReadData.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">
@@ -170,16 +182,7 @@
     <None Include="Sources\Shaders\GeometricPrimitive.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Sources\Shaders\StaticMesh.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Sources\Shaders\SkinnedMesh.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Sources\Shaders\FullscreenQuad.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Sources\Shaders\GltfModel.hlsli">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli">
@@ -190,6 +193,18 @@
     </None>
     <None Include="Sources\Shaders\Bloom.hlsli">
       <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Sources\Shaders\GltfModel.hlsli">
+      <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\SkinnedMesh.hlsli">
+      <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\StaticMesh.hlsli">
+      <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\SkyBoxEffect.hlsli">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -205,18 +220,6 @@
     <FxCompile Include="Sources\Shaders\GeometricPrimitiveVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Sources\Shaders\StaticMeshVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\StaticMeshPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\SkinnedMeshVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\SkinnedMeshPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Sources\Shaders\FullscreenQuadVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
@@ -227,12 +230,6 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\BlurPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\GltfModelVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Sources\Shaders\GltfModelPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\GaussianBlurDownsamplingPS.hlsl">
@@ -252,6 +249,30 @@
     </FxCompile>
     <FxCompile Include="Sources\Shaders\GlowExtractionPS.hlsl">
       <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GltfModelPS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GltfModelVS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkinnedMeshPS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkinnedMeshVS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\StaticMeshPS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\StaticMeshVS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkyBoxEffectVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkyBoxEffectPS.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -4,17 +4,17 @@ VS_OUT main(VS_IN vin)
 {
     float sigma = vin.tangent.w;
     
-    if (skin > -1)
-    {
-        row_major float4x4 skinMatrix =
-            vin.weights.x * jointMatrices[vin.joints.x] +
-            vin.weights.y * jointMatrices[vin.joints.y] +
-            vin.weights.z * jointMatrices[vin.joints.z] +
-            vin.weights.w * jointMatrices[vin.joints.w];
-        vin.position = mul(float4(vin.position.xyz, 1), skinMatrix);
-        vin.normal = normalize(mul(float4(vin.normal.xyz, 0), skinMatrix));
-        vin.tangent = normalize(mul(float4(vin.tangent.xyz, 0), skinMatrix));
-    }
+    //if (skin > -1)
+    //{
+    //    row_major float4x4 skinMatrix =
+    //        vin.weights.x * jointMatrices[vin.joints.x] +
+    //        vin.weights.y * jointMatrices[vin.joints.y] +
+    //        vin.weights.z * jointMatrices[vin.joints.z] +
+    //        vin.weights.w * jointMatrices[vin.joints.w];
+    //    vin.position = mul(float4(vin.position.xyz, 1), skinMatrix);
+    //    vin.normal = normalize(mul(float4(vin.normal.xyz, 0), skinMatrix));
+    //    vin.tangent = normalize(mul(float4(vin.tangent.xyz, 0), skinMatrix));
+    //}
     
     VS_OUT vout;
 	

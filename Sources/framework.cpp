@@ -245,7 +245,7 @@ bool Framework::Initialize()
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
+	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
@@ -261,8 +261,11 @@ bool Framework::Initialize()
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
-		"./Resources/deathwing/scene.gltf"
-		//"./Resources/Crunch.gltf"
+		//"./Resources/deathwing/scene.gltf"
+		//"./Resources/cube.glb"
+		//"./Resources/crunch.gltf"
+		"./Resources/Crunch/Crunch.gltf"
+		//"./Resources/Stage/Showcase.gltf"
 	);
 
 	//各種ステートオブジェクトセット
@@ -602,7 +605,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 
 
-#if 1
+#if 0
 		int clipIndex{ 0 };
 		int frameIndex{ 0 };
 		static float animationTick{ 0 };
@@ -627,17 +630,17 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		skinnedMeshes[0]->UpdateAnimation(keyframe);
 #endif // 1
 #else
-		Animation::Keyframe keyframe;
+		/*Animation::Keyframe keyframe;
 		const Animation::Keyframe* keyframes[2]{
 			&skinnedMeshes[0]->animationClips.at(0).sequence.at(40),
 			&skinnedMeshes[0]->animationClips.at(0).sequence.at(80)
 		};
 		skinnedMeshes[0]->BlendAnimations(keyframes, blendAnimation, keyframe);
-		skinnedMeshes[0]->UpdateAnimation(keyframe);
+		skinnedMeshes[0]->UpdateAnimation(keyframe);*/
 
 #endif // 0
 
-		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
+		//skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
 		static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
 		static float time{ 0 };
@@ -1052,7 +1055,7 @@ void Framework::DrawDebug()
 	staticMeshes[0]->DrawDebug();
 	staticMeshes[1]->DrawDebug();*/
 
-	skinnedMeshes[0]->DrawDebug();
+	//skinnedMeshes[0]->DrawDebug();
 
 	gltfModels[0]->DrawDebug();
 

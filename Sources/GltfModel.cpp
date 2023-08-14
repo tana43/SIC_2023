@@ -111,6 +111,11 @@ GltfModel::BufferView GltfModel::MakeBufferView(const tinygltf::Accessor& access
             bufferView.strideInBytes = sizeof(UINT);
             break;
 
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            bufferView.format = DXGI_FORMAT_R8_UINT;
+            bufferView.strideInBytes = sizeof(BYTE);
+            break;
+
         default:
             _ASSERT_EXPR(FALSE, L"This accessor component type is not supported.");
             break;
@@ -147,6 +152,16 @@ GltfModel::BufferView GltfModel::MakeBufferView(const tinygltf::Accessor& access
     case TINYGLTF_TYPE_VEC4:
         switch (accessor.componentType)
         {
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+            bufferView.format = DXGI_FORMAT_R8G8B8A8_SINT;
+            bufferView.strideInBytes = sizeof(CHAR) * 4;
+            break;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            bufferView.format = DXGI_FORMAT_R8G8B8A8_UINT;
+            bufferView.strideInBytes = sizeof(BYTE) * 4;
+            break;
+
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
             bufferView.format = DXGI_FORMAT_R16G16B16A16_UINT;
             bufferView.strideInBytes = sizeof(USHORT) * 4;
