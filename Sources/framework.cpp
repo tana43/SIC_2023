@@ -3,7 +3,7 @@
 #include "Texture.h"
 
 //オフスクリーンレンダリング無効
-//#define DISABLE_OFFSCREENRENDERING 
+#define DISABLE_OFFSCREENRENDERING 
 
 void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {
@@ -261,12 +261,17 @@ bool Framework::Initialize()
 		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
-		//"./Resources/deathwing/scene.gltf"
+		"./Resources/deathwing/scene.gltf"
 		//"./Resources/cube.glb"
 		//"./Resources/crunch.gltf"
-		"./Resources/Crunch/Crunch.gltf"
+		//"./Resources/Crunch/Crunch.gltf"
 		//"./Resources/Stage/Showcase.gltf"
 	);
+	skyboxSprite = std::make_unique<Sprite>(device.Get(), 
+		//L"./Resources/SkyBox/envmap_miramar.dds"
+		L"./Resources/SkyBox/Sky.png"
+	);
+	skybox = std::make_unique<SkyBox>(device.Get(), skyboxSprite.get());
 
 	//各種ステートオブジェクトセット
 	{
@@ -516,6 +521,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
 	data.lightDirection = { front.x,front.y,front.z,0 };
 	data.cameraPosition = { cameraPos.x,cameraPos.y,cameraPos.z,0 };
+	DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
@@ -527,6 +533,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	framebuffers[0]->Activate(immediateContext.Get());
 #endif // !ENABLE_OFFSCREENRENDERING
 
+	//背景
+	skybox->Render(immediateContext.Get(), V, P);
 
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
 

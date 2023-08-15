@@ -91,7 +91,7 @@
     <ClCompile Include="Sources\Bloom.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\SkyBoxShader.cpp">
+    <ClCompile Include="Sources\SkyBox.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -171,7 +171,7 @@
     <ClInclude Include="Sources\ReadData.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\SkyBoxShader.h">
+    <ClInclude Include="Sources\SkyBox.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -202,6 +202,9 @@
     </None>
     <None Include="Sources\Shaders\StaticMesh.hlsli">
       <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\SkyBox.hlsli">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -264,6 +267,12 @@
     </FxCompile>
     <FxCompile Include="Sources\Shaders\StaticMeshVS.hlsl">
       <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkyBoxPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkyBoxVS.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

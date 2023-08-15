@@ -7,14 +7,6 @@
 class Sprite
 {
 public:
-    Microsoft::WRL::ComPtr<ID3D11VertexShader>  vertexShader;
-    Microsoft::WRL::ComPtr<ID3D11PixelShader>   pixelShader;
-    Microsoft::WRL::ComPtr<ID3D11InputLayout>   inputLayout;
-    Microsoft::WRL::ComPtr<ID3D11Buffer>        vertexBuffer;
-
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
-    D3D11_TEXTURE2D_DESC texture2dDesc;
-
     Sprite(ID3D11Device* device,const wchar_t* filename);
     ~Sprite();
 
@@ -39,12 +31,28 @@ public:
     
     void DrawDebug();
 
-private:
+    //シェーダーリソースビュー取得
+    const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return shaderResourceView; }
+
+    //頂点バッファ取得
+    const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return vertexBuffer; }
+    
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
         DirectX::XMFLOAT4 color;
         DirectX::XMFLOAT2 texcoord;
     };
+
+private:
+   
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>  vertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>   pixelShader;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>   inputLayout;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        vertexBuffer;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+    D3D11_TEXTURE2D_DESC texture2dDesc;
 };
 
