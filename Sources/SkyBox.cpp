@@ -126,8 +126,8 @@ void SkyBox::Render(ID3D11DeviceContext* immediateContext, DirectX::XMMATRIX V, 
 	DirectX::XMStoreFloat4(&cbScene.viewPosition, V.r[3]);
 
 	//framework‚Å‚â‚Á‚Ä‚é
-	/*immediateContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
-	immediateContext->VSSetConstantBuffers(1, 1, sceneConstantBuffer.GetAddressOf());*/
+	immediateContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
+	immediateContext->VSSetConstantBuffers(1, 1, sceneConstantBuffer.GetAddressOf());
 
 	UINT stride{ sizeof(Sprite::Vertex) };
 	UINT offset{ 0 };

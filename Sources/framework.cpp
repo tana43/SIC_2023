@@ -269,7 +269,9 @@ bool Framework::Initialize()
 	);
 	skyboxSprite = std::make_unique<Sprite>(device.Get(), 
 		//L"./Resources/SkyBox/envmap_miramar.dds"
-		L"./Resources/SkyBox/Sky.png"
+		//L"./Resources/SkyBox/Sky.png"
+		//L"./Resources/SkyBox/realistic_bloodborne.jpg"
+		L"./Resources/SkyBox/realistic_tokyo_night_view.jpg"
 	);
 	skybox = std::make_unique<SkyBox>(device.Get(), skyboxSprite.get());
 
@@ -521,10 +523,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
 	data.lightDirection = { front.x,front.y,front.z,0 };
 	data.cameraPosition = { cameraPos.x,cameraPos.y,cameraPos.z,0 };
-	DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
-	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
-	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
-	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	//DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
+	
 	
 	immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
 	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());
@@ -535,6 +535,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 	//背景
 	skybox->Render(immediateContext.Get(), V, P);
+
+	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
+	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
+	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
 

@@ -57,7 +57,7 @@ public:
 		DirectX::XMFLOAT4X4 viewProjection;	//ビュープロジェクション交換行列
 		DirectX::XMFLOAT4 lightDirection;	//ライトの向き
 		DirectX::XMFLOAT4 cameraPosition;
-		DirectX::XMFLOAT4X4 inverseViewProjection;//ビュープロジェクション逆行列
+		//DirectX::XMFLOAT4X4 inverseViewProjection;//ビュープロジェクション逆行列
 	};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffers[8];
 

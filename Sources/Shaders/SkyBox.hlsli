@@ -6,10 +6,8 @@ struct VS_OUT
 
 cbuffer SCENE_CONSTANT_BUFFER : register(b1)
 {
-    row_major float4x4 viewProjection;
-    float4 lightDirection;
-    float4 cameraPosition;
     row_major float4x4 inverseViewProjection;
+    float4 cameraPosition;
 }
 
 static const float PI = 3.141592654f;
