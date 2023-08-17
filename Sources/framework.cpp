@@ -3,7 +3,7 @@
 #include "Texture.h"
 
 //オフスクリーンレンダリング無効
-#define DISABLE_OFFSCREENRENDERING 
+//#define DISABLE_OFFSCREENRENDERING 
 
 void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {

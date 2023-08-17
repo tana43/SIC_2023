@@ -94,6 +94,9 @@
     <ClCompile Include="Sources\SkyBox.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Particles.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Framework.h">
@@ -172,6 +175,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\SkyBox.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Particles.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -291,6 +291,7 @@
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="Sources\Particles.cpp" />
     <ClCompile Include="Sources\Shader.cpp">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch</PrecompiledHeaderOutputFile>
@@ -339,6 +340,7 @@
     <ClInclude Include="Sources\high_resolution_timer.h" />
     <ClInclude Include="Sources\MathHelper.h" />
     <ClInclude Include="Sources\Misc.h" />
+    <ClInclude Include="Sources\Particles.h" />
     <ClInclude Include="Sources\ReadData.h" />
     <ClInclude Include="Sources\Shader.h" />
     <ClInclude Include="Sources\SkinnedMesh.h" />
