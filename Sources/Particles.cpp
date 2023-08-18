@@ -43,5 +43,75 @@ Particles::Particles(ID3D11Device* device, size_t particleCount) : maxParticleCo
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     Shader::CreateVSFromCso(device, "./Resources/Shader/ParticleVS.cso", particleVS.ReleaseAndGetAddressOf(), NULL, NULL, 0);
-    Shader::CreatePSFromCso(device, "./Resources/Shader/ParticlePS.cso")
+    Shader::CreatePSFromCso(device, "./Resources/Shader/ParticlePS.cso",particlePS.ReleaseAndGetAddressOf());
+    Shader::CreateGSFromCso(device, "./Resources/Shader/ParticleGS.cso",particleGS.ReleaseAndGetAddressOf());
+    Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso",particleCS.ReleaseAndGetAddressOf());
+    Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso",particleInitializerCS.ReleaseAndGetAddressOf());
 }
+
+UINT Align(UINT num, UINT alignment)
+{
+    return (num + (alignment - 1)) & ~(alignment - 1);
+}
+
+void Particles::Integrate(ID3D11DeviceContext* immediateContext, float deltaTime)
+{
+    immediateContext->CSSetUnorderedAccessViews(0, 1, particleBufferUav.GetAddressOf(), NULL);
+
+    particleData.time += deltaTime;
+    particleData.deltaTime = deltaTime;
+    immediateContext->UpdateSubresource(constantBuffer.Get(),0,0,&particleData,0,0);
+    immediateContext->CSSetConstantBuffers(9, 1, constantBuffer.GetAddressOf());
+
+    immediateContext->CSSetShader(particleCS.Get(), NULL, 0);
+
+    const UINT threadGroupCountX = Align(static_cast<UINT>(maxParticleCount), NUMTHREADS_X) / NUMTHREADS_X;
+    immediateContext->Dispatch(threadGroupCountX, 1, 1);
+
+    ID3D11UnorderedAccessView* nullUnorederedAccessView{};
+    immediateContext->CSSetUnorderedAccessViews(0, 1, &nullUnorederedAccessView, NULL);
+}
+
+void Particles::Initialize(ID3D11DeviceContext* immediateContext, float deltaTime)
+{
+    immediateContext->CSSetUnorderedAccessViews(0, 1, particleBufferUav.GetAddressOf(), NULL);
+
+    particleData.time += deltaTime;
+    particleData.deltaTime = deltaTime;
+    immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &particleData, 0, 0);
+    immediateContext->CSSetConstantBuffers(9, 1, constantBuffer.GetAddressOf());
+
+    immediateContext->CSSetShader(particleInitializerCS.Get(), NULL, 0);
+
+    const UINT threadGroupCountX = Align(static_cast<UINT>(maxParticleCount), NUMTHREADS_X) / NUMTHREADS_X;
+    immediateContext->Dispatch(threadGroupCountX, 1, 1);
+
+    ID3D11UnorderedAccessView* nullUnorderedAccessView{};
+    immediateContext->CSSetUnorderedAccessViews(0, 1, &nullUnorderedAccessView, NULL);
+}
+
+void Particles::Render(ID3D11DeviceContext* immediateContext)
+{
+    immediateContext->VSSetShader(particleVS.Get(), NULL, 0);
+    immediateContext->PSSetShader(particlePS.Get(), NULL, 0);
+    immediateContext->GSSetShader(particleGS.Get(), NULL, 0);
+    immediateContext->GSSetShaderResources(9, 1, particleBufferSrv.GetAddressOf());
+
+    immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &particleData,0,0);
+    immediateContext->VSSetConstantBuffers(9, 1, constantBuffer.GetAddressOf());
+    immediateContext->PSSetConstantBuffers(9, 1, constantBuffer.GetAddressOf());
+    immediateContext->GSSetConstantBuffers(9, 1, constantBuffer.GetAddressOf());
+
+    immediateContext->IASetInputLayout(NULL);
+    immediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+    immediateContext->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
+    immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+    immediateContext->Draw(static_cast<UINT>(maxParticleCount), 0);
+
+    ID3D11ShaderResourceView* nullShaderResourceView{};
+    immediateContext->GSSetShaderResources(9, 1, &nullShaderResourceView);
+    immediateContext->VSSetShader(NULL, NULL, 0);
+    immediateContext->PSSetShader(NULL, NULL, 0);
+    immediateContext->GSSetShader(NULL, NULL, 0);
+}
+

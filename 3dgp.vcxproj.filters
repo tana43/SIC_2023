@@ -26,6 +26,9 @@
     <Filter Include="Shaders\Model">
       <UniqueIdentifier>{ba2ade6b-ab0a-4e2c-9a5c-0935adf0507c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Particle">
+      <UniqueIdentifier>{cce70c03-c16f-41ea-9aaa-f61506eea6d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Framework.cpp">
@@ -212,6 +215,9 @@
     <None Include="Sources\Shaders\SkyBox.hlsli">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Sources\Shaders\Particle.hlsli">
+      <Filter>Shaders\Particle</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Sources\Shaders\SpriteVS.hlsl">
@@ -279,6 +285,21 @@
     </FxCompile>
     <FxCompile Include="Sources\Shaders\SkyBoxVS.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticlePS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleVS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleCS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleGS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleInitializerCS.hlsl">
+      <Filter>Shaders\Particle</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

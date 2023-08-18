@@ -8,5 +8,9 @@ public:
         ID3D11InputLayout** inputLayout, D3D11_INPUT_ELEMENT_DESC* inputElementDesc, SIZE_T BytecodeLength);
 
     static void CreatePSFromCso(ID3D11Device* device, const char* csoName, ID3D11PixelShader** pixelShader);
+
+    static void CreateGSFromCso(ID3D11Device* device, const char* csoName, ID3D11GeometryShader** geometryShader);
+
+    static void CreateCSFromCso(ID3D11Device* device, const char* csoName, ID3D11ComputeShader** computeShader);
 };
 

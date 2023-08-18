@@ -246,6 +246,7 @@ bool Framework::Initialize()
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/golem.fbx");
 
 	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
 	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
@@ -615,7 +616,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		//staticMeshes[0]->Render(immediateContext.Get());
 		//staticMeshes[1]->Render(immediateContext.Get());
 
-#if 0
+#if 1
 		int clipIndex{ 0 };
 		int frameIndex{ 0 };
 		static float animationTick{ 0 };
@@ -650,7 +651,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 #endif // 0
 
-		//skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
+		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
 
 		static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
 		static float time{ 0 };
@@ -1065,7 +1066,7 @@ void Framework::DrawDebug()
 	staticMeshes[0]->DrawDebug();
 	staticMeshes[1]->DrawDebug();*/
 
-	//skinnedMeshes[0]->DrawDebug();
+	skinnedMeshes[0]->DrawDebug();
 
 	gltfModels[0]->DrawDebug();
 

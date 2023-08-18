@@ -6,6 +6,8 @@
 
 #include <vector>
 
+#define NUMTHREADS_X 16
+
 struct Particle
 {
     DirectX::XMFLOAT4 color{1, 1, 1, 1};
