@@ -19,6 +19,7 @@
 #include "SkinnedMesh.h"
 #include "GltfModel.h"
 #include "SkyBox.h"
+#include "Particles.h"
 
 #include "FrameBuffer.h"
 #include "FullscreenQuad.h"
@@ -227,6 +228,7 @@ private:
 	std::unique_ptr<GltfModel> gltfModels[8];
 	std::unique_ptr<SkyBox> skybox;
 	std::unique_ptr<Sprite> skyboxSprite;
+	std::unique_ptr<Particles> particles;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 

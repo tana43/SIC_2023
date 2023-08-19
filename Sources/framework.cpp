@@ -300,6 +300,9 @@ bool Framework::Initialize()
 	bloomer = std::make_unique<Bloom>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy);
 	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/FinalPassPS.cso", pixelShaders[0].ReleaseAndGetAddressOf());
 
+	particles = std::make_unique<decltype(particles)::element_type>(device.Get(), 1000);
+	particles->Initialize(immediateContext.Get(), 0);
+
 	return true;
 }
 
@@ -686,6 +689,24 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResorceViews, 0, 2, pixelShaders[1].Get());
 #endif // 0
 
+	
+	
+#endif // !DISABLE_OFFSCREENRENDERING
+
+#ifdef _DEBUG
+		immediateContext->RSSetState(rasterizerStates[1].Get());
+		//staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
+		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
+#endif // _DEBUG
+	}
+
+	//パーティクル
+	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_ON_ZW_ON)].Get(), 0);
+	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
+	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ADD)].Get(),nullptr,0xFFFFFFFF);
+	immediateContext->GSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	particles->Render(immediateContext.Get());
+
 	//ブルーム
 	bloomer->Make(immediateContext.Get(), framebuffers[0]->shaderResourceViews[0].Get());
 
@@ -698,15 +719,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		bloomer->ShaderResourceView(),
 	};
 	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResourceViews, 0, 2, pixelShaders[0].Get());
-	
-#endif // !DISABLE_OFFSCREENRENDERING
-
-#ifdef _DEBUG
-		immediateContext->RSSetState(rasterizerStates[1].Get());
-		//staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
-		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
-#endif // _DEBUG
-	}
 
 	
 
