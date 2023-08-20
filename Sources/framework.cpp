@@ -462,6 +462,13 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 		FullscreenState(!fullscreenMode);
 	}
 
+	//スペースでパーティクルリセット
+	if (GetAsyncKeyState(' ') & 0x8000)
+	{
+		particles->Initialize(immediateContext.Get(), 0);
+	}
+	particles->Integrate(immediateContext.Get(), elapsed_time);
+
 	DrawDebug();
 
 	//ImGui::ShowDemoWindow();
@@ -538,7 +545,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // !ENABLE_OFFSCREENRENDERING
 
 	//背景
-	skybox->Render(immediateContext.Get(), V, P);
+	//skybox->Render(immediateContext.Get(), V, P);
 
 	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
@@ -605,6 +612,12 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 	}
 
+	//パーティクル
+	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_ON_ZW_ON)].Get(), 0);
+	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
+	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ADD)].Get(), nullptr, 0xFFFFFFFF);
+	immediateContext->GSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	particles->Render(immediateContext.Get());
 
 	//3D
 	{
@@ -700,12 +713,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // _DEBUG
 	}
 
-	//パーティクル
-	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_ON_ZW_ON)].Get(), 0);
-	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
-	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ADD)].Get(),nullptr,0xFFFFFFFF);
-	immediateContext->GSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
-	particles->Render(immediateContext.Get());
+	
 
 	//ブルーム
 	bloomer->Make(immediateContext.Get(), framebuffers[0]->shaderResourceViews[0].Get());
@@ -720,7 +728,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	};
 	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResourceViews, 0, 2, pixelShaders[0].Get());
 
-	
 
 #ifdef USE_IMGUI
 	ImGui::Render();

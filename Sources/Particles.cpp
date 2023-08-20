@@ -30,7 +30,7 @@ Particles::Particles(ID3D11Device* device, size_t particleCount) : maxParticleCo
     unorderedAccessViewDesc.Buffer.FirstElement = 0;
     unorderedAccessViewDesc.Buffer.NumElements = static_cast<UINT>(particleCount);
     unorderedAccessViewDesc.Buffer.Flags = 0;
-    hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffer.GetAddressOf());
+    hr = device->CreateUnorderedAccessView(particleBuffer.Get(), &unorderedAccessViewDesc, particleBufferUav.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
     bufferDesc.ByteWidth = sizeof(ParticleConstants);

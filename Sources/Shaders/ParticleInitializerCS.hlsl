@@ -34,5 +34,5 @@ void main( uint3 dtid : SV_DISPATCHTHREADID)
     p.age = 10.0 * f2;
     p.state = 0;
 
-    particleBuffe[id] = p;
+    particleBuffer[id] = p;
 }

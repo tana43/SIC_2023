@@ -1,7 +1,7 @@
 #include "Particle.hlsli"
 
 StructuredBuffer<Particle> particleBuffer : register(t9);
-[maxvertexcount(3)]
+[maxvertexcount(4)]
 void main(point VS_OUT input[1] : SV_POSITION,inout TriangleStream<GS_OUT> output)
 {
     const float2 corners[] =
