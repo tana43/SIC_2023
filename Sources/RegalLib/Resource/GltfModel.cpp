@@ -1,9 +1,9 @@
 #include "GltfModel.h"
 
 #define TINYGLTF_IMPLEMENTATION
-#include "../External/tinygltf-release/tiny_gltf.h"
-#include "misc.h"
-#include "../imgui/imgui.h"
+#include "../../../External/tinygltf-release/tiny_gltf.h"
+#include "../Other/Misc.h"
+#include "../../../External/imgui/imgui.h"
 #include <stack>
 
 #include "Shader.h"

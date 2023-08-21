@@ -1,9 +1,9 @@
 #include "Particles.h"
 
-#include "Shader.h"
-#include "Misc.h"
+#include "../Resource/Shader.h"
+#include "../Other/Misc.h"
 
-#include "../imgui/imgui.h"
+#include "../../../External/imgui/imgui.h"
 
 Particles::Particles(ID3D11Device* device, size_t particleCount) : maxParticleCount(particleCount)
 {

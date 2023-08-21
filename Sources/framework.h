@@ -5,16 +5,16 @@
 #include <sstream>
 
 
-#include "misc.h"
-#include "high_resolution_timer.h"
+#include "RegalLib/Other/Misc.h"
+#include "HighResolutionTimer.h"
 
 #include <d3d11.h>
 #include <wrl.h>
 #include <dxgi1_6.h>
 
-#include "Sprite.h"
-#include "SpriteBatch.h"
-#include "GeometricPrimitive.h"
+#include "RegalLib/Resource/Sprite.h"
+#include "RegalLib/Resource/SpriteBatch.h"
+#include "RegalLib/"
 #include "StaticMesh.h"
 #include "SkinnedMesh.h"
 #include "GltfModel.h"
@@ -26,10 +26,10 @@
 #include "Bloom.h"
 
 #ifdef USE_IMGUI
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_internal.h"
-#include "../imgui/imgui_impl_dx11.h"
-#include "../imgui/imgui_impl_win32.h"
+#include "../External/imgui/imgui.h"
+#include "../External/imgui/imgui_internal.h"
+#include "../External/imgui/imgui_impl_dx11.h"
+#include "../External/imgui/imgui_impl_win32.h"
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 

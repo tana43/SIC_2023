@@ -6,10 +6,10 @@
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
-#include "../External/tinygltf-release/tiny_gltf.h"
+#include "../../tinygltf-release/tiny_gltf.h"
 #include <unordered_map>
 
-#include "Transform.h"
+#include "../Transform.h"
 
 
 class GltfModel
