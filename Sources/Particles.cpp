@@ -3,6 +3,8 @@
 #include "Shader.h"
 #include "Misc.h"
 
+#include "../imgui/imgui.h"
+
 Particles::Particles(ID3D11Device* device, size_t particleCount) : maxParticleCount(particleCount)
 {
     HRESULT hr{ S_OK };
@@ -113,5 +115,16 @@ void Particles::Render(ID3D11DeviceContext* immediateContext)
     immediateContext->VSSetShader(NULL, NULL, 0);
     immediateContext->PSSetShader(NULL, NULL, 0);
     immediateContext->GSSetShader(NULL, NULL, 0);
+}
+
+void Particles::DrawDebug()
+{
+    ImGui::Begin("Particle System");
+
+    ImGui::SliderFloat("Particle Size", &particleData.particleSize,0.0f,0.03f);
+    ImGui::DragFloat3("Emitter Position", &particleData.emitterPosition.x, 0.1f);
+    //ImGui::SliderFloat("Effect Time", &particleData.time,0.0f, 20.0f);
+
+    ImGui::End();
 }
 

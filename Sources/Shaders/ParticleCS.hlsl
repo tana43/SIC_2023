@@ -11,7 +11,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
     
     if (p.age > 10.0)
     {
-        const float g = -0.5;
+        const float g = -1.0;
         p.velocity.y += g * deltaTime;
         p.position += p.velocity * deltaTime;
         

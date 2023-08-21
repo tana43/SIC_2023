@@ -545,7 +545,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // !ENABLE_OFFSCREENRENDERING
 
 	//背景
-	//skybox->Render(immediateContext.Get(), V, P);
+	skybox->Render(immediateContext.Get(), V, P);
 
 	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
@@ -615,7 +615,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	//パーティクル
 	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_ON_ZW_ON)].Get(), 0);
 	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
-	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ADD)].Get(), nullptr, 0xFFFFFFFF);
+	//immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ADD)].Get(), nullptr, 0xFFFFFFFF);
 	immediateContext->GSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	particles->Render(immediateContext.Get());
 
@@ -1088,6 +1088,8 @@ void Framework::DrawDebug()
 	skinnedMeshes[0]->DrawDebug();
 
 	gltfModels[0]->DrawDebug();
+
+	particles->DrawDebug();
 
 #endif
 }

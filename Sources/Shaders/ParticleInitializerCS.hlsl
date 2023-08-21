@@ -21,9 +21,9 @@ void main( uint3 dtid : SV_DISPATCHTHREADID)
     
     p.position = emitterPosition;
     
-    p.velocity.x = 0.5 * sin(2 * 3.14 * f0);
+    p.velocity.x = 1.0 * sin(2 * 3.14 * f0);
     p.velocity.y = 2.0 * f1;
-    p.velocity.z = 0.5 * cos(2 * 3.14 * f0);
+    p.velocity.z = 1.0 * cos(2 * 3.14 * f0);
     
     p.color.x = 1.0;
     p.color.y = f0 * 0.5;
