@@ -12,18 +12,7 @@
 #include <wrl.h>
 #include <dxgi1_6.h>
 
-#include "RegalLib/Resource/Sprite.h"
-#include "RegalLib/Resource/SpriteBatch.h"
-#include "RegalLib/"
-#include "StaticMesh.h"
-#include "SkinnedMesh.h"
-#include "GltfModel.h"
-#include "SkyBox.h"
-#include "Particles.h"
-
-#include "FrameBuffer.h"
-#include "FullscreenQuad.h"
-#include "Bloom.h"
+#include "RegalLib/Regal.h"
 
 #ifdef USE_IMGUI
 #include "../External/imgui/imgui.h"

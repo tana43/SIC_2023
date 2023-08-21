@@ -4,7 +4,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
-#include "Sprite.h"
+#include "../Resource/Sprite.h"
 
 class SkyBox
 {

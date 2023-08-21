@@ -247,6 +247,7 @@
     <ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h" />
     <ClInclude Include="Sources\RegalLib\Helper\MathHelper.h" />
     <ClInclude Include="Sources\RegalLib\Other\Misc.h" />
+    <ClInclude Include="Sources\RegalLib\Regal.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h" />
     <ClInclude Include="Sources\RegalLib\Resource\Shader.h" />

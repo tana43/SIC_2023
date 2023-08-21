@@ -5,7 +5,7 @@
 #include <filesystem>
 
 #include "Shader.h"
-#include "misc.h"
+#include "../Other/Misc.h"
 #include "Texture.h"
 
 int StaticMesh::num{ 0 };

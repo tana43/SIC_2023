@@ -1,6 +1,6 @@
 #include "SkyBox.h"
-#include "Shader.h"
-#include "Misc.h"
+#include "../Resource/Shader.h"
+#include "../Other/Misc.h"
 
 SkyBox::SkyBox(ID3D11Device* device,Sprite* sprite) : sprite(sprite)
 {

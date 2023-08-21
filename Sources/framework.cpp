@@ -1,6 +1,4 @@
 #include "framework.h"
-#include "Shader.h"
-#include "Texture.h"
 
 //オフスクリーンレンダリング無効
 //#define DISABLE_OFFSCREENRENDERING 
@@ -904,7 +902,7 @@ void Framework::SetImguiStyle()
 	ImGuiIO& io = ImGui::GetIO();
 	//io.Fonts->AddFontFromFileTTF("./imgui/Fonts/Ruda-Bold.ttf", 12);
 	//io.Fonts->AddFontFromFileTTF("./imgui/Fonts/Ruda-Bold.ttf", 10);
-	io.Fonts->AddFontFromFileTTF("./imgui/Fonts/Ruda-Bold.ttf", 14);
+	io.Fonts->AddFontFromFileTTF("./External/imgui/Fonts/Ruda-Bold.ttf", 14);
 	//io.Fonts->AddFontFromFileTTF("./imgui/Fonts/Ruda-Bold.ttf", 18);
 
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

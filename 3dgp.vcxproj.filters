@@ -103,14 +103,14 @@
     <ClCompile Include="External\imgui\imgui_widgets.cpp">
       <Filter>External\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Transform.cpp">
-      <Filter>RegalLib</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Framework.cpp">
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Sources\main.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Transform.cpp">
+      <Filter>RegalLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,14 +183,17 @@
     <ClInclude Include="External\imgui\imstb_truetype.h">
       <Filter>External\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Transform.h">
-      <Filter>RegalLib</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Framework.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Sources\HighResolutionTimer.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Regal.h">
+      <Filter>RegalLib</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Transform.h">
+      <Filter>RegalLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
