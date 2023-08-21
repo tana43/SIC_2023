@@ -118,7 +118,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);USE_IMGUI</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\External\DirectXTK-main\Inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\include;.\External\cereal-master\include;.\External\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\External\DirectXTK-main\Inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\include;.\External\cereal-master\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -128,9 +128,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\External\assimp\build\lib\$(Configuration);.\External\DirectXTK-main\Bin\Desktop_2022\x64\$(Configuration);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\lib\vs2019\x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\External\DirectXTK-main\Bin\Desktop_2022\x64\$(Configuration);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\lib\vs2019\x64\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;DirectXTK.lib;zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>assimp-vc143-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -179,8 +179,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);USE_IMGUI</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\External\DirectXTK-main\Inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\include;.\External\cereal-master\include;.\External\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>.\External\DirectXTK-main\Inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\include;.\External\cereal-master\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -191,9 +191,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\External\assimp\build\lib\$(Configuration);.\External\DirectXTK-main\Bin\Desktop_2022\x64\$(Configuration);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\lib\vs2019\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;DirectXTK.lib;zlib-md.lib;libxm12-md.lib;libfbxsdk-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>assimp-vc143-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>.\External\DirectXTK-main\Bin\Desktop_2022\x64\$(Configuration);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.1\lib\vs2019\x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;DirectXTK.lib;zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -213,12 +213,13 @@
     <ClCompile Include="External\imgui\imgui_tables.cpp" />
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Sources\Framework.cpp" />
-    <ClCompile Include="Sources\main.cpp" />
+    <ClCompile Include="Sources\Main.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\FullscreenQuad.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Particles.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\SkyBox.cpp" />
+    <ClCompile Include="Sources\RegalLib\Other\Transform.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp" />
@@ -227,7 +228,6 @@
     <ClCompile Include="Sources\RegalLib\Resource\SpriteBatch.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\StaticMesh.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Texture.cpp" />
-    <ClCompile Include="Sources\RegalLib\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h" />
@@ -247,6 +247,7 @@
     <ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h" />
     <ClInclude Include="Sources\RegalLib\Helper\MathHelper.h" />
     <ClInclude Include="Sources\RegalLib\Other\Misc.h" />
+    <ClInclude Include="Sources\RegalLib\Other\Transform.h" />
     <ClInclude Include="Sources\RegalLib\Regal.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h" />
@@ -256,7 +257,6 @@
     <ClInclude Include="Sources\RegalLib\Resource\SpriteBatch.h" />
     <ClInclude Include="Sources\RegalLib\Resource\StaticMesh.h" />
     <ClInclude Include="Sources\RegalLib\Resource\Texture.h" />
-    <ClInclude Include="Sources\RegalLib\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli" />

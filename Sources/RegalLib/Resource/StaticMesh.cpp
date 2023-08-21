@@ -4,7 +4,7 @@
 #include <string>
 #include <filesystem>
 
-#include "Shader.h"
+#include "../Resource/Shader.h"
 #include "../Other/Misc.h"
 #include "Texture.h"
 

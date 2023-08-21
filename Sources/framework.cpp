@@ -543,7 +543,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // !ENABLE_OFFSCREENRENDERING
 
 	//背景
-	skybox->Render(immediateContext.Get(), V, P);
+	//skybox->Render(immediateContext.Get(), V, P);
 
 	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);

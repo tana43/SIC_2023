@@ -1,11 +1,11 @@
 #include "Bloom.h"
 
-#include "../imgui/imgui.h"
+#include "../../../External/imgui/imgui.h"
 
 #include <vector>
 
-#include "Shader.h"
-#include "misc.h"
+#include "../Resource/Shader.h"
+#include "../Other/Misc.h"
 
 Bloom::Bloom(ID3D11Device* device, uint32_t width, uint32_t height)
 {

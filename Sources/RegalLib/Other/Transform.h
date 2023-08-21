@@ -1,5 +1,5 @@
 #pragma once
-#include "Helper/MathHelper.h"
+#include "../Helper/MathHelper.h"
 #include <string>
 
 class Transform

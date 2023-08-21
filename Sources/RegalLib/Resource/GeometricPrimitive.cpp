@@ -1,7 +1,7 @@
 #include "GeometricPrimitive.h"
 #include "../Other/Misc.h"
 #include <sstream>
-#include "Shader.h"
+#include "../Resource/Shader.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

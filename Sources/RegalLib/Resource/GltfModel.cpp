@@ -6,7 +6,7 @@
 #include "../../../External/imgui/imgui.h"
 #include <stack>
 
-#include "Shader.h"
+#include "../Resource/Shader.h"
 #include "Texture.h"
 
 bool NullLoadImageData(tinygltf::Image*, const int, std::string*, std::string*,

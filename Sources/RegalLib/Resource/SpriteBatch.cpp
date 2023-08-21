@@ -1,10 +1,10 @@
 #include "SpriteBatch.h"
-#include "misc.h"
+#include "../Other/Misc.h"
 #include <sstream>
 #include <WICTextureLoader.h>
 
 #ifdef  USE_IMGUI
-#include "../imgui/imgui.h"
+#include "../../../External/imgui/imgui.h"
 #endif //  USE_IMGUI
 
 

@@ -9,7 +9,7 @@
 #include "../../tinygltf-release/tiny_gltf.h"
 #include <unordered_map>
 
-#include "../Transform.h"
+#include "../Other/Transform.h"
 
 
 class GltfModel

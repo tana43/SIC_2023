@@ -64,9 +64,6 @@
     <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp">
       <Filter>RegalLib\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp">
-      <Filter>RegalLib\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RegalLib\Resource\SkinnedMesh.cpp">
       <Filter>RegalLib\Resource</Filter>
     </ClCompile>
@@ -106,11 +103,14 @@
     <ClCompile Include="Sources\Framework.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\main.cpp">
+    <ClCompile Include="Sources\Main.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Transform.cpp">
-      <Filter>RegalLib</Filter>
+    <ClCompile Include="Sources\RegalLib\Other\Transform.cpp">
+      <Filter>RegalLib\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp">
+      <Filter>RegalLib\Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,9 +136,6 @@
       <Filter>RegalLib\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h">
-      <Filter>RegalLib\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Resource\Shader.h">
       <Filter>RegalLib\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Resource\SkinnedMesh.h">
@@ -192,8 +189,11 @@
     <ClInclude Include="Sources\RegalLib\Regal.h">
       <Filter>RegalLib</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Transform.h">
-      <Filter>RegalLib</Filter>
+    <ClInclude Include="Sources\RegalLib\Other\Transform.h">
+      <Filter>RegalLib\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\Shader.h">
+      <Filter>RegalLib\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

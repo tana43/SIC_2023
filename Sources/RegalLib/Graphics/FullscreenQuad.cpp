@@ -1,6 +1,6 @@
 #include "FullscreenQuad.h"
-#include "Shader.h"
-#include "misc.h"
+#include "../Resource/Shader.h"
+#include "../Other/misc.h"
 
 FullscreenQuad::FullscreenQuad(ID3D11Device* device)
 {

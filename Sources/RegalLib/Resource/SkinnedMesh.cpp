@@ -1,5 +1,5 @@
 #include "SkinnedMesh.h"
-#include "misc.h"
+#include "../Other/Misc.h"
 #include "Shader.h"
 #include "Texture.h"
 
@@ -9,7 +9,7 @@
 #include <filesystem>
 
 #ifdef USE_IMGUI
-#include "../imgui/imgui.h"
+#include "../../../External/imgui/imgui.h"
 #endif // USE_IMGUI
 
 

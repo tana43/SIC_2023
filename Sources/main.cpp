@@ -1,6 +1,6 @@
 #include <time.h>
 
-#include "framework.h"
+#include "Framework.h"
 
 CONST LONG SCREEN_WIDTH{ 1280 };
 CONST LONG SCREEN_HEIGHT{ 720 };
