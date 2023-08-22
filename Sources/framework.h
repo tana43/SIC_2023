@@ -208,16 +208,16 @@ private:
 	void FullscreenState(BOOL fullscreen);
 	void OnSizeChanged(UINT64 width, UINT height);
 
-	std::unique_ptr<Sprite> sprites[8];
-	std::unique_ptr<SpriteBatch> spritesBatches[8];
-	std::unique_ptr<GeometricPrimitive> geometricPrimitive[8];
-	std::unique_ptr<StaticMesh> staticMeshes[8];
-	std::unique_ptr<SkinnedMesh> skinnedMeshes[8];
-	std::unique_ptr<Framebuffer> framebuffers[8];
-	std::unique_ptr<GltfModel> gltfModels[8];
-	std::unique_ptr<SkyBox> skybox;
-	std::unique_ptr<Sprite> skyboxSprite;
-	std::unique_ptr<Particles> particles;
+	std::unique_ptr<Regal::Resource::Sprite> sprites[8];
+	std::unique_ptr<Regal::Resource::SpriteBatch> spritesBatches[8];
+	std::unique_ptr<Regal::Resource::GeometricPrimitive> geometricPrimitive[8];
+	std::unique_ptr<Regal::Resource::StaticMesh> staticMeshes[8];
+	std::unique_ptr<Regal::Resource::SkinnedMesh> skinnedMeshes[8];
+	std::unique_ptr<Regal::Resource::GltfModel> gltfModels[8];
+	std::unique_ptr<Regal::Graphics::Framebuffer> framebuffers[8];
+	std::unique_ptr<Regal::Graphics::SkyBox> skybox;
+	std::unique_ptr<Regal::Resource::Sprite> skyboxSprite;
+	std::unique_ptr<Regal::Graphics::Particles> particles;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
@@ -246,12 +246,12 @@ private:
 	float boneTranslationX{ 300.0f };
 	float blendAnimation{ 0.5f };
 
-	std::unique_ptr<FullscreenQuad> bitBlockTransfer;
+	std::unique_ptr<Regal::Graphics::FullscreenQuad> bitBlockTransfer;
 
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShaders[8];
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceViews[8];
 
-	std::unique_ptr<Bloom> bloomer;
+	std::unique_ptr<Regal::Graphics::Bloom> bloomer;
 };
 

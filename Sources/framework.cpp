@@ -3,6 +3,9 @@
 //オフスクリーンレンダリング無効
 //#define DISABLE_OFFSCREENRENDERING 
 
+using namespace Regal::Resource;
+using namespace Regal::Graphics;
+
 void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {
 	HRESULT hr{ S_OK };
