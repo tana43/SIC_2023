@@ -278,7 +278,10 @@ namespace Regal::Resource
 
         TransformEuler transform;
     };
+}
 
+namespace DirectX
+{
     //serializeテンプレート関数
     template<class T>
     void serialize(T& archive, DirectX::XMFLOAT2& v)
