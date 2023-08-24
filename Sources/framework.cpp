@@ -6,7 +6,8 @@
 using namespace Regal::Resource;
 using namespace Regal::Graphics;
 
-void acquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
+//GPU情報を取得
+void AcquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
 {
 	HRESULT hr{ S_OK };
 
@@ -63,8 +64,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 	hr = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(dxgiFactory6.GetAddressOf()));
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	//アダプター最適化（搭載GPUに対応）
-	acquireHighPerformanceAdapter(dxgiFactory6.Get(), adapter.GetAddressOf());
+	//アダプター最適化（搭載GPUに対応、よー分からん）
+	AcquireHighPerformanceAdapter(dxgiFactory6.Get(), adapter.GetAddressOf());
 
 	UINT createDeviceFlags{ 0 };
 #ifdef _DEBUG
@@ -230,33 +231,17 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(full
 
 bool Framework::Initialize()
 {
-	//sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
-	//sprites[1] = std::make_unique<Sprite>(device.Get(), L"./Resources/player-sprites.png");
-	//sprites[2] = std::make_unique<Sprite>(device.Get(), L"./Resources/fonts/font0.png");
-
+	//各リソースクラスの生成
+	//一応残してるだけ、閉じてていい
+#if 0 
+	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
 	spritesBatches[0] = std::make_unique<SpriteBatch>(device.Get(), L"./Resources/screenshot.jpg", 1);
-
-	geometricPrimitive[0] = std::make_unique<GeometricPrimitive>(device.Get());
 	geometricPrimitive[1] = std::make_unique<GeometricPrimitive>(device.Get(),
 		GeometricPrimitive::MeshType::Cylinder, DirectX::XMFLOAT3(-1.5f, 0, 0), DirectX::XMFLOAT4(0.1f, 0.8f, 0.2f, 1.0f));
-
-	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/F-14A_Tomcat/F-14A_Tomcat.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
-	//staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Cube.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
-	//staticMeshes[1] = std::make_unique<StaticMesh>(device.Get(),L"./Resources/Rock/Rock.obj", true);
-
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx",true);
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/test_model3.fbx");
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/nico.fbx");
-	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/golem.fbx");
-
-	//skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
-	//skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
-
-	framebuffers[0] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy,DXGI_FORMAT_R16G16B16A16_FLOAT,true);
-	framebuffers[1] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx / 2, framebufferDimensions.cy / 2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
-
-	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
-
+	staticMeshes[0] = std::make_unique<StaticMesh>(device.Get(), L"./Resources/F-14A_Tomcat/F-14A_Tomcat.obj", true, DirectX::XMFLOAT3(1.5f, 0, 0));
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/cube.004.fbx", true);
+	skinnedMeshes[0] = std::make_unique<SkinnedMesh>(device.Get(), "./Resources/AimTest/MNK_mesh.fbx");
+	skinnedMeshes[0]->AppendAnimations("./Resources/AimTest/Aim_Space.fbx", 0);
 	gltfModels[0] = std::make_unique<GltfModel>(device.Get(),
 		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
 		//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
@@ -269,6 +254,15 @@ bool Framework::Initialize()
 		//"./Resources/Crunch/Crunch.gltf"
 		//"./Resources/Stage/Showcase.gltf"
 	);
+#endif // 0
+
+	
+	framebuffers[0] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy,DXGI_FORMAT_R16G16B16A16_FLOAT,true);
+	framebuffers[1] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx / 2, framebufferDimensions.cy / 2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
+
+	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
+
+	//スカイボックス
 	skyboxSprite = std::make_unique<Sprite>(device.Get(), 
 		//L"./Resources/SkyBox/envmap_miramar.dds"
 		//L"./Resources/SkyBox/Sky.png"
@@ -552,8 +546,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
 	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
-
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
+
 
 	//2D
 	{
@@ -561,55 +555,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		immediateContext->OMSetDepthStencilState(setting2DDepthStencilState, 1);
 		//ラスタライザステートをセット
 		immediateContext->RSSetState(setting2DRasterizerState);
-
-	/*	sprites[0].get()->Render(immediateContext.Get(),
-	0.0f,0.0f,1280.0f,720.0f,
-	spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-	0);*/
-
-		/*sprites[1].get()->Render(immediateContext.Get(),
-			700.0f, 200.0f, 200.0f, 200.0f,
-			spriteColors[0], spriteColors[1], spriteColors[2], spriteColors[3],
-			45,
-			0, 0, 140.0f, 240.0f);*/
-		//
-		//	float x{ 0 };
-		//	float y{ 0 };
-		//#if 0
-		//	for (size_t i = 0; i < 1092; i++)
-		//	{
-		//		sprites[1]->Render(immediateContext.Get(),
-		//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
-		//				1, 1, 1, 1, 0, 140*0, 240 * 0,140,240);
-		//		x += 32;
-		//		if (x > 1280 - 64)
-		//		{
-		//			x = 0;
-		//			y += 24;
-		//		}
-		//	}
-		//#else
-		//	spritesBatches[0]->Begin(immediateContext.Get(),nullptr,nullptr);
-		//	for (size_t i = 0; i < 1092; i++)
-		//	{
-		//		spritesBatches[0]->Render(immediateContext.Get(),
-		//			x, static_cast<float>(static_cast<int>(y) % 720), 64, 64,
-		//			1, 1, 1, 1, 0, 140 *0, 240 * 0,140,240);
-		//		x += 32;
-		//		if (x > 1280 - 64)
-		//		{
-		//			x = 0;
-		//			y += 24;
-		//		}
-		//	}
-		//	spritesBatches[0]->End(immediateContext.Get());
-		//#endif
-
-		//prites[2]->Textout(immediateContext.Get(), "FULL SCREEN : alt + enter",0,0,30,30,1,1,1,1);
-
-		/*spritesBatches[0]->Begin(immediateContext.Get(), nullptr, nullptr);
-		spritesBatches[0]->Render(immediateContext.Get(), 0, 0, 1280, 720, 1, 1, 1, 1, 0);
-		spritesBatches[0]->End(immediateContext.Get());*/
 
 	}
 
@@ -627,13 +572,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		//ラスタライザステートをセット
 		immediateContext->RSSetState(setting3DRasterizerState);
 
-		//geometricPrimitive[0]->Render(immediateContext.Get());
-		//geometricPrimitive[1]->Render(immediateContext.Get());
+		//描画エンジンの課題範囲での描画、閉じてていい
+#if 0
 
-		//staticMeshes[0]->Render(immediateContext.Get());
-		//staticMeshes[1]->Render(immediateContext.Get());
 
-#if 1
+#if 0
 		int clipIndex{ 0 };
 		int frameIndex{ 0 };
 		static float animationTick{ 0 };
@@ -651,13 +594,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		}
 
 		Animation::Keyframe& keyframe{animation.sequence.at(frameIndex)};
-#if 0
-		DirectX::XMStoreFloat4(&keyframe.nodes.at(30).rotation,
-			DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1, 0, 0, 0), 1.5f));
-		keyframe.nodes.at(30).translation.x = boneTranslationX;
-		skinnedMeshes[0]->UpdateAnimation(keyframe);
-#endif // 1
+
 #else
+		//アニメーションブレンドのサンプル
 		/*Animation::Keyframe keyframe;
 		const Animation::Keyframe* keyframes[2]{
 			&skinnedMeshes[0]->animationClips.at(0).sequence.at(40),
@@ -674,37 +613,10 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		static float time{ 0 };
 		gltfModels[0]->Animate(0, time += elapsedTime, animatedNodes);
 		gltfModels[0]->Render(immediateContext.Get(),animatedNodes);
+#endif // 0
 
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffers[0]->Deactivate(immediateContext.Get());
-
-
-#if 0//先生の方のブルームに切り替え
-	immediateContext->RSSetState(rasterizerStates[4].Get());
-	immediateContext->OMSetDepthStencilState(depthStencilStates[3].Get(), 1);
-
-	framebuffers[1]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
-	framebuffers[1]->Activate(immediateContext.Get());
-	bitBlockTransfer->Bilt(immediateContext.Get(),
-		framebuffers[0]->shaderResourceViews[0].GetAddressOf(), 0, 1,pixelShaders[0].Get());
-	framebuffers[1]->Deactivate(immediateContext.Get());
-#endif // 1
-
-#if 0
-	bitBlockTransfer->Bilt(immediateContext.Get(),
-		framebuffers[1]->shaderResourceViews[0].GetAddressOf(), 0, 1);
-#endif // 1
-
-#if 0
-	//シーン画像とブラーをかけた高輝度成分画像を合成
-	ID3D11ShaderResourceView* shaderResorceViews[2]{
-		framebuffers[0]->shaderResourceViews[0].Get(),framebuffers[1]->shaderResourceViews[0].Get()
-	};
-	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResorceViews, 0, 2, pixelShaders[1].Get());
-#endif // 0
-
-	
-	
 #endif // !DISABLE_OFFSCREENRENDERING
 
 #ifdef _DEBUG
@@ -713,22 +625,22 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
 #endif // _DEBUG
 	}
-
 	
 
 	//ブルーム
-	bloomer->Make(immediateContext.Get(), framebuffers[0]->shaderResourceViews[0].Get());
-
-	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_OFF_ZW_OFF)].Get(), 0);
-	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
-	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].Get(), nullptr, 0xFFFFFFFF);
-	ID3D11ShaderResourceView* shaderResourceViews[] =
 	{
-		framebuffers[0]->shaderResourceViews[0].Get(),
-		bloomer->ShaderResourceView(),
-	};
-	bitBlockTransfer->Bilt(immediateContext.Get(), shaderResourceViews, 0, 2, pixelShaders[0].Get());
+		bloomer->Make(immediateContext.Get(), framebuffers[0]->shaderResourceViews[0].Get());
 
+		immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_OFF_ZW_OFF)].Get(), 0);
+		immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
+		immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].Get(), nullptr, 0xFFFFFFFF);
+		ID3D11ShaderResourceView* shaderResourceViews[] =
+		{
+			framebuffers[0]->shaderResourceViews[0].Get(),
+			bloomer->ShaderResourceView(),
+		};
+		bitBlockTransfer->Bilt(immediateContext.Get(), shaderResourceViews, 0, 2, pixelShaders[0].Get());
+	}
 
 #ifdef USE_IMGUI
 	ImGui::Render();
@@ -806,8 +718,6 @@ void Framework::FullscreenState(BOOL fullscreen)
 		ShowWindow(hwnd, SW_NORMAL);
 	}
 }
-
-// RendrDoc
 
 void Framework::OnSizeChanged(UINT64 width, UINT height)
 {
@@ -1086,9 +996,9 @@ void Framework::DrawDebug()
 	staticMeshes[0]->DrawDebug();
 	staticMeshes[1]->DrawDebug();*/
 
-	skinnedMeshes[0]->DrawDebug();
+	//skinnedMeshes[0]->DrawDebug();
 
-	gltfModels[0]->DrawDebug();
+	//gltfModels[0]->DrawDebug();
 
 	particles->DrawDebug();
 

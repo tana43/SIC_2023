@@ -4,12 +4,8 @@
 #include <tchar.h>
 #include <sstream>
 
-
-#include "RegalLib/Other/Misc.h"
 #include "HighResolutionTimer.h"
 
-#include <d3d11.h>
-#include <wrl.h>
 #include <dxgi1_6.h>
 
 #include "RegalLib/Regal.h"

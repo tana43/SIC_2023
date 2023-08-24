@@ -229,6 +229,8 @@
     <ClCompile Include="Sources\RegalLib\Resource\SpriteBatch.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\StaticMesh.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Texture.cpp" />
+    <ClCompile Include="Sources\RegalLib\Scene\BaseScene.cpp" />
+    <ClCompile Include="Sources\RegalLib\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h" />
@@ -258,6 +260,8 @@
     <ClInclude Include="Sources\RegalLib\Resource\SpriteBatch.h" />
     <ClInclude Include="Sources\RegalLib\Resource\StaticMesh.h" />
     <ClInclude Include="Sources\RegalLib\Resource\Texture.h" />
+    <ClInclude Include="Sources\RegalLib\Scene\BaseScene.h" />
+    <ClInclude Include="Sources\RegalLib\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli" />

@@ -1,317 +1,332 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<ItemGroup>
-		<Filter Include="Shaders">
-			<UniqueIdentifier>{9f64f4ff-d9e0-43d7-88e1-13e6d3656a89}</UniqueIdentifier>
-			<Extensions>hlsl;hlsli</Extensions>
-		</Filter>
-		<Filter Include="Shaders\PostEffect">
-			<UniqueIdentifier>{45979160-8473-4d1a-8de5-f039eab00feb}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="Shaders\Model">
-			<UniqueIdentifier>{ba2ade6b-ab0a-4e2c-9a5c-0935adf0507c}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="Shaders\Particle">
-			<UniqueIdentifier>{cce70c03-c16f-41ea-9aaa-f61506eea6d7}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="External">
-			<UniqueIdentifier>{de637ab3-12a7-4db4-a926-55f218e81fb3}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="External\imgui">
-			<UniqueIdentifier>{5d2ed881-4062-49d0-a1ce-86240074d016}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="Game">
-			<UniqueIdentifier>{0972509a-7b35-4efc-9806-ec96498f8369}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="RegalLib">
-			<UniqueIdentifier>{88aa71f6-3460-4c51-adec-e6769524a2e4}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="RegalLib\Graphics">
-			<UniqueIdentifier>{87eb73f7-5382-406c-8a24-4357f99a3e69}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="RegalLib\Helper">
-			<UniqueIdentifier>{afe225b3-8918-48f7-808e-cdd05ac1d288}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="RegalLib\Input">
-			<UniqueIdentifier>{66b73d70-67b9-498f-a89a-2dedf0969aea}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="RegalLib\Other">
-			<UniqueIdentifier>{0a888344-9c9d-4b7c-bc0d-6ac98ae82db2}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="RegalLib\Resource">
-			<UniqueIdentifier>{feb0724d-b36c-4ac9-bfd0-7e8e90df3ec0}</UniqueIdentifier>
-		</Filter>
-	</ItemGroup>
-	<ItemGroup>
-		<ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Graphics\Framebuffer.cpp">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Graphics\FullscreenQuad.cpp">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Graphics\Particles.cpp">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Graphics\SkyBox.cpp">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\SkinnedMesh.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\Sprite.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\SpriteBatch.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\StaticMesh.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\Texture.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui_demo.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui_draw.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui_impl_dx11.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui_impl_win32.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui_tables.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="External\imgui\imgui_widgets.cpp">
-			<Filter>External\imgui</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\Framework.cpp">
-			<Filter>Game</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\Main.cpp">
-			<Filter>Game</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Other\Transform.cpp">
-			<Filter>RegalLib\Other</Filter>
-		</ClCompile>
-		<ClCompile Include="Sources\RegalLib\Resource\Shader.cpp">
-			<Filter>RegalLib\Resource</Filter>
-		</ClCompile>
-	</ItemGroup>
-	<ItemGroup>
-		<ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Graphics\Framebuffer.h">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Graphics\FullscreenQuad.h">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Graphics\Particles.h">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h">
-			<Filter>RegalLib\Graphics</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Helper\MathHelper.h">
-			<Filter>RegalLib\Helper</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\GltfModel.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\SkinnedMesh.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\Sprite.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\SpriteBatch.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\StaticMesh.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\Texture.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Other\Misc.h">
-			<Filter>RegalLib\Other</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imconfig.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imgui.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imgui_impl_dx11.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imgui_impl_win32.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imgui_internal.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imstb_rectpack.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imstb_textedit.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="External\imgui\imstb_truetype.h">
-			<Filter>External\imgui</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\Framework.h">
-			<Filter>Game</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\HighResolutionTimer.h">
-			<Filter>Game</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Regal.h">
-			<Filter>RegalLib</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Other\Transform.h">
-			<Filter>RegalLib\Other</Filter>
-		</ClInclude>
-		<ClInclude Include="Sources\RegalLib\Resource\Shader.h">
-			<Filter>RegalLib\Resource</Filter>
-		</ClInclude>
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="Sources\Shaders\Sprite.hlsli">
-			<Filter>Shaders</Filter>
-		</None>
-		<None Include="Sources\Shaders\GeometricPrimitive.hlsli">
-			<Filter>Shaders</Filter>
-		</None>
-		<None Include="Sources\Shaders\FullscreenQuad.hlsli">
-			<Filter>Shaders</Filter>
-		</None>
-		<None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli">
-			<Filter>Shaders</Filter>
-		</None>
-		<None Include="Sources\Shaders\ImageBasedLighting.hlsli">
-			<Filter>Shaders</Filter>
-		</None>
-		<None Include="Sources\Shaders\Bloom.hlsli">
-			<Filter>Shaders\PostEffect</Filter>
-		</None>
-		<None Include="Sources\Shaders\GltfModel.hlsli">
-			<Filter>Shaders\Model</Filter>
-		</None>
-		<None Include="Sources\Shaders\SkinnedMesh.hlsli">
-			<Filter>Shaders\Model</Filter>
-		</None>
-		<None Include="Sources\Shaders\StaticMesh.hlsli">
-			<Filter>Shaders\Model</Filter>
-		</None>
-		<None Include="Sources\Shaders\SkyBox.hlsli">
-			<Filter>Shaders</Filter>
-		</None>
-		<None Include="Sources\Shaders\Particle.hlsli">
-			<Filter>Shaders\Particle</Filter>
-		</None>
-	</ItemGroup>
-	<ItemGroup>
-		<FxCompile Include="Sources\Shaders\SpriteVS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\SpritePS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GeometricPrimitivePS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GeometricPrimitiveVS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\FullscreenQuadVS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\FullscreenQuadPS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\LuminanceExtractionPS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\BlurPS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GaussianBlurDownsamplingPS.hlsl">
-			<Filter>Shaders\PostEffect</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GaussianBlurHorizontalPS.hlsl">
-			<Filter>Shaders\PostEffect</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GaussianBlurUpsamplingPS.hlsl">
-			<Filter>Shaders\PostEffect</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GaussianBlurVerticalPS.hlsl">
-			<Filter>Shaders\PostEffect</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\FinalPassPS.hlsl">
-			<Filter>Shaders\PostEffect</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GlowExtractionPS.hlsl">
-			<Filter>Shaders\PostEffect</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GltfModelPS.hlsl">
-			<Filter>Shaders\Model</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\GltfModelVS.hlsl">
-			<Filter>Shaders\Model</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\SkinnedMeshPS.hlsl">
-			<Filter>Shaders\Model</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\SkinnedMeshVS.hlsl">
-			<Filter>Shaders\Model</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\StaticMeshPS.hlsl">
-			<Filter>Shaders\Model</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\StaticMeshVS.hlsl">
-			<Filter>Shaders\Model</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\SkyBoxPS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\SkyBoxVS.hlsl">
-			<Filter>Shaders</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\ParticlePS.hlsl">
-			<Filter>Shaders\Particle</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\ParticleVS.hlsl">
-			<Filter>Shaders\Particle</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\ParticleCS.hlsl">
-			<Filter>Shaders\Particle</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\ParticleGS.hlsl">
-			<Filter>Shaders\Particle</Filter>
-		</FxCompile>
-		<FxCompile Include="Sources\Shaders\ParticleInitializerCS.hlsl">
-			<Filter>Shaders\Particle</Filter>
-		</FxCompile>
-	</ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{9f64f4ff-d9e0-43d7-88e1-13e6d3656a89}</UniqueIdentifier>
+      <Extensions>hlsl;hlsli</Extensions>
+    </Filter>
+    <Filter Include="Shaders\PostEffect">
+      <UniqueIdentifier>{45979160-8473-4d1a-8de5-f039eab00feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Model">
+      <UniqueIdentifier>{ba2ade6b-ab0a-4e2c-9a5c-0935adf0507c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Particle">
+      <UniqueIdentifier>{cce70c03-c16f-41ea-9aaa-f61506eea6d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{de637ab3-12a7-4db4-a926-55f218e81fb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\imgui">
+      <UniqueIdentifier>{5d2ed881-4062-49d0-a1ce-86240074d016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{0972509a-7b35-4efc-9806-ec96498f8369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib">
+      <UniqueIdentifier>{88aa71f6-3460-4c51-adec-e6769524a2e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib\Graphics">
+      <UniqueIdentifier>{87eb73f7-5382-406c-8a24-4357f99a3e69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib\Helper">
+      <UniqueIdentifier>{afe225b3-8918-48f7-808e-cdd05ac1d288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib\Input">
+      <UniqueIdentifier>{66b73d70-67b9-498f-a89a-2dedf0969aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib\Other">
+      <UniqueIdentifier>{0a888344-9c9d-4b7c-bc0d-6ac98ae82db2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib\Resource">
+      <UniqueIdentifier>{feb0724d-b36c-4ac9-bfd0-7e8e90df3ec0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegalLib\Scene">
+      <UniqueIdentifier>{1cc80362-84aa-4473-b012-c93fd7f1690b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Graphics\Framebuffer.cpp">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Graphics\FullscreenQuad.cpp">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Graphics\Particles.cpp">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Graphics\SkyBox.cpp">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\SkinnedMesh.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\Sprite.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\SpriteBatch.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\StaticMesh.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\Texture.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_demo.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_draw.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_impl_dx11.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_impl_win32.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_tables.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_widgets.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Framework.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Main.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Other\Transform.cpp">
+      <Filter>RegalLib\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Scene\SceneManager.cpp">
+      <Filter>RegalLib\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Scene\BaseScene.cpp">
+      <Filter>RegalLib\Scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Graphics\Framebuffer.h">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Graphics\FullscreenQuad.h">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Graphics\Particles.h">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Helper\MathHelper.h">
+      <Filter>RegalLib\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\SkinnedMesh.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\Sprite.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\SpriteBatch.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\StaticMesh.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\Texture.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Other\Misc.h">
+      <Filter>RegalLib\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imconfig.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imgui.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imgui_impl_dx11.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imgui_impl_win32.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imgui_internal.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imstb_rectpack.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imstb_textedit.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\imstb_truetype.h">
+      <Filter>External\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Framework.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\HighResolutionTimer.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Regal.h">
+      <Filter>RegalLib</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Other\Transform.h">
+      <Filter>RegalLib\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\Shader.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Scene\SceneManager.h">
+      <Filter>RegalLib\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Scene\BaseScene.h">
+      <Filter>RegalLib\Scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sources\Shaders\Sprite.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\GeometricPrimitive.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\FullscreenQuad.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\ImageBasedLighting.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\Bloom.hlsli">
+      <Filter>Shaders\PostEffect</Filter>
+    </None>
+    <None Include="Sources\Shaders\GltfModel.hlsli">
+      <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\SkinnedMesh.hlsli">
+      <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\StaticMesh.hlsli">
+      <Filter>Shaders\Model</Filter>
+    </None>
+    <None Include="Sources\Shaders\SkyBox.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Sources\Shaders\Particle.hlsli">
+      <Filter>Shaders\Particle</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Sources\Shaders\SpriteVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SpritePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GeometricPrimitivePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GeometricPrimitiveVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\FullscreenQuadVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\FullscreenQuadPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\LuminanceExtractionPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\BlurPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurDownsamplingPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurHorizontalPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurUpsamplingPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GaussianBlurVerticalPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\FinalPassPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GlowExtractionPS.hlsl">
+      <Filter>Shaders\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GltfModelPS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\GltfModelVS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkinnedMeshPS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkinnedMeshVS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\StaticMeshPS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\StaticMeshVS.hlsl">
+      <Filter>Shaders\Model</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkyBoxPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\SkyBoxVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticlePS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleVS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleCS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleGS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\ParticleInitializerCS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>
