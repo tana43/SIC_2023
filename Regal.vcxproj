@@ -219,6 +219,7 @@
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\FullscreenQuad.cpp" />
+    <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Particles.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\SkyBox.cpp" />
     <ClCompile Include="Sources\RegalLib\Other\Transform.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Framebuffer.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\FullscreenQuad.h" />
+    <ClInclude Include="Sources\RegalLib\Graphics\Graphics.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Particles.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h" />
     <ClInclude Include="Sources\RegalLib\Helper\MathHelper.h" />
