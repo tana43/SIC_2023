@@ -464,9 +464,12 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	}
 	particles->Integrate(immediateContext.Get(), elapsed_time);
 
+#if _DEBUG
 	DrawDebug();
 
 	//ImGui::ShowDemoWindow();
+
+#endif // _DEBUG
 	
 }
 

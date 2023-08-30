@@ -121,6 +121,9 @@
     <ClCompile Include="Sources\RegalLib\Scene\BaseScene.cpp">
       <Filter>RegalLib\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Scene\DemoScene.cpp">
+      <Filter>RegalLib\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -208,6 +211,9 @@
       <Filter>RegalLib\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Scene\BaseScene.h">
+      <Filter>RegalLib\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Scene\DemoScene.h">
       <Filter>RegalLib\Scene</Filter>
     </ClInclude>
   </ItemGroup>

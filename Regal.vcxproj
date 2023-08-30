@@ -215,6 +215,7 @@
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Sources\Framework.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\FullscreenQuad.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="External\imgui\imstb_truetype.h" />
     <ClInclude Include="Sources\Framework.h" />
     <ClInclude Include="Sources\HighResolutionTimer.h" />
+    <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Framebuffer.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\FullscreenQuad.h" />

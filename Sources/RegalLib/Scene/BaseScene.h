@@ -1,4 +1,5 @@
 #pragma once
+
 namespace Regal::Scene
 {
     enum SCENE_TYPE

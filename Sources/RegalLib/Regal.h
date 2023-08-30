@@ -24,3 +24,6 @@
 #include "Other/Transform.h"
 
 #include "Helper/MathHelper.h"
+
+#include "Scene/BaseScene.h"
+#include "Scene/SceneManager.h"
