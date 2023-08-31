@@ -22,21 +22,21 @@ class Framework
 {
 public:
 	CONST HWND hwnd;
-	SIZE framebufferDimensions;
+	//SIZE framebufferDimensions;
 
-	Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter;//メモリの使用状況の確認ができる
-	size_t VideoMemoryUsage()
-	{
-		DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
-		adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
-		return videoMemoryInfo.CurrentUsage / 1024 / 1024;
-	}
+	//Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter;//メモリの使用状況の確認ができる
+	//size_t VideoMemoryUsage()
+	//{
+	//	DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
+	//	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
+	//	return videoMemoryInfo.CurrentUsage / 1024 / 1024;
+	//}
 
-	Microsoft::WRL::ComPtr<ID3D11Device> device;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
-	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	//Microsoft::WRL::ComPtr<ID3D11Device> device;
+	//Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
+	//Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
+	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+	//Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 
 	struct  SceneConstants
 	{
@@ -56,7 +56,7 @@ public:
 	};
 	ParametricConstants parametricConstants;
 
-	void CreateSwapChain(IDXGIFactory6* dxgiFactory6);
+	//void CreateSwapChain(IDXGIFactory6* dxgiFactory6);
 
 
 	Framework(HWND hwnd,BOOL fullscreen);
@@ -80,7 +80,9 @@ public:
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
-		ImGui_ImplDX11_Init(device.Get(), immediateContext.Get());
+		ImGui_ImplDX11_Init(
+			Regal::Graphics::Graphics::Instance().GetDevice(), 
+			Regal::Graphics::Graphics::Instance().GetDeviceContext());
 #endif
 
 		while (WM_QUIT != msg.message)
@@ -107,10 +109,10 @@ public:
 
 #if 1
 		BOOL fullscreen = 0;
-		swapChain->GetFullscreenState(&fullscreen, 0);
+		Regal::Graphics::Graphics::Instance().GetSwapChain()->GetFullscreenState(&fullscreen, 0);
 		if (fullscreen)
 		{
-			swapChain->SetFullscreenState(FALSE, 0);
+			Regal::Graphics::Graphics::Instance().GetSwapChain()->SetFullscreenState(FALSE, 0);
 		}
 #endif
 
@@ -154,7 +156,7 @@ public:
 		{
 			RECT clientRect{};
 			GetClientRect(hwnd, &clientRect);
-			OnSizeChanged(static_cast<UINT64>(clientRect.right - clientRect.left),clientRect.bottom - clientRect.top);
+			Regal::Graphics::Graphics::Instance().OnSizeChanged(static_cast<UINT64>(clientRect.right - clientRect.left),clientRect.bottom - clientRect.top);
 
 			break;
 		}
@@ -174,6 +176,10 @@ private:
 	void DrawDebug();
 
 private:
+	Regal::Graphics::Graphics graphics;
+
+private:
+
 	float color[4] = { 0.1f,0.1f,0.1f,1.0f };
 
 	high_resolution_timer tictoc;
@@ -194,15 +200,15 @@ private:
 		}
 	}
 
-	BOOL fullscreenMode{ FALSE };
-	BOOL vsync{ FALSE };//垂直同期
-	BOOL tearingSupported{ FALSE };
+	//BOOL fullscreenMode{ FALSE };
+	//BOOL vsync{ FALSE };//垂直同期
+	//BOOL tearingSupported{ FALSE };
 
-	RECT windowedRect;
-	DWORD windowedStyle;
+	//RECT windowedRect;
+	//DWORD windowedStyle;
 
-	void FullscreenState(BOOL fullscreen);
-	void OnSizeChanged(UINT64 width, UINT height);
+	//void FullscreenState(BOOL fullscreen);
+	//void OnSizeChanged(UINT64 width, UINT height);
 
 	std::unique_ptr<Regal::Resource::Sprite> sprites[8];
 	std::unique_ptr<Regal::Resource::SpriteBatch> spritesBatches[8];
@@ -215,7 +221,7 @@ private:
 	std::unique_ptr<Regal::Resource::Sprite> skyboxSprite;
 	std::unique_ptr<Regal::Graphics::Particles> particles;
 
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
+	/*Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
 	enum class DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
@@ -224,6 +230,11 @@ private:
 
 	enum class BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
+
+	enum class RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE };
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[5];
+	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get() };
+	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get() };*/
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 
@@ -234,10 +245,7 @@ private:
 	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
-	enum class RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE};
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[5];
-	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get()};
-	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get()};
+	
 
 	float boneTranslationX{ 300.0f };
 	float blendAnimation{ 0.5f };

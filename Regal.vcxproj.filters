@@ -124,7 +124,9 @@
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp">
       <Filter>RegalLib\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp" />
+    <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -217,7 +219,9 @@
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h">
       <Filter>RegalLib\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Graphics\Graphics.h" />
+    <ClInclude Include="Sources\RegalLib\Graphics\Graphics.h">
+      <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">

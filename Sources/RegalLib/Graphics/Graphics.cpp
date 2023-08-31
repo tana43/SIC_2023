@@ -39,6 +39,8 @@ void AcquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** 
 
 namespace Regal::Graphics
 {
+	Graphics* Graphics::instance = nullptr;
+
     Graphics::Graphics(HWND hwnd, BOOL fullscreen):
 		hwnd(hwnd),
 		fullscreenMode(fullscreen),
@@ -48,14 +50,16 @@ namespace Regal::Graphics
         _ASSERT_EXPR(instance == nullptr, "already instantiated");
         instance = this;
 
-        //画面サイズ取得
-        RECT rc;
-        GetClientRect(hwnd, &rc);
-        UINT screenWidth = rc.right - rc.left;
-        UINT screenHeight = rc.bottom - rc.top;
+		if (fullscreen)
+		{
+			FullscreenState(TRUE);
+		}
 
-        this->framebufferDimensions.cx = static_cast<float>(screenWidth);
-        this->framebufferDimensions.cy = static_cast<float>(screenHeight);
+        //画面サイズ取得
+		RECT clientRect;
+		GetClientRect(hwnd, &clientRect);
+		framebufferDimensions.cx = clientRect.right - clientRect.left;
+		framebufferDimensions.cy = clientRect.bottom - clientRect.top;
 
         HRESULT hr{ S_OK };
 
@@ -99,7 +103,13 @@ namespace Regal::Graphics
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 		CreateSwapChain(dxgiFactory6.Get());
+
+
     }
+
+	Graphics::~Graphics()
+	{
+	}
 
     void Graphics::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
     {
@@ -279,6 +289,202 @@ namespace Regal::Graphics
 			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 			CreateSwapChain(dxgiFactory6.Get());
 		}
+	}
+
+	void Graphics::CreateStates()
+	{
+
+		HRESULT hr{ S_OK };
+
+		D3D11_SAMPLER_DESC samplerDesc;
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+		samplerDesc.MipLODBias = 0;
+		samplerDesc.MaxAnisotropy = 16;
+		samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		samplerDesc.BorderColor[0] = 0;
+		samplerDesc.BorderColor[1] = 0;
+		samplerDesc.BorderColor[2] = 0;
+		samplerDesc.BorderColor[3] = 0;
+		samplerDesc.MinLOD = 0;
+		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+		hr = device->CreateSamplerState(&samplerDesc, samplerStates[0].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		hr = device->CreateSamplerState(&samplerDesc, samplerStates[1].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+		hr = device->CreateSamplerState(&samplerDesc, samplerStates[2].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		//深度ステンシルステートオブジェクトの生成
+		{
+			//深度テスト：オン,深度ライト：オン
+			D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
+			depthStencilDesc.DepthEnable = TRUE;
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[0].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			//深度テスト：オフ,深度ライト：オン
+			depthStencilDesc.DepthEnable = FALSE;
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[1].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			//深度テスト：オン,深度ライト：オフ
+			depthStencilDesc.DepthEnable = TRUE;
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[2].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			//深度テスト：オフ,深度ライト：オフ
+			depthStencilDesc.DepthEnable = FALSE;
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[3].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+		}
+
+		//ブレンディングステートオブジェクト作成
+		{
+			D3D11_BLEND_DESC blend_desc{};
+			blend_desc.AlphaToCoverageEnable = FALSE;
+			blend_desc.IndependentBlendEnable = FALSE;
+			blend_desc.RenderTarget[0].BlendEnable = FALSE;
+			blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+			blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+			blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+			blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+			blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+			hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::NONE)].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			blend_desc.AlphaToCoverageEnable = FALSE;
+			blend_desc.IndependentBlendEnable = FALSE;
+			blend_desc.RenderTarget[0].BlendEnable = TRUE;
+			blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+			blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+			blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+			blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+			blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+			hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			blend_desc.AlphaToCoverageEnable = FALSE;
+			blend_desc.IndependentBlendEnable = FALSE;
+			blend_desc.RenderTarget[0].BlendEnable = TRUE;
+			blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; //D3D11_BLEND_ONE D3D11_BLEND_SRC_ALPHA
+			blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+			blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+			blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+			blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+			hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ADD)].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			blend_desc.AlphaToCoverageEnable = FALSE;
+			blend_desc.IndependentBlendEnable = FALSE;
+			blend_desc.RenderTarget[0].BlendEnable = TRUE;
+			blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO; //D3D11_BLEND_DEST_COLOR
+			blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_SRC_COLOR; //D3D11_BLEND_SRC_COLOR
+			blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+			blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+			blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+			blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+			hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::MULTIPLY)].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+		}
+
+		//ラスタライザーステートオブジェクト生成
+		{
+			D3D11_RASTERIZER_DESC rasterizerDesc{};
+			rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+			rasterizerDesc.CullMode = D3D11_CULL_BACK;
+			rasterizerDesc.FrontCounterClockwise = FALSE;
+			rasterizerDesc.DepthBias = 0;
+			rasterizerDesc.DepthBiasClamp = 0;
+			rasterizerDesc.SlopeScaledDepthBias = 0;
+			rasterizerDesc.DepthClipEnable = TRUE;
+			rasterizerDesc.ScissorEnable = FALSE;
+			rasterizerDesc.MultisampleEnable = FALSE;
+			rasterizerDesc.AntialiasedLineEnable = FALSE;
+			hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[0].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			//面カリングを逆向きにするステート
+			rasterizerDesc.FrontCounterClockwise = TRUE;
+			hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[3].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+			rasterizerDesc.CullMode = D3D11_CULL_BACK;
+			rasterizerDesc.AntialiasedLineEnable = TRUE;
+			hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[1].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+			rasterizerDesc.CullMode = D3D11_CULL_NONE;
+			rasterizerDesc.AntialiasedLineEnable = TRUE;
+			hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[2].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+			//面カリング無し
+			rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+			rasterizerDesc.CullMode = D3D11_CULL_NONE;
+			rasterizerDesc.AntialiasedLineEnable = TRUE;
+			hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[4].GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+		}
+
+		//各種ステートオブジェクトセット
+		{
+			setting2DDepthStencilState = depthStencilStates[DEPTH_STATE::ZT_OFF_ZW_OFF].Get();
+			setting3DDepthStencilState = depthStencilStates[DEPTH_STATE::ZT_ON_ZW_ON].Get();
+			setting2DRasterizerState = rasterizerStates[RASTER_STATE::SOLID].Get();
+			setting3DRasterizerState = rasterizerStates[RASTER_STATE::SOLID].Get();
+			setting2DBlendState = blendStates[BLEND_STATE::ALPHA].Get();
+			setting3DBlendState = blendStates[BLEND_STATE::ALPHA].Get();
+		}
+	}
+
+	void Graphics::SetStates(int depthStencilState, int rastarizerState, int blendState)
+	{
+		immediateContext->RSSetState(rasterizerStates[rastarizerState].Get());
+		immediateContext->OMSetDepthStencilState(depthStencilStates[depthStencilState].Get(), 1);
+		immediateContext->OMSetBlendState(blendStates[blendState].Get(), nullptr, 0xFFFFFFFF);
+	}
+
+	void Graphics::Set2DStates()
+	{
+		immediateContext->OMSetDepthStencilState(setting2DDepthStencilState, 1);
+		immediateContext->RSSetState(setting2DRasterizerState);
+		immediateContext->OMSetBlendState(setting2DBlendState, nullptr, 0xFFFFFFFF);
+	}
+
+	void Graphics::Set3DStates()
+	{
+		immediateContext->OMSetDepthStencilState(setting3DDepthStencilState, 1);
+		immediateContext->RSSetState(setting3DRasterizerState);
+		immediateContext->OMSetBlendState(setting3DBlendState, nullptr, 0xFFFFFFFF);
+	}
+
+	void Graphics::DrawDebug()
+	{
+
 	}
 }
 

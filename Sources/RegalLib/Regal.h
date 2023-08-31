@@ -14,6 +14,7 @@
 #include "Resource/GltfModel.h"
 #include "Resource/Texture.h"
 
+#include "Graphics/Graphics.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/FullscreenQuad.h"
 #include "Graphics/Bloom.h"

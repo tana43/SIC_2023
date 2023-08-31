@@ -48,16 +48,55 @@ namespace Regal::Graphics
 		//ミューテックス取得
 		std::mutex& GetMutex() { return mutex; }
 
+		void OnSizeChanged(UINT64 width, UINT height);
+
+		//各種ステートの生成
+		void CreateStates();
+
+		//各種ステートをセット
+		void SetStates(int depthStencilState, int rastarizeState, int blendState);
+
+		//2D用のステートをセット
+		void Set2DStates();
+		//3D用のステートをセット
+		void Set3DStates();
+
+		void DrawDebug();
+
+		void FullscreenState(BOOL fullscreen);
+
+		//とりあえず動くようにしたいからサンプラーステートバインド関数置いとく（後で消す）
+		void BindSamplersState()
+		{
+			immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
+			immediateContext->PSSetSamplers(1, 1, samplerStates[1].GetAddressOf());
+			immediateContext->PSSetSamplers(2, 1, samplerStates[2].GetAddressOf());
+		}
+
+	public:
+		enum DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
+		enum BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
+		enum RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE };
+
+		BOOL fullscreenMode{ FALSE };
+		BOOL vsync{ FALSE };//垂直同期
+		BOOL tearingSupported{ FALSE };
+
 	private:
 		void CreateSwapChain(IDXGIFactory6* dxgiFactory6);
 
-		void FullscreenState(BOOL fullscreen);
-		void OnSizeChanged(UINT64 width, UINT height);
+		size_t VideoMemoryUsage()
+		{
+			DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
+			adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
+			return videoMemoryInfo.CurrentUsage / 1024 / 1024;
+		}
 
 	private:
 		static Graphics* instance;
 
 		Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter;//メモリの使用状況の確認ができる
+
 
 		Microsoft::WRL::ComPtr<ID3D11Device>			device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>		immediateContext;
@@ -71,12 +110,27 @@ namespace Regal::Graphics
 		std::unique_ptr<LineRenderer>					lineRenderer;
 		std::unique_ptr<ImGuiRenderer>					imguiRenderer;*/
 
-		CONST HWND hwnd;
-		SIZE framebufferDimensions;
+		//各種ステート
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
 
-		BOOL fullscreenMode{ FALSE };
-		BOOL vsync{ FALSE };//垂直同期
-		BOOL tearingSupported{ FALSE };
+		
+
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
+		ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[ZT_ON_ZW_ON].Get() };
+		ID3D11DepthStencilState* setting3DDepthStencilState{ depthStencilStates[ZT_ON_ZW_ON].Get() };
+
+		Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
+		ID3D11BlendState* setting2DBlendState{ blendStates[ALPHA].Get() };
+		ID3D11BlendState* setting3DBlendState{ blendStates[ALPHA].Get() };
+
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[5];
+		ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[SOLID].Get() };
+		ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[SOLID].Get() };
+
+		CONST HWND hwnd;
+		SIZE framebufferDimensions;//スクリーンサイズ
+
+		
 
 		RECT windowedRect;
 		DWORD windowedStyle;

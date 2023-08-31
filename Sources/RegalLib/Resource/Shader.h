@@ -14,5 +14,7 @@ namespace Regal::Resource
         static void CreateGSFromCso(ID3D11Device* device, const char* csoName, ID3D11GeometryShader** geometryShader);
 
         static void CreateCSFromCso(ID3D11Device* device, const char* csoName, ID3D11ComputeShader** computeShader);
+
+   
     };
 }

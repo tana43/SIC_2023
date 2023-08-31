@@ -6,207 +6,127 @@
 using namespace Regal::Resource;
 using namespace Regal::Graphics;
 
-//GPU情報を取得
-void AcquireHighPerformanceAdapter(IDXGIFactory6* dxgiFactory6, IDXGIAdapter3** dxgiAdapter3)
+
+Framework::Framework(HWND hwnd,BOOL fullscreen) : 
+	hwnd(hwnd),
+	graphics(hwnd,fullscreen)
 {
-	HRESULT hr{ S_OK };
+	//D3D11_SAMPLER_DESC samplerDesc;
+	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	//samplerDesc.MipLODBias = 0;
+	//samplerDesc.MaxAnisotropy = 16;
+	//samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	//samplerDesc.BorderColor[0] = 0;
+	//samplerDesc.BorderColor[1] = 0;
+	//samplerDesc.BorderColor[2] = 0;
+	//samplerDesc.BorderColor[3] = 0;
+	//samplerDesc.MinLOD = 0;
+	//samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	//hr = device->CreateSamplerState(&samplerDesc, samplerStates[0].GetAddressOf());
+	//_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	Microsoft::WRL::ComPtr<IDXGIAdapter3> enumeratedAdapter;
-	for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory6->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(enumeratedAdapter.ReleaseAndGetAddressOf())); ++adapterIndex)
-	{
-		DXGI_ADAPTER_DESC1 adapterDesc;
-		hr = enumeratedAdapter->GetDesc1(&adapterDesc);
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	//hr = device->CreateSamplerState(&samplerDesc, samplerStates[1].GetAddressOf());
+	//_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-		//VenterID 各企業毎に発行される企業固有のID
-		if (adapterDesc.VendorId == 0x1002/*AMD*/ || adapterDesc.VendorId == 0x10DE/*NVIDIA*/)
-		{
-			OutputDebugStringW((std::wstring(adapterDesc.Description) + L" has been selected.\n").c_str());
-			OutputDebugStringA(std::string("\tVendorId:" + std::to_string(adapterDesc.VendorId) + '\n').c_str());
-			OutputDebugStringA(std::string("\tDeviceId:" + std::to_string(adapterDesc.DeviceId) + '\n').c_str());
-			OutputDebugStringA(std::string("\tSubSysId:" + std::to_string(adapterDesc.SubSysId) + '\n').c_str());
-			OutputDebugStringA(std::string("\tRevision:" + std::to_string(adapterDesc.Revision) + '\n').c_str());
-			OutputDebugStringA(std::string("\tDedicatedVideoMemory:" + std::to_string(adapterDesc.DedicatedVideoMemory) + '\n').c_str());
-			OutputDebugStringA(std::string("\tDedicatedSystemMemory:" + std::to_string(adapterDesc.DedicatedSystemMemory) + '\n').c_str());
-			OutputDebugStringA(std::string("\tSharedSystemMemory:" + std::to_string(adapterDesc.SharedSystemMemory) + '\n').c_str());
-			OutputDebugStringA(std::string("\tAdapterLuid.HighPart:" + std::to_string(adapterDesc.AdapterLuid.HighPart) + '\n').c_str());
-			OutputDebugStringA(std::string("\tAdapterLuid.LowPart:" + std::to_string(adapterDesc.AdapterLuid.LowPart) + '\n').c_str());
-			OutputDebugStringA(std::string("\tFlags:" + std::to_string(adapterDesc.Flags) + '\n').c_str());
-			break;
-		}
-	}
+	//samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	//hr = device->CreateSamplerState(&samplerDesc, samplerStates[2].GetAddressOf());
+	//_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	//GPUの情報を取得
-	*dxgiAdapter3 = enumeratedAdapter.Detach();
-}
+	//	//深度ステンシルステートオブジェクトの生成
+	//{
+	//	//深度テスト：オン,深度ライト：オン
+	//	D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//	depthStencilDesc.DepthEnable = TRUE;
+	//	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	//	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	//	hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[0].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-Framework::Framework(HWND hwnd,BOOL fullscreen) : hwnd(hwnd),fullscreenMode(fullscreen),windowedStyle(static_cast<DWORD>(GetWindowLongPtrW(hwnd,GWL_STYLE)))
-{
-	if (fullscreen)
-	{
-		FullscreenState(TRUE);
-	}
+	//	//深度テスト：オフ,深度ライト：オン
+	//	depthStencilDesc.DepthEnable = FALSE;
+	//	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	//	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	//	hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[1].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	RECT clientRect;
-	GetClientRect(hwnd, &clientRect);
-	framebufferDimensions.cx = clientRect.right - clientRect.left;
-	framebufferDimensions.cy = clientRect.bottom - clientRect.top;
+	//	//深度テスト：オン,深度ライト：オフ
+	//	depthStencilDesc.DepthEnable = TRUE;
+	//	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	//	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	//	hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[2].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	HRESULT hr{ S_OK };
+	//	//深度テスト：オフ,深度ライト：オフ
+	//	depthStencilDesc.DepthEnable = FALSE;
+	//	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	//	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	//	hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[3].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+	//}
+	//
+	//	//ブレンディングステートオブジェクト作成
+	//{
+	//	D3D11_BLEND_DESC blend_desc{};
+	//	blend_desc.AlphaToCoverageEnable                 = FALSE;
+	//	blend_desc.IndependentBlendEnable                = FALSE;
+	//	blend_desc.RenderTarget[0].BlendEnable           = FALSE;
+	//	blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ONE;
+	//	blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_ZERO;
+	//	blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+	//	blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+	//	blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//	hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::NONE)].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	UINT createFactoryFlags{};
-#ifdef _DEBUG
-	createFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
-#else
+	//	blend_desc.AlphaToCoverageEnable                 = FALSE;
+	//	blend_desc.IndependentBlendEnable                = FALSE;
+	//	blend_desc.RenderTarget[0].BlendEnable           = TRUE;
+	//	blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
+	//	blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
+	//	blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+	//	blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_INV_SRC_ALPHA;
+	//	blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//	hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-#endif // _DEBUG
-	Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory6;
-	hr = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(dxgiFactory6.GetAddressOf()));
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+	//	blend_desc.AlphaToCoverageEnable                 = FALSE;
+	//	blend_desc.IndependentBlendEnable                = FALSE;
+	//	blend_desc.RenderTarget[0].BlendEnable           = TRUE;
+	//	blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA; //D3D11_BLEND_ONE D3D11_BLEND_SRC_ALPHA
+	//	blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_ONE;
+	//	blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ZERO;
+	//	blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ONE;
+	//	blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//	hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ADD)].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	//アダプター最適化（搭載GPUに対応、よー分からん）
-	AcquireHighPerformanceAdapter(dxgiFactory6.Get(), adapter.GetAddressOf());
+	//	blend_desc.AlphaToCoverageEnable                 = FALSE;
+	//	blend_desc.IndependentBlendEnable                = FALSE;
+	//	blend_desc.RenderTarget[0].BlendEnable           = TRUE;
+	//	blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ZERO; //D3D11_BLEND_DEST_COLOR
+	//	blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_SRC_COLOR; //D3D11_BLEND_SRC_COLOR
+	//	blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_DEST_ALPHA;
+	//	blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+	//	blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+	//	blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//	hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::MULTIPLY)].GetAddressOf());
+	//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+	//}
 
-	UINT createDeviceFlags{ 0 };
-#ifdef _DEBUG
-	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif // _DEBUG
+	HRESULT hr{S_OK};
 
-	/*D3D_FEATURE_LEVEL featureLevels[]
-	{ 
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0
-	};
-	D3D_FEATURE_LEVEL featureLevel;
-	hr = D3D11CreateDevice( 
-		adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, 0, 
-		createDeviceFlags, featureLevels, _countof(featureLevels), D3D11_SDK_VERSION,
-		device.ReleaseAndGetAddressOf(), &featureLevel, immediateContext.ReleaseAndGetAddressOf()
-	);
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	_ASSERT_EXPR(!(featureLevel < D3D_FEATURE_LEVEL_11_0), L"Direct3D Feature Level 11 unsupported.");*/
-	D3D_FEATURE_LEVEL featureLevels{D3D_FEATURE_LEVEL_11_1,};
-	hr = D3D11CreateDevice(
-		adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, 0,
-		createDeviceFlags, &featureLevels,1, D3D11_SDK_VERSION,
-		device.ReleaseAndGetAddressOf(), NULL, immediateContext.ReleaseAndGetAddressOf()
-	);
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	CreateSwapChain(dxgiFactory6.Get());
-
-	D3D11_SAMPLER_DESC samplerDesc;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.MipLODBias = 0;
-	samplerDesc.MaxAnisotropy = 16;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.BorderColor[0] = 0;
-	samplerDesc.BorderColor[1] = 0;
-	samplerDesc.BorderColor[2] = 0;
-	samplerDesc.BorderColor[3] = 0;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	hr = device->CreateSamplerState(&samplerDesc, samplerStates[0].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	hr = device->CreateSamplerState(&samplerDesc, samplerStates[1].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	hr = device->CreateSamplerState(&samplerDesc, samplerStates[2].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		//深度ステンシルステートオブジェクトの生成
-	{
-		//深度テスト：オン,深度ライト：オン
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
-		depthStencilDesc.DepthEnable = TRUE;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[0].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		//深度テスト：オフ,深度ライト：オン
-		depthStencilDesc.DepthEnable = FALSE;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[1].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		//深度テスト：オン,深度ライト：オフ
-		depthStencilDesc.DepthEnable = TRUE;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[2].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		//深度テスト：オフ,深度ライト：オフ
-		depthStencilDesc.DepthEnable = FALSE;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilStates[3].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	}
-	
-		//ブレンディングステートオブジェクト作成
-	{
-		D3D11_BLEND_DESC blend_desc{};
-		blend_desc.AlphaToCoverageEnable                 = FALSE;
-		blend_desc.IndependentBlendEnable                = FALSE;
-		blend_desc.RenderTarget[0].BlendEnable           = FALSE;
-		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ONE;
-		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_ZERO;
-		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
-		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
-		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::NONE)].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		blend_desc.AlphaToCoverageEnable                 = FALSE;
-		blend_desc.IndependentBlendEnable                = FALSE;
-		blend_desc.RenderTarget[0].BlendEnable           = TRUE;
-		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
-		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
-		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
-		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_INV_SRC_ALPHA;
-		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		blend_desc.AlphaToCoverageEnable                 = FALSE;
-		blend_desc.IndependentBlendEnable                = FALSE;
-		blend_desc.RenderTarget[0].BlendEnable           = TRUE;
-		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_SRC_ALPHA; //D3D11_BLEND_ONE D3D11_BLEND_SRC_ALPHA
-		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_ONE;
-		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ZERO;
-		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ONE;
-		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::ADD)].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		blend_desc.AlphaToCoverageEnable                 = FALSE;
-		blend_desc.IndependentBlendEnable                = FALSE;
-		blend_desc.RenderTarget[0].BlendEnable           = TRUE;
-		blend_desc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ZERO; //D3D11_BLEND_DEST_COLOR
-		blend_desc.RenderTarget[0].DestBlend             = D3D11_BLEND_SRC_COLOR; //D3D11_BLEND_SRC_COLOR
-		blend_desc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_DEST_ALPHA;
-		blend_desc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
-		blend_desc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		hr = device->CreateBlendState(&blend_desc, blendStates[static_cast<size_t>(BLEND_STATE::MULTIPLY)].GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	}
+	auto device{ Graphics::Instance().GetDevice() };
 
 	D3D11_BUFFER_DESC bufferDesc{};
 	bufferDesc.ByteWidth = sizeof(SceneConstants);
@@ -256,191 +176,191 @@ bool Framework::Initialize()
 	);
 #endif // 0
 
-	
-	framebuffers[0] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy,DXGI_FORMAT_R16G16B16A16_FLOAT,true);
-	framebuffers[1] = std::make_unique<Framebuffer>(device.Get(), framebufferDimensions.cx / 2, framebufferDimensions.cy / 2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
+	Graphics& graphics{ Graphics::Instance() };
+	framebuffers[0] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, true);
+	framebuffers[1] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth()/2, graphics.GetScreenHeight()/2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
 
-	bitBlockTransfer = std::make_unique<FullscreenQuad>(device.Get());
+	bitBlockTransfer = std::make_unique<FullscreenQuad>(graphics.GetDevice());
 
-	//スカイボックス
-	skyboxSprite = std::make_unique<Sprite>(device.Get(), 
-		//L"./Resources/SkyBox/envmap_miramar.dds"
-		//L"./Resources/SkyBox/Sky.png"
-		//L"./Resources/SkyBox/realistic_bloodborne.jpg"
-		L"./Resources/SkyBox/realistic_tokyo_night_view.jpg"
-	);
-	skybox = std::make_unique<SkyBox>(device.Get(), skyboxSprite.get());
+	////スカイボックス
+	//skyboxSprite = std::make_unique<Sprite>(device.Get(), 
+	//	//L"./Resources/SkyBox/envmap_miramar.dds"
+	//	//L"./Resources/SkyBox/Sky.png"
+	//	//L"./Resources/SkyBox/realistic_bloodborne.jpg"
+	//	L"./Resources/SkyBox/realistic_tokyo_night_view.jpg"
+	//);
+	//skybox = std::make_unique<SkyBox>(device.Get(), skyboxSprite.get());
 
-	//各種ステートオブジェクトセット
-	{
-		setting2DDepthStencilState = depthStencilStates[3].Get();
-		setting3DDepthStencilState = depthStencilStates[0].Get();
-		setting2DRasterizerState = rasterizerStates[0].Get();
-		setting3DRasterizerState = rasterizerStates[0].Get();
-	}
+	////各種ステートオブジェクトセット
+	//{
+	//	setting2DDepthStencilState = depthStencilStates[3].Get();
+	//	setting3DDepthStencilState = depthStencilStates[0].Get();
+	//	setting2DRasterizerState = rasterizerStates[0].Get();
+	//	setting3DRasterizerState = rasterizerStates[0].Get();
+	//}
 
-	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/LuminanceExtractionPS.cso", pixelShaders[0].GetAddressOf());
-	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/BlurPS.cso", pixelShaders[1].GetAddressOf());
+	//Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/LuminanceExtractionPS.cso", pixelShaders[0].GetAddressOf());
+	//Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/BlurPS.cso", pixelShaders[1].GetAddressOf());
 
-	D3D11_TEXTURE2D_DESC texture2dDesc;
-	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/sunset_jhbcentral_4k.dds", 
-		shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
-	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/diffuse_iem.dds",
-		shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
-	LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/specular_pmrem.dds",
-		shaderResourceViews[2].GetAddressOf(), &texture2dDesc);
-	LoadTextureFromFile(device.Get(), L"./Resources/environments/lut_ggx.dds",
-		shaderResourceViews[3].GetAddressOf(), &texture2dDesc);
+	//D3D11_TEXTURE2D_DESC texture2dDesc;
+	//LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/sunset_jhbcentral_4k.dds", 
+	//	shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
+	//LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/diffuse_iem.dds",
+	//	shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
+	//LoadTextureFromFile(device.Get(), L"./Resources/environments/sunset_jhbcentral_4k/specular_pmrem.dds",
+	//	shaderResourceViews[2].GetAddressOf(), &texture2dDesc);
+	//LoadTextureFromFile(device.Get(), L"./Resources/environments/lut_ggx.dds",
+	//	shaderResourceViews[3].GetAddressOf(), &texture2dDesc);
 
-	bloomer = std::make_unique<Bloom>(device.Get(), framebufferDimensions.cx, framebufferDimensions.cy);
-	Shader::CreatePSFromCso(device.Get(), "./Resources/Shader/FinalPassPS.cso", pixelShaders[0].ReleaseAndGetAddressOf());
+	bloomer = std::make_unique<Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
+	Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", pixelShaders[0].ReleaseAndGetAddressOf());
 
-	particles = std::make_unique<decltype(particles)::element_type>(device.Get(), 1000);
-	particles->Initialize(immediateContext.Get(), 0);
+	particles = std::make_unique<decltype(particles)::element_type>(graphics.GetDevice(), 1000);
+	particles->Initialize(graphics.GetDeviceContext(), 0);
 
 	return true;
 }
 
-void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
-{
-	HRESULT hr{ S_OK };
-
-	if (swapChain)
-	{
-		//ウィンドウサイズ変更処理
-		ID3D11RenderTargetView* nullRenderTargetView{};
-		immediateContext->OMSetRenderTargets(1, &nullRenderTargetView, NULL);
-		renderTargetView.Reset();
-
-		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
-		swapChain->GetDesc(&swapChainDesc);
-		hr = swapChain->ResizeBuffers(
-			swapChainDesc.BufferCount,
-			framebufferDimensions.cx, framebufferDimensions.cy,
-			swapChainDesc.BufferDesc.Format, swapChainDesc.Flags
-		);
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTargetBuffer;
-		hr = swapChain->GetBuffer(0, IID_PPV_ARGS(renderTargetBuffer.GetAddressOf()));
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-		D3D11_TEXTURE2D_DESC texture2dDesc;
-		renderTargetBuffer->GetDesc(&texture2dDesc);
-
-		hr = device->CreateRenderTargetView(renderTargetBuffer.Get(), NULL, renderTargetView.ReleaseAndGetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	}
-	else
-	{
-		BOOL allowTearing = FALSE;
-		if (SUCCEEDED(hr))
-		{
-			hr = dxgiFactory6->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
-		}
-		tearingSupported = SUCCEEDED(hr) && allowTearing;
-
-		DXGI_SWAP_CHAIN_DESC1 swapChainDesk1{};
-		swapChainDesk1.Width = framebufferDimensions.cx;
-		swapChainDesk1.Height = framebufferDimensions.cy;
-		swapChainDesk1.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapChainDesk1.Stereo = FALSE;
-		swapChainDesk1.SampleDesc.Count = 1;
-		swapChainDesk1.SampleDesc.Quality = 0;
-		swapChainDesk1.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDesk1.BufferCount = 2;
-		swapChainDesk1.Scaling = DXGI_SCALING_STRETCH;
-		swapChainDesk1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-		swapChainDesk1.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-		swapChainDesk1.Flags = tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
-		hr = dxgiFactory6->CreateSwapChainForHwnd(device.Get(), hwnd, &swapChainDesk1, nullptr, nullptr, swapChain.ReleaseAndGetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		//標準のフルスクリーン入力 alt+enter を無効にしている
-		dxgiFactory6->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER);
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer{};
-		hr = swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-		hr = device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.ReleaseAndGetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	}
-
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer{};
-	D3D11_TEXTURE2D_DESC texture2dDesc{};
-	texture2dDesc.Width = framebufferDimensions.cx;
-	texture2dDesc.Height = framebufferDimensions.cy;
-	texture2dDesc.MipLevels = 1;
-	texture2dDesc.ArraySize = 1;
-	texture2dDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-	texture2dDesc.SampleDesc.Count = 1;
-	texture2dDesc.SampleDesc.Quality = 0;
-	texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
-	texture2dDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	texture2dDesc.CPUAccessFlags = 0;
-	texture2dDesc.MiscFlags = 0;
-	hr = device->CreateTexture2D(&texture2dDesc, NULL, depthStencilBuffer.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Texture2D.MipSlice = 0;
-	hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), &depthStencilViewDesc, depthStencilView.ReleaseAndGetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	
-
-	D3D11_VIEWPORT viewport{};
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = static_cast<float>(framebufferDimensions.cx);
-	viewport.Height = static_cast<float>(framebufferDimensions.cy);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	immediateContext->RSSetViewports(1, &viewport);
-
-	//ラスタライザーステートオブジェクト生成
-	D3D11_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = FALSE;
-	rasterizerDesc.DepthBias = 0;
-	rasterizerDesc.DepthBiasClamp = 0;
-	rasterizerDesc.SlopeScaledDepthBias = 0;
-	rasterizerDesc.DepthClipEnable = TRUE;
-	rasterizerDesc.ScissorEnable = FALSE;
-	rasterizerDesc.MultisampleEnable = FALSE;
-	rasterizerDesc.AntialiasedLineEnable = FALSE;
-	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[0].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	//面カリングを逆向きにするステート
-	rasterizerDesc.FrontCounterClockwise = TRUE;
-	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[3].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.AntialiasedLineEnable = TRUE;
-	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[1].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-	
-	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
-	rasterizerDesc.AntialiasedLineEnable = TRUE;
-	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[2].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	//面カリング無し
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
-	rasterizerDesc.AntialiasedLineEnable = TRUE;
-	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[4].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-}
+//void Framework::CreateSwapChain(IDXGIFactory6* dxgiFactory6)
+//{
+//	HRESULT hr{ S_OK };
+//
+//	if (swapChain)
+//	{
+//		//ウィンドウサイズ変更処理
+//		ID3D11RenderTargetView* nullRenderTargetView{};
+//		immediateContext->OMSetRenderTargets(1, &nullRenderTargetView, NULL);
+//		renderTargetView.Reset();
+//
+//		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
+//		swapChain->GetDesc(&swapChainDesc);
+//		hr = swapChain->ResizeBuffers(
+//			swapChainDesc.BufferCount,
+//			framebufferDimensions.cx, framebufferDimensions.cy,
+//			swapChainDesc.BufferDesc.Format, swapChainDesc.Flags
+//		);
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//		Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTargetBuffer;
+//		hr = swapChain->GetBuffer(0, IID_PPV_ARGS(renderTargetBuffer.GetAddressOf()));
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//		D3D11_TEXTURE2D_DESC texture2dDesc;
+//		renderTargetBuffer->GetDesc(&texture2dDesc);
+//
+//		hr = device->CreateRenderTargetView(renderTargetBuffer.Get(), NULL, renderTargetView.ReleaseAndGetAddressOf());
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//	}
+//	else
+//	{
+//		BOOL allowTearing = FALSE;
+//		if (SUCCEEDED(hr))
+//		{
+//			hr = dxgiFactory6->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
+//		}
+//		tearingSupported = SUCCEEDED(hr) && allowTearing;
+//
+//		DXGI_SWAP_CHAIN_DESC1 swapChainDesk1{};
+//		swapChainDesk1.Width = framebufferDimensions.cx;
+//		swapChainDesk1.Height = framebufferDimensions.cy;
+//		swapChainDesk1.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+//		swapChainDesk1.Stereo = FALSE;
+//		swapChainDesk1.SampleDesc.Count = 1;
+//		swapChainDesk1.SampleDesc.Quality = 0;
+//		swapChainDesk1.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+//		swapChainDesk1.BufferCount = 2;
+//		swapChainDesk1.Scaling = DXGI_SCALING_STRETCH;
+//		swapChainDesk1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+//		swapChainDesk1.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+//		swapChainDesk1.Flags = tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+//		hr = dxgiFactory6->CreateSwapChainForHwnd(device.Get(), hwnd, &swapChainDesk1, nullptr, nullptr, swapChain.ReleaseAndGetAddressOf());
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//		//標準のフルスクリーン入力 alt+enter を無効にしている
+//		dxgiFactory6->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER);
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer{};
+//		hr = swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//		hr = device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.ReleaseAndGetAddressOf());
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//	}
+//
+//	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer{};
+//	D3D11_TEXTURE2D_DESC texture2dDesc{};
+//	texture2dDesc.Width = framebufferDimensions.cx;
+//	texture2dDesc.Height = framebufferDimensions.cy;
+//	texture2dDesc.MipLevels = 1;
+//	texture2dDesc.ArraySize = 1;
+//	texture2dDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+//	texture2dDesc.SampleDesc.Count = 1;
+//	texture2dDesc.SampleDesc.Quality = 0;
+//	texture2dDesc.Usage = D3D11_USAGE_DEFAULT;
+//	texture2dDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+//	texture2dDesc.CPUAccessFlags = 0;
+//	texture2dDesc.MiscFlags = 0;
+//	hr = device->CreateTexture2D(&texture2dDesc, NULL, depthStencilBuffer.GetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//	
+//
+//	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
+//	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+//	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+//	depthStencilViewDesc.Texture2D.MipSlice = 0;
+//	hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), &depthStencilViewDesc, depthStencilView.ReleaseAndGetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//	
+//
+//	D3D11_VIEWPORT viewport{};
+//	viewport.TopLeftX = 0;
+//	viewport.TopLeftY = 0;
+//	viewport.Width = static_cast<float>(framebufferDimensions.cx);
+//	viewport.Height = static_cast<float>(framebufferDimensions.cy);
+//	viewport.MinDepth = 0.0f;
+//	viewport.MaxDepth = 1.0f;
+//	immediateContext->RSSetViewports(1, &viewport);
+//
+//	//ラスタライザーステートオブジェクト生成
+//	D3D11_RASTERIZER_DESC rasterizerDesc{};
+//	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+//	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+//	rasterizerDesc.FrontCounterClockwise = FALSE;
+//	rasterizerDesc.DepthBias = 0;
+//	rasterizerDesc.DepthBiasClamp = 0;
+//	rasterizerDesc.SlopeScaledDepthBias = 0;
+//	rasterizerDesc.DepthClipEnable = TRUE;
+//	rasterizerDesc.ScissorEnable = FALSE;
+//	rasterizerDesc.MultisampleEnable = FALSE;
+//	rasterizerDesc.AntialiasedLineEnable = FALSE;
+//	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[0].GetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//	//面カリングを逆向きにするステート
+//	rasterizerDesc.FrontCounterClockwise = TRUE;
+//	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[3].GetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+//	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+//	rasterizerDesc.AntialiasedLineEnable = TRUE;
+//	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[1].GetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//	
+//	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+//	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+//	rasterizerDesc.AntialiasedLineEnable = TRUE;
+//	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[2].GetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//	//面カリング無し
+//	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+//	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+//	rasterizerDesc.AntialiasedLineEnable = TRUE;
+//	hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerStates[4].GetAddressOf());
+//	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//
+//}
 
 void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 {
@@ -452,17 +372,19 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	ImGui::NewFrame();
 #endif
 
+	Graphics& graphics{ Graphics::Instance() };
+
 	if (GetAsyncKeyState(VK_RETURN) & 1 && GetAsyncKeyState(VK_MENU) & 1)
 	{
-		FullscreenState(!fullscreenMode);
+		graphics.FullscreenState(!graphics.fullscreenMode);
 	}
 
 	//スペースでパーティクルリセット
 	if (GetAsyncKeyState(' ') & 0x8000)
 	{
-		particles->Initialize(immediateContext.Get(), 0);
+		particles->Initialize(graphics.GetDeviceContext(), 0);
 	}
-	particles->Integrate(immediateContext.Get(), elapsed_time);
+	particles->Integrate(graphics.GetDeviceContext(), elapsed_time);
 
 #if _DEBUG
 	DrawDebug();
@@ -477,7 +399,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	HRESULT hr{ S_OK };
 
-	ID3D11RenderTargetView* nullRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+	/*ID3D11RenderTargetView* nullRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
 	immediateContext->OMSetRenderTargets(_countof(nullRenderTargetViews), nullRenderTargetViews, 0);
 	ID3D11ShaderResourceView* nullShaderResourcesViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
 	immediateContext->VSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
@@ -486,7 +408,17 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 	immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());*/
+
+	Graphics& graphics = Graphics::Instance();
+	ID3D11DeviceContext* immediateContext = graphics.GetDeviceContext();
+	ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
+	ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+
+	//画面クリア&レンダーターゲット設定
+	immediateContext->ClearRenderTargetView(rtv, color);
+	immediateContext->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	immediateContext->OMSetRenderTargets(1, &rtv, dsv);
 
 	//テクスチャバインド
 	immediateContext->PSSetShaderResources(32, 1, shaderResourceViews[0].GetAddressOf());
@@ -495,12 +427,10 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->PSSetShaderResources(35, 1, shaderResourceViews[3].GetAddressOf());
 
 	//サンプラーステートオブジェクトをバインド
-	immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
+	/*immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
 	immediateContext->PSSetSamplers(1, 1, samplerStates[1].GetAddressOf());
-	immediateContext->PSSetSamplers(2, 1, samplerStates[2].GetAddressOf());
-
-	//ブレンディングステートオブジェクトセット
-	immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].Get(), nullptr, 0xFFFFFFFF);
+	immediateContext->PSSetSamplers(2, 1, samplerStates[2].GetAddressOf());*/
+	graphics.BindSamplersState();
 
 	//ビュー・プロジェクション交換行列を計算
 	D3D11_VIEWPORT viewport;
@@ -538,8 +468,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
 	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());
 #ifndef DISABLE_OFFSCREENRENDERING
-	framebuffers[0]->Clear(immediateContext.Get(),color[0], color[1], color[2], color[3]);
-	framebuffers[0]->Activate(immediateContext.Get());
+	framebuffers[0]->Clear(immediateContext,color[0], color[1], color[2], color[3]);
+	framebuffers[0]->Activate(immediateContext);
 #endif // !ENABLE_OFFSCREENRENDERING
 
 	//背景
@@ -554,26 +484,17 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 	//2D
 	{
-		//深度ステートオブジェクトセット
-		immediateContext->OMSetDepthStencilState(setting2DDepthStencilState, 1);
-		//ラスタライザステートをセット
-		immediateContext->RSSetState(setting2DRasterizerState);
-
+		graphics.Set2DStates();
 	}
 
 	//パーティクル
-	immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_ON_ZW_ON)].Get(), 0);
-	immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
-	//immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ADD)].Get(), nullptr, 0xFFFFFFFF);
+	graphics.SetStates(Graphics::ZT_ON_ZW_ON,Graphics::CULL_NONE,Graphics::ALPHA);
 	immediateContext->GSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
-	particles->Render(immediateContext.Get());
+	particles->Render(immediateContext);
 
 	//3D
 	{
-		//深度ステートオブジェクトセット
-		immediateContext->OMSetDepthStencilState(setting3DDepthStencilState, 1);
-		//ラスタライザステートをセット
-		immediateContext->RSSetState(setting3DRasterizerState);
+		graphics.Set3DStates();
 
 		//描画エンジンの課題範囲での描画、閉じてていい
 #if 0
@@ -619,11 +540,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 #endif // 0
 
 #ifndef DISABLE_OFFSCREENRENDERING
-	framebuffers[0]->Deactivate(immediateContext.Get());
+	framebuffers[0]->Deactivate(immediateContext);
 #endif // !DISABLE_OFFSCREENRENDERING
 
 #ifdef _DEBUG
-		immediateContext->RSSetState(rasterizerStates[1].Get());
+		//immediateContext->RSSetState(rasterizerStates[1].Get());
 		//staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
 		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
 #endif // _DEBUG
@@ -632,17 +553,14 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 	//ブルーム
 	{
-		bloomer->Make(immediateContext.Get(), framebuffers[0]->shaderResourceViews[0].Get());
-
-		immediateContext->OMSetDepthStencilState(depthStencilStates[static_cast<size_t>(DEPTH_STATE::ZT_OFF_ZW_OFF)].Get(), 0);
-		immediateContext->RSSetState(rasterizerStates[static_cast<size_t>(RASTER_STATE::CULL_NONE)].Get());
-		immediateContext->OMSetBlendState(blendStates[static_cast<size_t>(BLEND_STATE::ALPHA)].Get(), nullptr, 0xFFFFFFFF);
+		bloomer->Make(immediateContext, framebuffers[0]->shaderResourceViews[0].Get());
+		graphics.SetStates(Graphics::ZT_OFF_ZW_OFF, Graphics::CULL_NONE, Graphics::ALPHA);
 		ID3D11ShaderResourceView* shaderResourceViews[] =
 		{
 			framebuffers[0]->shaderResourceViews[0].Get(),
 			bloomer->ShaderResourceView(),
 		};
-		bitBlockTransfer->Bilt(immediateContext.Get(), shaderResourceViews, 0, 2, pixelShaders[0].Get());
+		bitBlockTransfer->Bilt(immediateContext, shaderResourceViews, 0, 2, pixelShaders[0].Get());
 	}
 
 #ifdef USE_IMGUI
@@ -650,94 +568,15 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif
 
-	UINT syncInterval{ vsync ? 1U : 0U };
-	UINT flags = (tearingSupported && !fullscreenMode && !vsync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
-	hr = swapChain->Present(syncInterval, flags);
+	UINT syncInterval{ graphics.vsync ? 1U : 0U };
+	UINT flags = (graphics.tearingSupported && !graphics.fullscreenMode && !graphics.vsync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+	hr = graphics.GetSwapChain()->Present(syncInterval, flags);
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
 bool Framework::Uninitialize()
 {
 	return true;
-}
-
-void Framework::FullscreenState(BOOL fullscreen)
-{
-	fullscreenMode = fullscreen;
-	if (fullscreen)
-	{
-		GetWindowRect(hwnd, &windowedRect);
-
-		//ウィンドウスタイルの指定
-		SetWindowLongPtrA(
-			hwnd, GWL_STYLE, 
-			WS_OVERLAPPEDWINDOW & 
-			~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME)
-		);//WS_OVERLAPP...~...WS_CHICKFRAME)は WS_OVERLAPPED のこと？
-
-		RECT fullscreenWindowRect;
-
-		{
-			DEVMODE devmode{};
-			devmode.dmSize = sizeof(DEVMODE);
-			EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode);
-	
-			fullscreenWindowRect = {
-				devmode.dmPosition.x,
-				devmode.dmPosition.y,
-				devmode.dmPosition.x + static_cast<LONG>(devmode.dmPelsWidth),
-				devmode.dmPosition.y + static_cast<LONG>(devmode.dmPelsHeight),
-			};
-		}
-		SetWindowPos(
-			hwnd,
-#ifdef _DEBUG
-			NULL,
-#else
-			HWND_TOPMOST,
-#endif // _DEBUG
-			fullscreenWindowRect.left,
-			fullscreenWindowRect.top,
-			fullscreenWindowRect.right,
-			fullscreenWindowRect.bottom,
-			SWP_FRAMECHANGED | SWP_NOACTIVATE
-		);
-
-		ShowWindow(hwnd, SW_MAXIMIZE);
-	}
-	else
-	{
-		SetWindowLongPtrA(hwnd, GWL_STYLE, windowedStyle);
-		SetWindowPos(
-			hwnd,
-			HWND_NOTOPMOST,
-			windowedRect.left,
-			windowedRect.top,
-			windowedRect.right - windowedRect.left,
-			windowedRect.bottom - windowedRect.top,
-			SWP_FRAMECHANGED | SWP_NOACTIVATE
-		);
-
-		ShowWindow(hwnd, SW_NORMAL);
-	}
-}
-
-void Framework::OnSizeChanged(UINT64 width, UINT height)
-{
-	//最小化対応
-	if (width == 0 || height == 0)return;
-
-	HRESULT hr{ S_OK };
-	if (width != framebufferDimensions.cx || height != framebufferDimensions.cy)
-	{
-		framebufferDimensions.cx = static_cast<LONG>(width);
-		framebufferDimensions.cy = height;
-
-		Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory6;
-		hr = swapChain->GetParent(IID_PPV_ARGS(dxgiFactory6.GetAddressOf()));
-		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-		CreateSwapChain(dxgiFactory6.Get());
-	}
 }
 
 Framework::~Framework()
@@ -853,7 +692,7 @@ void Framework::DrawDebug()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("2D"))
+		/*if (ImGui::BeginMenu("2D"))
 		{
 			if (ImGui::TreeNode("SpriteColor"))
 			{
@@ -975,7 +814,7 @@ void Framework::DrawDebug()
 			ImGui::SliderFloat("BlendAnimation",&blendAnimation,0.0f,1.0f);
 
 			ImGui::EndMenu();
-		}
+		}*/
 
 		if (ImGui::BeginMenu("PostEffect"))
 		{
