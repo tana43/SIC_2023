@@ -127,6 +127,9 @@
     <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp">
       <Filter>RegalLib\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="External\imgui\ImGuiCtrl.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -221,6 +224,9 @@
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Graphics\Graphics.h">
       <Filter>RegalLib\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\ImGuiCtrl.h">
+      <Filter>External\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

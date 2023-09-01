@@ -11,32 +11,13 @@
 #include "RegalLib/Regal.h"
 
 #ifdef USE_IMGUI
-#include "../External/imgui/imgui.h"
-#include "../External/imgui/imgui_internal.h"
-#include "../External/imgui/imgui_impl_dx11.h"
-#include "../External/imgui/imgui_impl_win32.h"
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#include "../External/imgui/ImGuiCtrl.h"
 #endif
 
 class Framework
 {
 public:
 	CONST HWND hwnd;
-	//SIZE framebufferDimensions;
-
-	//Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter;//メモリの使用状況の確認ができる
-	//size_t VideoMemoryUsage()
-	//{
-	//	DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
-	//	adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo);
-	//	return videoMemoryInfo.CurrentUsage / 1024 / 1024;
-	//}
-
-	//Microsoft::WRL::ComPtr<ID3D11Device> device;
-	//Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
-	//Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
-	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-	//Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 
 	struct  SceneConstants
 	{
@@ -56,8 +37,6 @@ public:
 	};
 	ParametricConstants parametricConstants;
 
-	//void CreateSwapChain(IDXGIFactory6* dxgiFactory6);
-
 
 	Framework(HWND hwnd,BOOL fullscreen);
 	~Framework();
@@ -76,14 +55,8 @@ public:
 			return 0;
 		}
 
-#ifdef USE_IMGUI
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGui_ImplWin32_Init(hwnd);
-		ImGui_ImplDX11_Init(
-			Regal::Graphics::Graphics::Instance().GetDevice(), 
-			Regal::Graphics::Graphics::Instance().GetDeviceContext());
-#endif
+		// ImGui初期化(DirectX11の初期化の下に置くこと)
+		IMGUI_CTRL_INITIALIZE(hwnd, graphics.GetDevice(), graphics.GetDeviceContext());
 
 		while (WM_QUIT != msg.message)
 		{
@@ -101,11 +74,8 @@ public:
 			}
 		}
 
-#ifdef USE_IMGUI
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-#endif
+		// ImGui終了化
+		IMGUI_CTRL_UNINITIALIZE();
 
 #if 1
 		BOOL fullscreen = 0;
@@ -121,9 +91,9 @@ public:
 
 	LRESULT CALLBACK handle_message(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
-#ifdef USE_IMGUI
-		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) { return true; }
-#endif
+		// ImGui(先頭に置く)
+		IMGUI_CTRL_WND_PRC_HANDLER(hwnd, msg, wparam, lparam);
+		
 		switch (msg)
 		{
 		case WM_PAINT:
@@ -200,16 +170,6 @@ private:
 		}
 	}
 
-	//BOOL fullscreenMode{ FALSE };
-	//BOOL vsync{ FALSE };//垂直同期
-	//BOOL tearingSupported{ FALSE };
-
-	//RECT windowedRect;
-	//DWORD windowedStyle;
-
-	//void FullscreenState(BOOL fullscreen);
-	//void OnSizeChanged(UINT64 width, UINT height);
-
 	std::unique_ptr<Regal::Resource::Sprite> sprites[8];
 	std::unique_ptr<Regal::Resource::SpriteBatch> spritesBatches[8];
 	std::unique_ptr<Regal::Resource::GeometricPrimitive> geometricPrimitive[8];
@@ -221,20 +181,6 @@ private:
 	std::unique_ptr<Regal::Resource::Sprite> skyboxSprite;
 	std::unique_ptr<Regal::Graphics::Particles> particles;
 
-	/*Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
-
-	enum class DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
-	ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[0].Get() };
-	ID3D11DepthStencilState* setting3DDepthStencilState{ depthStencilStates[0].Get() };
-
-	enum class BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
-	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
-
-	enum class RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE };
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[5];
-	ID3D11RasterizerState* setting2DRasterizerState{ rasterizerStates[0].Get() };
-	ID3D11RasterizerState* setting3DRasterizerState{ rasterizerStates[0].Get() };*/
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 
