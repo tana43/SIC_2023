@@ -142,7 +142,6 @@ private:
 	void Render(float elapsed_time/*Elapsed seconds from last frame*/);
 	bool Uninitialize();
 
-	void SetImguiStyle();
 	void DrawDebug();
 
 private:

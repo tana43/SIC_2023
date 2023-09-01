@@ -15,6 +15,14 @@ namespace Regal::Resource
 
         static void CreateCSFromCso(ID3D11Device* device, const char* csoName, ID3D11ComputeShader** computeShader);
 
-   
+    public:
+        Shader(ID3D11Device* device);
+        ~Shader() {}
+
+        void Initialize();
+
+        //•`‰æŠJŽn
+        void Begin(ID3D11DeviceContext* immediateContext, const RenderContext& renderContext);
+        void Begin(ID3D11DeviceContext* immediateContext, const RenderContext& renderContext, )
     };
 }
