@@ -223,6 +223,9 @@
     <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Particles.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\SkyBox.cpp" />
+    <ClCompile Include="Sources\RegalLib\Input\Input.cpp" />
+    <ClCompile Include="Sources\RegalLib\Input\Keyboard.cpp" />
+    <ClCompile Include="Sources\RegalLib\Input\Mouse.cpp" />
     <ClCompile Include="Sources\RegalLib\Other\Transform.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp" />
@@ -255,6 +258,9 @@
     <ClInclude Include="Sources\RegalLib\Graphics\Particles.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h" />
     <ClInclude Include="Sources\RegalLib\Helper\MathHelper.h" />
+    <ClInclude Include="Sources\RegalLib\Input\Input.h" />
+    <ClInclude Include="Sources\RegalLib\Input\Keyboard.h" />
+    <ClInclude Include="Sources\RegalLib\Input\Mouse.h" />
     <ClInclude Include="Sources\RegalLib\Other\Misc.h" />
     <ClInclude Include="Sources\RegalLib\Other\Transform.h" />
     <ClInclude Include="Sources\RegalLib\Regal.h" />

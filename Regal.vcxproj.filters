@@ -130,6 +130,13 @@
     <ClCompile Include="External\imgui\ImGuiCtrl.cpp">
       <Filter>External\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Input\Input.cpp">
+      <Filter>RegalLib\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Input\Keyboard.cpp">
+      <Filter>RegalLib\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Input\Mouse.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -228,6 +235,13 @@
     <ClInclude Include="External\imgui\ImGuiCtrl.h">
       <Filter>External\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Input\Input.h">
+      <Filter>RegalLib\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Input\Keyboard.h">
+      <Filter>RegalLib\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Input\Mouse.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">
