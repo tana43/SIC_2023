@@ -5,6 +5,7 @@
 
 using namespace Regal::Resource;
 using namespace Regal::Graphics;
+using namespace Regal::Input;
 
 
 Framework::Framework(HWND hwnd,BOOL fullscreen) : 
@@ -129,6 +130,8 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	IMGUI_CTRL_CLEAR_FRAME();
 #endif
 
+	Input::Instance().Update();
+
 	Graphics& graphics{ Graphics::Instance() };
 
 	if (GetAsyncKeyState(VK_RETURN) & 1 && GetAsyncKeyState(VK_MENU) & 1)
@@ -137,7 +140,7 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 	}
 
 	//スペースでパーティクルリセット
-	if (GetAsyncKeyState(' ') & 0x8000)
+	if (/*GetAsyncKeyState(' ') & 0x8000*/ Keyboard::Instance().GetKeyDown(DirectX::Keyboard::Space))
 	{
 		particles->Initialize(graphics.GetDeviceContext(), 0);
 	}

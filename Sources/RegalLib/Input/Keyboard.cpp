@@ -13,12 +13,12 @@ namespace Regal::Input
         tracker.Update(state);
     }
 
-    const bool Keyboard::GetKeyUp(const DirectX::Keyboard::Keys key)
+    const bool Keyboard::GetKeyDown(const DirectX::Keyboard::Keys key)
     {
         return tracker.IsKeyPressed(key);
     }
 
-    const bool Keyboard::GetKeyDown(const DirectX::Keyboard::Keys key)
+    const bool Keyboard::GetKeyUp(const DirectX::Keyboard::Keys key)
     {
         return tracker.IsKeyReleased(key);
     }

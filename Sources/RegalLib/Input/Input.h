@@ -1,10 +1,12 @@
 #pragma once
-#include <GamePad.h>
-#include <Keyboard.h>
-#include <Mouse.h>
+
+#include "../Input/Mouse.h"
+#include "../Input/Keyboard.h"
 
 namespace Regal::Input
 {
+    //このクラスから各種入力のアップデートをする
+    //入力判定を各アクションごとに決めたいときもここで関数定義する
     class Input
     {
     private:
@@ -18,24 +20,7 @@ namespace Regal::Input
             return instance;
         }
 
-        //最低限使いそうなキーのみ定義
-        enum UseKey
-        {
-            ENTER,
-            W,A,S,D,
-            Q,E,R,F,
-            SPACE,
-            I,J,K,L,
-            L_SHIFT,
-            L_CTRL,
-        };
-
         void Update();
-
-    private:
-        std::unique_ptr<DirectX::Keyboard> keyboard;
-
-        
     };
 }
 

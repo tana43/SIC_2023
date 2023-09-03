@@ -25,10 +25,10 @@ namespace Regal::Input
         DirectX::Keyboard::State& GetKeyState() { return state; }
 
         //キーを押した瞬間かどうかを返す
-        const bool GetKeyUp(const DirectX::Keyboard::Keys key);
+        const bool GetKeyDown(const DirectX::Keyboard::Keys key);
 
         //キーを離した瞬間かどうかを返す
-        const bool GetKeyDown(const DirectX::Keyboard::Keys key);
+        const bool GetKeyUp(const DirectX::Keyboard::Keys key);
 
     private:
         //DirectX::Keyboardクラスを生成するためのポインタ

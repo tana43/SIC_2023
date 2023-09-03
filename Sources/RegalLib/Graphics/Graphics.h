@@ -37,7 +37,7 @@ namespace Regal::Graphics
 		ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView.Get(); }
 
 		// シェーダー取得
-		Shader* GetShader() const { return shader.get(); }
+		//Shader* GetShader() const { return shader.get(); }
 
 		// スクリーン幅取得
 		float GetScreenWidth() const { return framebufferDimensions.cx; }
