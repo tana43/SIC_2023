@@ -360,154 +360,24 @@ void Framework::DrawDebug()
 	{
 		if (ImGui::BeginMenu("Framework"))
 		{
-			/*if (ImGui::TreeNode("Camera"))
-			{
-				ImGui::DragFloat3("position", &cameraPos.x, 0.1f);
-				ImGui::DragFloat3("Angle", &cameraAngle.x, 0.01f);
-				ImGui::DragFloat("Fov", &cameraFov,0.1f);
-				ImGui::DragFloat("Far", &cameraFar,1.0f);
-				ImGui::TreePop();
-			}*/
 
 			Camera::Instance().DrawDebug();
 
-			if (ImGui::TreeNode("Light"))
+			if (ImGui::BeginMenu("Light"))
 			{
 				ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
-				ImGui::TreePop();
+				ImGui::EndMenu();
 			}
 
-			if (ImGui::TreeNode("ClearColor"))
+			if (ImGui::BeginMenu("ClearColor"))
 			{
 				ImGui::ColorPicker4("color",color);
-				ImGui::TreePop();
-			}
-			ImGui::EndMenu();
-		}
-
-		/*if (ImGui::BeginMenu("2D"))
-		{
-			if (ImGui::TreeNode("SpriteColor"))
-			{
-				ImGui::ColorPicker4("color", spriteColors, ImGuiColorEditFlags_::ImGuiColorEditFlags_AlphaBar);
-				ImGui::TreePop();
-			}
-
-			static bool selectDFlag[4] = { false,false,false,true };
-			if (ImGui::BeginMenu("DepthStencilState"))
-			{
-				if (ImGui::MenuItem("Z_Test ON  : Z_Write ON", "", selectDFlag[0]))
-				{
-					setting2DDepthStencilState = depthStencilStates[0].Get();
-					selectDFlag[0] = true; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Z_Test OFF : Z_Write ON", "", selectDFlag[1]))
-				{
-					setting2DDepthStencilState = depthStencilStates[1].Get();
-					selectDFlag[0] = false; selectDFlag[1] = true; selectDFlag[2] = false; selectDFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Z_Test ON  : Z_Write OFF", "", selectDFlag[2]))
-				{
-					setting2DDepthStencilState = depthStencilStates[2].Get();
-					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = true; selectDFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Z_Test OFF : Z_Write OFF", "", selectDFlag[3]))
-				{
-					setting2DDepthStencilState = depthStencilStates[3].Get();
-					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = true;
-				}
-
-				ImGui::EndMenu();
-			}
-
-
-			static bool selectRFlag[3] = { true,false,false };
-			if (ImGui::BeginMenu("RasterizerState"))
-			{
-				if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
-				{
-					setting2DRasterizerState = rasterizerStates[0].Get();
-					selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false;
-				}
-				if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
-				{
-					setting2DRasterizerState = rasterizerStates[1].Get();
-					selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false;
-				}
-				if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
-				{
-					setting2DRasterizerState = rasterizerStates[2].Get();
-					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true;
-				}
-
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}
-		
-		if (ImGui::BeginMenu("3D"))
-		{
-			static bool selectDFlag[4] = { true,false,false,false };
-			if (ImGui::BeginMenu("DepthStencilState"))
-			{
-				if (ImGui::MenuItem("Z_Test ON  : Z_Write ON", "", selectDFlag[0]))
-				{
-					setting3DDepthStencilState = depthStencilStates[0].Get();
-					selectDFlag[0] = true; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Z_Test OFF : Z_Write ON", "", selectDFlag[1]))
-				{
-					setting3DDepthStencilState = depthStencilStates[1].Get();
-					selectDFlag[0] = false; selectDFlag[1] = true; selectDFlag[2] = false; selectDFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Z_Test ON  : Z_Write OFF", "", selectDFlag[2]))
-				{
-					setting3DDepthStencilState = depthStencilStates[2].Get();
-					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = true; selectDFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Z_Test OFF : Z_Write OFF", "", selectDFlag[3]))
-				{
-					setting3DDepthStencilState = depthStencilStates[3].Get();
-					selectDFlag[0] = false; selectDFlag[1] = false; selectDFlag[2] = false; selectDFlag[3] = true;
-				}
 
-				ImGui::EndMenu();
-			}
-
-
-			static bool selectRFlag[4] = { true,false,false,false };
-			if (ImGui::BeginMenu("RasterizerState"))
-			{
-				if (ImGui::MenuItem("Solid", "", selectRFlag[0]))
-				{
-					setting3DRasterizerState = rasterizerStates[0].Get();
-					selectRFlag[0] = true; selectRFlag[1] = false; selectRFlag[2] = false; selectRFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Wireframe", "", selectRFlag[1]))
-				{
-					setting3DRasterizerState = rasterizerStates[1].Get();
-					selectRFlag[0] = false; selectRFlag[1] = true; selectRFlag[2] = false; selectRFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Wireframe Culling Off", "", selectRFlag[2]))
-				{
-					setting3DRasterizerState = rasterizerStates[2].Get();
-					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = true; selectRFlag[3] = false;
-				}
-				if (ImGui::MenuItem("Solid Reverse", "", selectRFlag[3]))
-				{
-					setting3DRasterizerState = rasterizerStates[3].Get();
-					selectRFlag[0] = false; selectRFlag[1] = false; selectRFlag[2] = false; selectRFlag[3] = true;
-				}
-
-				ImGui::EndMenu();
-			}
-
-			ImGui::DragFloat("BoneTranslation",&boneTranslationX);
-
-			ImGui::SliderFloat("BlendAnimation",&blendAnimation,0.0f,1.0f);
-
-			ImGui::EndMenu();
-		}*/
+		graphics.DrawDebug();
 
 		if (ImGui::BeginMenu("PostEffect"))
 		{

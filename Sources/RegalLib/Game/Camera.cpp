@@ -33,7 +33,7 @@ namespace Regal::Game
 		const DirectX::XMMATRIX P{CalcProjectionMatrix()};
 		const DirectX::XMMATRIX V{CalcViewMatrix()};
 
-		ViewProjection = P * V;
+		ViewProjection = V * P;
 	}
 
     DirectX::XMMATRIX Camera::CalcViewMatrix() const
@@ -70,10 +70,10 @@ namespace Regal::Game
 
 		//Eye.m128_f32[3] = Focus.m128_f32[3] = 1.0f;
 
-		//DirectX::XMVECTOR Up{DirectX::XMVectorSet(0,1,0,0.0f)};
+		DirectX::XMVECTOR Up{DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f)};
 
-		DirectX::XMFLOAT3 up = DirectX::XMFLOAT3(0,1,0);
-		DirectX::XMVECTOR Up{DirectX::XMLoadFloat3(&up)};
+		//DirectX::XMFLOAT3 up = DirectX::XMFLOAT3(0,1,0);
+		//DirectX::XMVECTOR Up{DirectX::XMLoadFloat3(&up)};
 
 		return DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
     }
@@ -91,7 +91,7 @@ namespace Regal::Game
 	//シーン用のImguiメニューに出す
 	void Camera::DrawDebug()
 	{
-		if (ImGui::TreeNode("Camera"))
+		if (ImGui::BeginMenu("Camera"))
 		{
 			ImGui::SliderFloat("Fov", &parameters.fov,1.0f,110.0f);
 			ImGui::DragFloat("NearZ", &parameters.nearZ, 1.0f,0.1f);
@@ -103,7 +103,7 @@ namespace Regal::Game
 			ImGui::InputFloat("Height",&parameters.height);
 			ImGui::InputFloat("AspectRatio",&parameters.aspectRatio);
 
-			ImGui::TreePop();
+			ImGui::EndMenu();
 		}
 	}
 }
