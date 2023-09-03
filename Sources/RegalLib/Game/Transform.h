@@ -2,7 +2,7 @@
 #include "../Helper/MathHelper.h"
 #include <string>
 
-namespace Regal
+namespace Regal::Game
 {
     class Transform
     {
@@ -21,6 +21,7 @@ namespace Regal
         Transform& operator=(const Transform&&) = delete;
 
         virtual void DrawDebug();
+        virtual void DrawDebugPosAndRotOnly();//座標と回転のみのデバッグ表示
         void Reset();
 
         DirectX::XMMATRIX CalcWorldMatrix();

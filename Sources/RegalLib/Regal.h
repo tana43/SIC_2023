@@ -22,7 +22,8 @@
 #include "Graphics/Particles.h"
 #include "Resource/Shader.h"
 
-#include "Other/Transform.h"
+#include "Game/Transform.h"
+#include "Game/Camera.h"
 
 #include "Helper/MathHelper.h"
 

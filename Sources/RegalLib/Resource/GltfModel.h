@@ -9,7 +9,7 @@
 #include "../../tinygltf-release/tiny_gltf.h"
 #include <unordered_map>
 
-#include "../Other/Transform.h"
+#include "../Game/Transform.h"
 
 namespace Regal::Resource
 {
@@ -205,6 +205,6 @@ namespace Regal::Resource
         };
         Microsoft::WRL::ComPtr<ID3D11Buffer> primitiveCbuffer;
 
-        TransformEuler transform;
+        Regal::Game::TransformEuler transform;
     };
 }

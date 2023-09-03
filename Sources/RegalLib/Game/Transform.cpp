@@ -2,7 +2,7 @@
 #include "../../../External/imgui/imgui.h"
 #include <vector>
 
-namespace Regal
+namespace Regal::Game
 {
     void Transform::DrawDebug()
     {
@@ -28,6 +28,17 @@ namespace Regal
 
             ImGuiCoordinateComboUI();
 
+            ImGui::TreePop();
+        }
+    }
+
+    void Transform::DrawDebugPosAndRotOnly()
+    {
+        ImGui::SetNextItemOpen(true, ImGuiCond_FirstUseEver);
+        if (ImGui::TreeNode("Transform"))
+        {
+            ImGui::DragFloat3("Position", &position.x, 0.1f, -FLT_MAX, FLT_MAX);
+            ImGui::DragFloat3("Rotation", &rotation.x, 0.01f, -FLT_MAX, FLT_MAX);
             ImGui::TreePop();
         }
     }

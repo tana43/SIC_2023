@@ -217,6 +217,8 @@
     <ClCompile Include="Sources\Framework.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp" />
+    <ClCompile Include="Sources\RegalLib\Game\Camera.cpp" />
+    <ClCompile Include="Sources\RegalLib\Game\Transform.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\FullscreenQuad.cpp" />
@@ -226,7 +228,6 @@
     <ClCompile Include="Sources\RegalLib\Input\Input.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\Keyboard.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\Mouse.cpp" />
-    <ClCompile Include="Sources\RegalLib\Other\Transform.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp" />
@@ -251,6 +252,8 @@
     <ClInclude Include="Sources\Framework.h" />
     <ClInclude Include="Sources\HighResolutionTimer.h" />
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h" />
+    <ClInclude Include="Sources\RegalLib\Game\Camera.h" />
+    <ClInclude Include="Sources\RegalLib\Game\Transform.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Framebuffer.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\FullscreenQuad.h" />
@@ -262,7 +265,6 @@
     <ClInclude Include="Sources\RegalLib\Input\Keyboard.h" />
     <ClInclude Include="Sources\RegalLib\Input\Mouse.h" />
     <ClInclude Include="Sources\RegalLib\Other\Misc.h" />
-    <ClInclude Include="Sources\RegalLib\Other\Transform.h" />
     <ClInclude Include="Sources\RegalLib\Regal.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h" />

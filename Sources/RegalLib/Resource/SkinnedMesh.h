@@ -13,7 +13,7 @@
 #include <cereal/types/set.hpp>
 #include <cereal/types/unordered_map.hpp>
 
-#include "../Other/Transform.h"
+#include "../Game/Transform.h"
 
 namespace Regal::Resource
 {
@@ -276,7 +276,7 @@ namespace Regal::Resource
         void FetchSkeleton(FbxMesh* fbxMesh, Skeleton& bindPose);
         void FetchAnimations(FbxScene* fbxScene, std::vector<Animation>& animationClips, float samplingRate);
 
-        TransformEuler transform;
+        Regal::Game::TransformEuler transform;
     };
 }
 

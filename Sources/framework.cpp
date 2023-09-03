@@ -6,6 +6,7 @@
 using namespace Regal::Resource;
 using namespace Regal::Graphics;
 using namespace Regal::Input;
+using namespace Regal::Game;
 
 
 Framework::Framework(HWND hwnd,BOOL fullscreen) : 
@@ -41,6 +42,8 @@ bool Framework::Initialize()
 {
 	Graphics& graphics{ Graphics::Instance() };
 
+	Camera::Instance().Initialize();
+
 	//各リソースクラスの生成
 	//一応残してるだけ、閉じてていい
 #if 0 
@@ -66,18 +69,18 @@ bool Framework::Initialize()
 	);
 #endif // 0
 
-	gltfModels[0] = std::make_unique<GltfModel>(graphics.GetDevice(),
-		//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
-		//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
-		//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
-		//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
-		//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
-		"./Resources/deathwing/scene.gltf"
-		//"./Resources/cube.glb"
-		//"./Resources/crunch.gltf"
-		//"./Resources/Crunch/Crunch.gltf"
-		//"./Resources/Stage/Showcase.gltf"
-	);
+	//gltfModels[0] = std::make_unique<GltfModel>(graphics.GetDevice(),
+	//	//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
+	//	//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+	//	//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
+	//	//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
+	//	//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
+	//	"./Resources/deathwing/scene.gltf"
+	//	//"./Resources/cube.glb"
+	//	//"./Resources/crunch.gltf"
+	//	//"./Resources/Crunch/Crunch.gltf"
+	//	//"./Resources/Stage/Showcase.gltf"
+	//);
 
 	framebuffers[0] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, true);
 	framebuffers[1] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth()/2, graphics.GetScreenHeight()/2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
@@ -193,7 +196,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	graphics.BindSamplersState();
 
 	//ビュー・プロジェクション交換行列を計算
-	D3D11_VIEWPORT viewport;
+	/*D3D11_VIEWPORT viewport;
 	UINT numViewports{ 1 };
 	immediateContext->RSGetViewports(&numViewports, &viewport);
 
@@ -213,15 +216,19 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	DirectX::XMVECTOR eye{ DirectX::XMVectorSet(cameraPos.x,cameraPos.y,cameraPos.z,1.0f) };
 	DirectX::XMVECTOR focus{ DirectX::XMVectorSet(cameraFocus.x,cameraFocus.y,cameraFocus.z,1.0f) };
 	DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f) };
-	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };
+	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };*/
+
+	auto& camera{ Camera::Instance() };
+	camera.UpdateViewProjectionMatrix();
 
 	//定数バッファにセット
 	SceneConstants data{};
-	DirectX::XMStoreFloat4x4(&data.viewProjection, V * P);
+	DirectX::XMStoreFloat4x4(&data.viewProjection, camera.GetViewProjectionMatrix());
 	DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
+	DirectX::XMFLOAT3 front;
 	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
 	data.lightDirection = { front.x,front.y,front.z,0 };
-	data.cameraPosition = { cameraPos.x,cameraPos.y,cameraPos.z,0 };
+	data.cameraPosition = camera.GetPosition();
 	//DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
 	
 	
@@ -256,10 +263,10 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	{
 		graphics.Set3DStates();
 
-		static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
+		/*static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
 		static float time{ 0 };
 		gltfModels[0]->Animate(0, time += elapsedTime, animatedNodes);
-		gltfModels[0]->Render(graphics.GetDeviceContext(), animatedNodes);
+		gltfModels[0]->Render(graphics.GetDeviceContext(), animatedNodes);*/
 
 		//描画エンジンの課題範囲での描画、閉じてていい
 #if 0
@@ -353,14 +360,17 @@ void Framework::DrawDebug()
 	{
 		if (ImGui::BeginMenu("Framework"))
 		{
-			if (ImGui::TreeNode("Camera"))
+			/*if (ImGui::TreeNode("Camera"))
 			{
 				ImGui::DragFloat3("position", &cameraPos.x, 0.1f);
 				ImGui::DragFloat3("Angle", &cameraAngle.x, 0.01f);
 				ImGui::DragFloat("Fov", &cameraFov,0.1f);
 				ImGui::DragFloat("Far", &cameraFar,1.0f);
 				ImGui::TreePop();
-			}
+			}*/
+
+			Camera::Instance().DrawDebug();
+
 			if (ImGui::TreeNode("Light"))
 			{
 				ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
