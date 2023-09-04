@@ -228,6 +228,7 @@
     <ClCompile Include="Sources\RegalLib\Input\Input.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\Keyboard.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\Mouse.cpp" />
+    <ClCompile Include="Sources\RegalLib\Model\StaticModel.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp" />
@@ -264,6 +265,8 @@
     <ClInclude Include="Sources\RegalLib\Input\Input.h" />
     <ClInclude Include="Sources\RegalLib\Input\Keyboard.h" />
     <ClInclude Include="Sources\RegalLib\Input\Mouse.h" />
+    <ClInclude Include="Sources\RegalLib\Model\Model.h" />
+    <ClInclude Include="Sources\RegalLib\Model\StaticModel.h" />
     <ClInclude Include="Sources\RegalLib\Other\Misc.h" />
     <ClInclude Include="Sources\RegalLib\Regal.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h" />

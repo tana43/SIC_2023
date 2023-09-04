@@ -755,6 +755,54 @@ namespace Regal::Resource
         }
     }
 
+    void SkinnedMesh::_Render(ID3D11DeviceContext* immediateContext, Regal::Game::Transform* transform)
+    {
+        auto World{ transform->CalcWorldMatrix() };
+        DirectX::XMFLOAT4X4 world;
+        DirectX::XMStoreFloat4x4(&world, World);
+        
+        for (const Mesh& mesh : meshes)
+        {
+            uint32_t stride{ sizeof(Vertex) };
+            uint32_t offset{ 0 };
+            immediateContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+            immediateContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+            immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            immediateContext->IASetInputLayout(inputLayout.Get());
+
+            immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
+            immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
+
+            //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
+
+            Constants data;
+
+            DirectX::XMStoreFloat4x4(&data.world,
+                DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
+            for (size_t boneIndex = 0; boneIndex < MAX_BONES; ++boneIndex)
+            {
+                data.boneTransforms[boneIndex] = { 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+            }
+
+            for (const Mesh::Subset& subset : mesh.subsets)
+            {
+                const Material& material{ materials.at(subset.materialUniqueId) };
+                DirectX::XMStoreFloat4(&data.materialColor,
+                    DirectX::XMVectorMultiply(
+                        DirectX::XMLoadFloat4(&color),
+                        DirectX::XMLoadFloat4(&material.Kd))
+                );
+                immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
+                immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
+                immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
+                immediateContext->PSSetShaderResources(1, 1, material.shaderResourceViews[1].GetAddressOf());
+
+                immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);
+            }
+        }
+    }
+
     void SkinnedMesh::DrawDebug()
     {
         std::string name = "SkinnedMesh " + std::to_string(myNum);

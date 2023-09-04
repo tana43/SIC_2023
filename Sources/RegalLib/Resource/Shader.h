@@ -1,8 +1,11 @@
 #pragma once
 #include <d3d11.h>
+#include <wrl.h>
+#include <DirectXMath.h>
 
 namespace Regal::Resource
 {
+    //ゲープロと同じ作りにしようと思ったけど時間がないのでパス
     class Shader
     {
     public:
@@ -16,13 +19,37 @@ namespace Regal::Resource
         static void CreateCSFromCso(ID3D11Device* device, const char* csoName, ID3D11ComputeShader** computeShader);
 
     public:
-        //Shader(ID3D11Device* device);
-        //~Shader() {}
-
-        //void Initialize();
+        //Shader() {}
+        //virtual ~Shader() {}
 
         ////描画開始
-        //void Begin(ID3D11DeviceContext* immediateContext, const RenderContext& renderContext);
-        //void Begin(ID3D11DeviceContext* immediateContext, const RenderContext& renderContext, )
+        //virtual void Begin(ID3D11DeviceContext* immediateContext) = 0;
+
+        ////描画
+        //virtual void Draw(ID3D11DeviceContext* immediateContext, const Model* model) = 0;
+
+        ////描画終了
+        //virtual void End(ID3D11DeviceContext* immediateContext) = 0;
+
+        struct  SceneConstants
+        {
+            DirectX::XMFLOAT4X4 viewProjection;	//ビュープロジェクション交換行列
+            DirectX::XMFLOAT4 lightDirection;	//ライトの向き
+            DirectX::XMFLOAT4 cameraPosition;
+            //DirectX::XMFLOAT4X4 inverseViewProjection;//ビュープロジェクション逆行列
+        };
+
+        Shader(ID3D11Device* device);
+        ~Shader() {}
+
+        //描画開始(シーン用の定数バッファをセット更新しているだけ)
+        void UpdateSceneConstants(ID3D11DeviceContext* immediateContext);
+
+        void SceneConstantsDrawDebug();
+
+    private:
+        Microsoft::WRL::ComPtr<ID3D11Buffer> sceneConstantBuffer;
+
+        DirectX::XMFLOAT3 directionalLightAngle{DirectX::XMFLOAT3(0,0,0)};
     };
 }

@@ -18,14 +18,14 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) :
 	auto device{ Graphics::Instance().GetDevice() };
 
 	D3D11_BUFFER_DESC bufferDesc{};
-	bufferDesc.ByteWidth = sizeof(SceneConstants);
+	/*bufferDesc.ByteWidth = sizeof(Regal::Resource::Shader::SceneConstants);
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bufferDesc.CPUAccessFlags = 0;
 	bufferDesc.MiscFlags = 0;
 	bufferDesc.StructureByteStride = 0;
 	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));*/
 
 	//抽出輝度成分の輝度の閾値を制御するためのバッファ
 	bufferDesc.ByteWidth = sizeof(parametricConstants);
@@ -218,17 +218,17 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f) };
 	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };*/
 
-	auto& camera{ Camera::Instance() };
-	camera.UpdateViewProjectionMatrix();
+	/*auto& camera{ Camera::Instance() };
+	camera.UpdateViewProjectionMatrix();*/
 
 	//定数バッファにセット
-	SceneConstants data{};
+	/*SceneConstants data{};
 	DirectX::XMStoreFloat4x4(&data.viewProjection, camera.GetViewProjectionMatrix());
 	DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
 	DirectX::XMFLOAT3 front;
 	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
 	data.lightDirection = { front.x,front.y,front.z,0 };
-	data.cameraPosition = camera.GetPosition();
+	data.cameraPosition = camera.GetPosition();*/
 	//DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
 	
 	
@@ -242,10 +242,12 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	//背景
 	//skybox->Render(immediateContext.Get(), V, P);
 
+	graphics.GetShader()->UpdateSceneConstants(immediateContext);
+
 	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
-	immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
+	/*immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
 	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
-	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());*/
 	//immediateContext->RSSetState(rasterizerStates[4].Get());
 
 
@@ -363,11 +365,7 @@ void Framework::DrawDebug()
 
 			Camera::Instance().DrawDebug();
 
-			if (ImGui::BeginMenu("Light"))
-			{
-				ImGui::DragFloat3("angle", &lightAngle.x, 0.01f);
-				ImGui::EndMenu();
-			}
+			
 
 			if (ImGui::BeginMenu("ClearColor"))
 			{

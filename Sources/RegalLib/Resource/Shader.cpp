@@ -1,6 +1,8 @@
 #include "Shader.h"
 #include <sstream>
 #include "../Other/Misc.h"
+#include "../Game/Camera.h"
+#include "../../../External/imgui/imgui.h"
 
 namespace Regal::Resource
 {
@@ -86,5 +88,53 @@ namespace Regal::Resource
 
         HRESULT hr = device->CreateComputeShader(csoData.get(), csoSz, nullptr, computeShader);
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    }
+
+    Shader::Shader(ID3D11Device* device)
+    {
+        HRESULT hr{ S_OK };
+
+        D3D11_BUFFER_DESC bufferDesc{};
+        bufferDesc.ByteWidth = sizeof(SceneConstants);
+        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        bufferDesc.CPUAccessFlags = 0;
+        bufferDesc.MiscFlags = 0;
+        bufferDesc.StructureByteStride = 0;
+        hr = device->CreateBuffer(&bufferDesc, nullptr, sceneConstantBuffer.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    }
+
+    void Shader::UpdateSceneConstants(ID3D11DeviceContext* immediateContext)
+    {
+        auto& camera{ Regal::Game::Camera::Instance() };
+        camera.UpdateViewProjectionMatrix();
+
+        //定数バッファにセット
+        SceneConstants data{};
+        DirectX::XMStoreFloat4x4(&data.viewProjection, camera.GetViewProjectionMatrix());
+        DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(
+            directionalLightAngle.x, 
+            directionalLightAngle.y, 
+            directionalLightAngle.z) };
+        DirectX::XMFLOAT3 front;
+        DirectX::XMStoreFloat3(&front, lightDirection.r[2]);
+        data.lightDirection = { front.x,front.y,front.z,0 };
+        data.cameraPosition = camera.GetPosition();
+
+        immediateContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &data, 0, 0);
+        immediateContext->VSSetConstantBuffers(1, 1, sceneConstantBuffer.GetAddressOf());
+        immediateContext->PSSetConstantBuffers(1, 1, sceneConstantBuffer.GetAddressOf());
+    }
+
+    void Shader::SceneConstantsDrawDebug()
+    {
+        Regal::Game::Camera::Instance().DrawDebug();
+
+        if (ImGui::BeginMenu("Light"))
+        {
+            ImGui::DragFloat3("Angle", &directionalLightAngle.x, 0.01f);
+            ImGui::EndMenu();
+        }
     }
 }

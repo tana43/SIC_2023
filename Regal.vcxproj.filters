@@ -47,6 +47,9 @@
     <Filter Include="RegalLib\Game">
       <UniqueIdentifier>{97567fc3-3548-4dc7-93f6-3a2dc4262457}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RegalLib\Model">
+      <UniqueIdentifier>{f7278ac5-93cb-4c33-9ac0-f983b178aac8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
@@ -144,6 +147,9 @@
     </ClCompile>
     <ClCompile Include="Sources\RegalLib\Game\Camera.cpp">
       <Filter>RegalLib\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Model\StaticModel.cpp">
+      <Filter>RegalLib\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +260,12 @@
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Game\Camera.h">
       <Filter>RegalLib\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Model\Model.h">
+      <Filter>RegalLib\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Model\StaticModel.h">
+      <Filter>RegalLib\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

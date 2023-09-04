@@ -251,10 +251,15 @@ namespace Regal::Resource
 
         void CreateComObjects(ID3D11Device* device, const char* fbxFilename);
 
+        //描画エンジンの課題で作成した関数　この中で各シェーダーのセットをしている
         void Render(ID3D11DeviceContext* immediateContext, const Animation::Keyframe* keyframe);
         void Render(ID3D11DeviceContext* immediateContext,
             const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& materialColor,
             const Animation::Keyframe* keyframe);
+
+        //スタティックモデル用に作ったけど、課題とほぼ変わらん
+        //現在はアニメーション非対応
+        void _Render(ID3D11DeviceContext* immediateContext,Regal::Game::Transform* transform);
 
         void DrawDebug();
 

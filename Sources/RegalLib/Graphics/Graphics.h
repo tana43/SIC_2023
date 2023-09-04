@@ -9,6 +9,8 @@
 //つまり同じリソースに対する複数の更新処理によってデータの整合性が取れなくなることを防いでいる
 #include <mutex>
 
+#include "../Resource/Shader.h"
+
 namespace Regal::Graphics
 {
 	class Graphics
@@ -37,7 +39,7 @@ namespace Regal::Graphics
 		ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView.Get(); }
 
 		// シェーダー取得
-		//Shader* GetShader() const { return shader.get(); }
+		Regal::Resource::Shader* GetShader() const { return shader.get(); }
 
 		// スクリーン幅取得
 		float GetScreenWidth() const { return framebufferDimensions.cx; }
@@ -105,10 +107,10 @@ namespace Regal::Graphics
 		Microsoft::WRL::ComPtr<ID3D11Texture2D>			depthStencilBuffer;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	depthStencilView;
 
-		/*std::unique_ptr<Shader>							shader;
-		std::unique_ptr<DebugRenderer>					debugRenderer;
-		std::unique_ptr<LineRenderer>					lineRenderer;
-		std::unique_ptr<ImGuiRenderer>					imguiRenderer;*/
+		std::unique_ptr<Regal::Resource::Shader>		shader;
+		//std::unique_ptr<DebugRenderer>					debugRenderer;
+		//std::unique_ptr<LineRenderer>					lineRenderer;
+		//std::unique_ptr<ImGuiRenderer>					imguiRenderer;
 
 		//各種ステート
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
@@ -129,8 +131,6 @@ namespace Regal::Graphics
 
 		CONST HWND hwnd;
 		SIZE framebufferDimensions;//スクリーンサイズ
-
-		
 
 		RECT windowedRect;
 		DWORD windowedStyle;

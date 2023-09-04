@@ -105,7 +105,10 @@ namespace Regal::Graphics
 
 		CreateSwapChain(dxgiFactory6.Get());
 
-
+		//シェーダー
+		{
+			shader = std::make_unique<Regal::Resource::Shader>(device.Get());
+		}
     }
 
 	Graphics::~Graphics()
