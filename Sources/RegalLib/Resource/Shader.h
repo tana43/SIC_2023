@@ -39,13 +39,17 @@ namespace Regal::Resource
             //DirectX::XMFLOAT4X4 inverseViewProjection;//ビュープロジェクション逆行列
         };
 
-        Shader(ID3D11Device* device);
+        Shader();
         ~Shader() {}
 
-        //描画開始(シーン用の定数バッファをセット更新しているだけ)
+        void CreateSceneBuffer(ID3D11Device* device);
+
+        //シーン用の定数バッファをセット、更新しているだけ
         void UpdateSceneConstants(ID3D11DeviceContext* immediateContext);
 
         void SceneConstantsDrawDebug();
+
+        Microsoft::WRL::ComPtr<ID3D11Buffer> GetSceneConstanceBuffer() { return sceneConstantBuffer; }
 
     private:
         Microsoft::WRL::ComPtr<ID3D11Buffer> sceneConstantBuffer;

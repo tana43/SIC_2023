@@ -25,9 +25,9 @@ void main( uint3 dtid : SV_DISPATCHTHREADID)
     p.velocity.y = 2.0 * f1;
     p.velocity.z = 1.0 * cos(2 * 3.14 * f0);
     
-    p.color.x = 1.0;
+    p.color.z = 1.0;
     p.color.y = f0 * 0.5;
-    p.color.z = f0 * 0.05;
+    p.color.x = f0 * 0.05;
     p.color.xyz *= 3.0;
     p.color.w = 1.0f;
     

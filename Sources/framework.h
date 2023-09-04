@@ -215,15 +215,15 @@ private:
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 
-	/*float cameraFov{30};
-	float cameraFar{100.0f};
-	DirectX::XMFLOAT3 cameraPos{ 0.0f, 0.0f, -10.0f};
-	DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
-	DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
+	//float cameraFov{30};
+	//float cameraFar{100.0f};
+	//DirectX::XMFLOAT3 cameraPos{ 0.0f, 0.0f, -10.0f};
+	//DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
+	//DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
-	float boneTranslationX{ 300.0f };
-	float blendAnimation{ 0.5f };*/
+	//float boneTranslationX{ 300.0f };
+	//float blendAnimation{ 0.5f };
 
 	std::unique_ptr<Regal::Graphics::FullscreenQuad> bitBlockTransfer;
 

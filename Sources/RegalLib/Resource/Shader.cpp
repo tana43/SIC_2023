@@ -90,7 +90,11 @@ namespace Regal::Resource
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     }
 
-    Shader::Shader(ID3D11Device* device)
+    Shader::Shader()
+    {
+    }
+
+    void Shader::CreateSceneBuffer(ID3D11Device* device)
     {
         HRESULT hr{ S_OK };
 

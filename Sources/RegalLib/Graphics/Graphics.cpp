@@ -107,7 +107,7 @@ namespace Regal::Graphics
 
 		//シェーダー
 		{
-			shader = std::make_unique<Regal::Resource::Shader>(device.Get());
+			shader = std::make_unique<Regal::Resource::Shader>();
 		}
     }
 

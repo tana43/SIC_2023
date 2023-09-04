@@ -17,8 +17,8 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) :
 
 	auto device{ Graphics::Instance().GetDevice() };
 
-	D3D11_BUFFER_DESC bufferDesc{};
-	/*bufferDesc.ByteWidth = sizeof(Regal::Resource::Shader::SceneConstants);
+	/*D3D11_BUFFER_DESC bufferDesc{};
+	bufferDesc.ByteWidth = sizeof(Regal::Resource::Shader::SceneConstants);
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bufferDesc.CPUAccessFlags = 0;
@@ -26,8 +26,11 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) :
 	bufferDesc.StructureByteStride = 0;
 	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));*/
+	
+	graphics.GetShader()->CreateSceneBuffer(graphics.GetDevice());
 
 	//抽出輝度成分の輝度の閾値を制御するためのバッファ
+	D3D11_BUFFER_DESC bufferDesc{};
 	bufferDesc.ByteWidth = sizeof(parametricConstants);
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -218,22 +221,23 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f) };
 	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };*/
 
-	/*auto& camera{ Camera::Instance() };
-	camera.UpdateViewProjectionMatrix();*/
+	//auto& camera{ Camera::Instance() };
+	//camera.UpdateViewProjectionMatrix();
 
-	//定数バッファにセット
-	/*SceneConstants data{};
-	DirectX::XMStoreFloat4x4(&data.viewProjection, camera.GetViewProjectionMatrix());
-	DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
-	DirectX::XMFLOAT3 front;
-	DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
-	data.lightDirection = { front.x,front.y,front.z,0 };
-	data.cameraPosition = camera.GetPosition();*/
+	////定数バッファにセット
+	//Shader::SceneConstants data{};
+	//DirectX::XMStoreFloat4x4(&data.viewProjection, camera.GetViewProjectionMatrix());
+	//DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
+	//DirectX::XMFLOAT3 front;
+	//DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
+	//data.lightDirection = { front.x,front.y,front.z,0 };
+	//data.cameraPosition = camera.GetPosition();
 	//DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
 	
+	graphics.GetShader()->UpdateSceneConstants(immediateContext);
 	
-	immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
-	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());
+	/*immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
+	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());*/
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffers[0]->Clear(immediateContext,color[0], color[1], color[2], color[3]);
 	framebuffers[0]->Activate(immediateContext);
@@ -242,7 +246,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	//背景
 	//skybox->Render(immediateContext.Get(), V, P);
 
-	graphics.GetShader()->UpdateSceneConstants(immediateContext);
 
 	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
 	/*immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
@@ -258,7 +261,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 	//パーティクル
 	graphics.SetStates(Graphics::ZT_ON_ZW_ON,Graphics::CULL_NONE,Graphics::ALPHA);
-	immediateContext->GSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
+	immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
 	particles->Render(immediateContext);
 
 	//3D
