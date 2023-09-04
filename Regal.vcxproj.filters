@@ -50,6 +50,9 @@
     <Filter Include="RegalLib\Model">
       <UniqueIdentifier>{f7278ac5-93cb-4c33-9ac0-f983b178aac8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RegalLib\Demo">
+      <UniqueIdentifier>{55007fd7-6791-4cb3-a241-8c3b9835ad80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
@@ -124,9 +127,6 @@
     <ClCompile Include="Sources\RegalLib\Scene\BaseScene.cpp">
       <Filter>RegalLib\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp">
-      <Filter>RegalLib\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp">
       <Filter>RegalLib\Graphics</Filter>
     </ClCompile>
@@ -150,6 +150,9 @@
     </ClCompile>
     <ClCompile Include="Sources\RegalLib\Model\StaticModel.cpp">
       <Filter>RegalLib\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp">
+      <Filter>RegalLib\Demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,9 +240,6 @@
     <ClInclude Include="Sources\RegalLib\Scene\BaseScene.h">
       <Filter>RegalLib\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h">
-      <Filter>RegalLib\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\RegalLib\Graphics\Graphics.h">
       <Filter>RegalLib\Graphics</Filter>
     </ClInclude>
@@ -266,6 +266,9 @@
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Model\StaticModel.h">
       <Filter>RegalLib\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h">
+      <Filter>RegalLib\Demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

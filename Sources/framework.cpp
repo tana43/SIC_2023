@@ -7,26 +7,21 @@ using namespace Regal::Resource;
 using namespace Regal::Graphics;
 using namespace Regal::Input;
 using namespace Regal::Game;
+using namespace Regal::Scene;
+using namespace Regal::Demo;
 
 
 Framework::Framework(HWND hwnd,BOOL fullscreen) : 
 	hwnd(hwnd),
 	graphics(hwnd,fullscreen)
 {
-	HRESULT hr{S_OK};
+}
 
-	auto device{ Graphics::Instance().GetDevice() };
+bool Framework::Initialize()
+{
+	HRESULT hr{ S_OK };
 
-	/*D3D11_BUFFER_DESC bufferDesc{};
-	bufferDesc.ByteWidth = sizeof(Regal::Resource::Shader::SceneConstants);
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bufferDesc.CPUAccessFlags = 0;
-	bufferDesc.MiscFlags = 0;
-	bufferDesc.StructureByteStride = 0;
-	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[0].GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));*/
-	
+	//シーン用バッファー作成
 	graphics.GetShader()->CreateSceneBuffer(graphics.GetDevice());
 
 	//抽出輝度成分の輝度の閾値を制御するためのバッファ
@@ -37,12 +32,9 @@ Framework::Framework(HWND hwnd,BOOL fullscreen) :
 	bufferDesc.CPUAccessFlags = 0;
 	bufferDesc.MiscFlags = 0;
 	bufferDesc.StructureByteStride = 0;
-	hr = device->CreateBuffer(&bufferDesc, nullptr, constantBuffers[1].GetAddressOf());
+	hr = graphics.GetDevice()->CreateBuffer(&bufferDesc, nullptr, constantBuffers[1].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-}
 
-bool Framework::Initialize()
-{
 	Graphics& graphics{ Graphics::Instance() };
 
 	Camera::Instance().Initialize();
@@ -71,20 +63,6 @@ bool Framework::Initialize()
 		//"./Resources/Stage/Showcase.gltf"
 	);
 #endif // 0
-
-	//gltfModels[0] = std::make_unique<GltfModel>(graphics.GetDevice(),
-	//	//"./Resources/glTF-Sample-Models-master/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
-	//	//"./Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
-	//	//"./Resources/glTF-Sample-Models-master/2.0/Fox/glTF/Fox.gltf"
-	//	//"./Resources/glTF-Sample-Models-master/2.0/CesiumMan/glTF/CesiumMan.gltf"
-	//	//"./Resources/glTF-Sample-Models-master/2.0/BrainStem/glTF/BrainStem.gltf"
-	//	"./Resources/deathwing/scene.gltf"
-	//	//"./Resources/cube.glb"
-	//	//"./Resources/crunch.gltf"
-	//	//"./Resources/Crunch/Crunch.gltf"
-	//	//"./Resources/Stage/Showcase.gltf"
-	//);
-
 	framebuffers[0] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, true);
 	framebuffers[1] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth()/2, graphics.GetScreenHeight()/2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
 
@@ -126,10 +104,12 @@ bool Framework::Initialize()
 	particles = std::make_unique<decltype(particles)::element_type>(graphics.GetDevice(), 1000);
 	particles->Initialize(graphics.GetDeviceContext(), 0);
 
+	SceneManager::Instance().ChangeScene(new DemoScene);
+
 	return true;
 }
 
-void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
+void Framework::Update(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 #ifdef USE_IMGUI
 	// ImGui更新
@@ -140,17 +120,14 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	Graphics& graphics{ Graphics::Instance() };
 
-	if (GetAsyncKeyState(VK_RETURN) & 1 && GetAsyncKeyState(VK_MENU) & 1)
+	//オフスクリーンレンダリングのスクリーンサイズ変更処理をしていないため
+	//途中でフルスクリーンに変更するとエラーが起きるのでコメントアウトしておく
+	/*if (GetAsyncKeyState(VK_RETURN) & 1 && GetAsyncKeyState(VK_MENU) & 1)
 	{
 		graphics.FullscreenState(!graphics.fullscreenMode);
-	}
+	}*/
 
-	//スペースでパーティクルリセット
-	if (/*GetAsyncKeyState(' ') & 0x8000*/ Keyboard::Instance().GetKeyDown(DirectX::Keyboard::Space))
-	{
-		particles->Initialize(graphics.GetDeviceContext(), 0);
-	}
-	particles->Integrate(graphics.GetDeviceContext(), elapsed_time);
+	SceneManager::Instance().Update(elapsedTime);
 
 #if _DEBUG
 	DrawDebug();
@@ -164,17 +141,6 @@ void Framework::Update(float elapsed_time/*Elapsed seconds from last frame*/)
 void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	HRESULT hr{ S_OK };
-
-	/*ID3D11RenderTargetView* nullRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
-	immediateContext->OMSetRenderTargets(_countof(nullRenderTargetViews), nullRenderTargetViews, 0);
-	ID3D11ShaderResourceView* nullShaderResourcesViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
-	immediateContext->VSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
-	immediateContext->PSSetShaderResources(0, _countof(nullShaderResourcesViews), nullShaderResourcesViews);
-
-
-	immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
-	immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());*/
 
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* immediateContext = graphics.GetDeviceContext();
@@ -193,47 +159,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->PSSetShaderResources(35, 1, shaderResourceViews[3].GetAddressOf());
 
 	//サンプラーステートオブジェクトをバインド
-	/*immediateContext->PSSetSamplers(0, 1, samplerStates[0].GetAddressOf());
-	immediateContext->PSSetSamplers(1, 1, samplerStates[1].GetAddressOf());
-	immediateContext->PSSetSamplers(2, 1, samplerStates[2].GetAddressOf());*/
 	graphics.BindSamplersState();
 
-	//ビュー・プロジェクション交換行列を計算
-	/*D3D11_VIEWPORT viewport;
-	UINT numViewports{ 1 };
-	immediateContext->RSGetViewports(&numViewports, &viewport);
-
-	float aspectRaito{ viewport.Width / viewport.Height };
-	DirectX::XMMATRIX P{ DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(cameraFov),aspectRaito,0.1f,cameraFar) };
-
-	DirectX::XMMATRIX Transform =DirectX::XMMatrixRotationRollPitchYaw(cameraAngle.x, cameraAngle.y, cameraAngle.z);
-	DirectX::XMVECTOR Front = Transform.r[2];
-	DirectX::XMFLOAT3 front;
-	DirectX::XMStoreFloat3(&front, Front);
-	cameraFocus = {
-		cameraPos.x + front.x * 10,
-		cameraPos.y + front.y * 10,
-		cameraPos.z + front.z * 10
-	};
-
-	DirectX::XMVECTOR eye{ DirectX::XMVectorSet(cameraPos.x,cameraPos.y,cameraPos.z,1.0f) };
-	DirectX::XMVECTOR focus{ DirectX::XMVectorSet(cameraFocus.x,cameraFocus.y,cameraFocus.z,1.0f) };
-	DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f) };
-	DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye,focus,up) };*/
-
-	//auto& camera{ Camera::Instance() };
-	//camera.UpdateViewProjectionMatrix();
-
-	////定数バッファにセット
-	//Shader::SceneConstants data{};
-	//DirectX::XMStoreFloat4x4(&data.viewProjection, camera.GetViewProjectionMatrix());
-	//DirectX::XMMATRIX lightDirection{ DirectX::XMMatrixRotationRollPitchYaw(lightAngle.x,lightAngle.y,lightAngle.z) };
-	//DirectX::XMFLOAT3 front;
-	//DirectX::XMStoreFloat3(&front,lightDirection.r[2]);
-	//data.lightDirection = { front.x,front.y,front.z,0 };
-	//data.cameraPosition = camera.GetPosition();
-	//DirectX::XMStoreFloat4x4(&data.inverseViewProjection, DirectX::XMMatrixInverse(nullptr,V * P));
-	
+	//シーン用バッファ更新
 	graphics.GetShader()->UpdateSceneConstants(immediateContext);
 	
 	/*immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
@@ -243,89 +171,16 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	framebuffers[0]->Activate(immediateContext);
 #endif // !ENABLE_OFFSCREENRENDERING
 
-	//背景
-	//skybox->Render(immediateContext.Get(), V, P);
+	SceneManager::Instance().Render(elapsedTime);
 
-
-	//背景で使うシーン用バッファーに上書きされないように背景描画後にバッファー更新
-	/*immediateContext->UpdateSubresource(constantBuffers[0].Get(), 0, 0, &data, 0, 0);
-	immediateContext->VSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());
-	immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());*/
-	//immediateContext->RSSetState(rasterizerStates[4].Get());
-
-
-	//2D
-	{
-		graphics.Set2DStates();
-	}
-
-	//パーティクル
-	graphics.SetStates(Graphics::ZT_ON_ZW_ON,Graphics::CULL_NONE,Graphics::ALPHA);
-	immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
-	particles->Render(immediateContext);
-
-	//3D
-	{
-		graphics.Set3DStates();
-
-		/*static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
-		static float time{ 0 };
-		gltfModels[0]->Animate(0, time += elapsedTime, animatedNodes);
-		gltfModels[0]->Render(graphics.GetDeviceContext(), animatedNodes);*/
-
-		//描画エンジンの課題範囲での描画、閉じてていい
-#if 0
-
-
-#if 0
-		int clipIndex{ 0 };
-		int frameIndex{ 0 };
-		static float animationTick{ 0 };
-
-		Animation& animation{ skinnedMeshes[0]->animationClips.at(clipIndex) };
-		frameIndex = static_cast<int>(animationTick * animation.samplingRate);
-		if (frameIndex > animation.sequence.size() - 1)
-		{
-			frameIndex = 0;
-			animationTick = 0;
-		}
-		else
-		{
-			animationTick += elapsedTime;
-		}
-
-		Animation::Keyframe& keyframe{animation.sequence.at(frameIndex)};
-
-#else
-		//アニメーションブレンドのサンプル
-		/*Animation::Keyframe keyframe;
-		const Animation::Keyframe* keyframes[2]{
-			&skinnedMeshes[0]->animationClips.at(0).sequence.at(40),
-			&skinnedMeshes[0]->animationClips.at(0).sequence.at(80)
-		};
-		skinnedMeshes[0]->BlendAnimations(keyframes, blendAnimation, keyframe);
-		skinnedMeshes[0]->UpdateAnimation(keyframe);*/
-
-#endif // 0
-
-		skinnedMeshes[0]->Render(immediateContext.Get(), &keyframe);
-
-		static std::vector<GltfModel::Node> animatedNodes{gltfModels[0]->nodes};
-		static float time{ 0 };
-		gltfModels[0]->Animate(0, time += elapsedTime, animatedNodes);
-		gltfModels[0]->Render(immediateContext.Get(),animatedNodes);
-#endif // 0
 
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffers[0]->Deactivate(immediateContext);
 #endif // !DISABLE_OFFSCREENRENDERING
 
 #ifdef _DEBUG
-		//immediateContext->RSSetState(rasterizerStates[1].Get());
-		//staticMeshes[0]->BoundingBoxRender(immediateContext.Get());
-		//staticMeshes[1]->BoundingBoxRender(immediateContext.Get());
+		
 #endif // _DEBUG
-	}
 	
 
 	//ブルーム
@@ -392,21 +247,11 @@ void Framework::DrawDebug()
 			ImGui::EndMenu();
 		}
 
+		SceneManager::Instance().DrawDebug();
+
 		ImGui::EndMainMenuBar();
 	}
 	
-	//ImGui::End();
-	/*geometricPrimitive[0]->DrawDebug();
-	geometricPrimitive[1]->DrawDebug();
-
-	staticMeshes[0]->DrawDebug();
-	staticMeshes[1]->DrawDebug();*/
-
-	//skinnedMeshes[0]->DrawDebug();
-
-	//gltfModels[0]->DrawDebug();
-
-	particles->DrawDebug();
 
 #endif
 }

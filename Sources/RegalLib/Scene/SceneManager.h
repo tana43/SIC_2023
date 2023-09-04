@@ -16,7 +16,6 @@ namespace Regal::Scene
             return instance;
         }
 
-        void Initialize();
         void Update(float elapsedFlame);
         void Render(float elapsedFlame);
 

@@ -1,12 +1,8 @@
 #include "SceneManager.h"
+#include "../../../External/imgui/imgui.h"
 
 namespace Regal::Scene
 {
-    void SceneManager::Initialize()
-    {
-
-    }
-
     void SceneManager::Update(float elapsedFlame)
     {
         //次のシーンがセットされているなら切り替え
@@ -34,26 +30,26 @@ namespace Regal::Scene
             currentScene->Update(elapsedFlame);
             currentScene->End();
         }
-#ifdef _DEBUG
-        //各シーンのデバッグ表示
-        currentScene->DrawDebug();
-
-        //シーンマネージャーのデバッグ表示
-        DrawDebug();
-#endif // _DEBUG
 
     }
 
-    void SceneManager::Render(float elapsedFlame)
+    void SceneManager::Render(float elapsedTime)
     {
         if (!currentScene)return;
         
-        currentScene->Render(elapsedFlame);
+        currentScene->Render(elapsedTime);
     }
 
     void SceneManager::DrawDebug()
     {
+        if (!currentScene)return;
 
+        //各シーンのデバッグ表示
+        if (ImGui::BeginMenu("Scene"))
+        {
+            currentScene->DrawDebug();
+            ImGui::EndMenu();
+        }
     }
 
     void SceneManager::Clear()

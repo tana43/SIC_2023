@@ -123,12 +123,13 @@ namespace Regal::Graphics
 
     void Particles::DrawDebug()
     {
-        ImGui::Begin("Particle System");
+        if (ImGui::BeginMenu("Particle System"))
+        {
+            ImGui::SliderFloat("Particle Size", &particleData.particleSize, 0.0f, 0.1f);
+            ImGui::DragFloat3("Emitter Position", &particleData.emitterPosition.x, 0.1f);
+            //ImGui::SliderFloat("Effect Time", &particleData.time,0.0f, 20.0f);
 
-        ImGui::SliderFloat("Particle Size", &particleData.particleSize, 0.0f, 0.1f);
-        ImGui::DragFloat3("Emitter Position", &particleData.emitterPosition.x, 0.1f);
-        //ImGui::SliderFloat("Effect Time", &particleData.time,0.0f, 20.0f);
-
-        ImGui::End();
+            ImGui::EndMenu();
+        }
     }
 }

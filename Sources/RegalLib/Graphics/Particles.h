@@ -50,7 +50,9 @@ namespace Regal::Graphics
         Particles& operator=(Particles&&) noexcept = delete;
         virtual ~Particles() = default;
 
+        //çXêVèàóù
         void Integrate(ID3D11DeviceContext* immediateContext, float deltaTime);
+
         void Initialize(ID3D11DeviceContext* immediateContext, float deltaTime);
         void Render(ID3D11DeviceContext* immediateContext);
         void DrawDebug();
