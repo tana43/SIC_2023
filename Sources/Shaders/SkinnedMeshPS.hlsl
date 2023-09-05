@@ -12,7 +12,8 @@ Texture2D textureMaps[4] : register(t0);
 float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 color = textureMaps[0].Sample(samplerStates[ANISOTROPIC], pin.texcoord);
-    float alpha = color.a;
+    //float alpha = color.a;
+    float alpha = materialColor.a;
     float3 N = normalize(pin.worldNormal.xyz);
     float3 T = normalize(pin.worldTangent.xyz);
     float sigma = pin.worldTangent.w;

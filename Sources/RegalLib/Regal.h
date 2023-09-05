@@ -4,7 +4,7 @@
 //#define DISABLE_OFFSCREENRENDERING 
 
 //ƒfƒ‚ƒ‚[ƒh‚ÉØ‚è‘Ö‚¦
-//#define DEMO_MODE
+#define DEMO_MODE
 
 #include "Other/Misc.h"
 

@@ -18,7 +18,7 @@ namespace Regal::Demo
 		bloomer = std::make_unique<Regal::Graphics::Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
 		Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
-		model = std::make_unique<Regal::Model::StaticModel>("./Resources/cube.000.fbx");
+		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube02.fbx");
     }
 
     void DemoScene::Initialize()

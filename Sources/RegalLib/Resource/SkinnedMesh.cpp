@@ -409,6 +409,13 @@ namespace Regal::Resource
                     material.textureFilenames[1] = fileTexture ? fileTexture->GetRelativeFileName() : "";
                 }
 
+                //エミッションテクスチャ取得
+                fbxProperty = fbxMaterial->FindProperty(FbxSurfaceMaterial::sEmissive);
+                if (fbxProperty.IsValid())
+                {
+                    const FbxFileTexture* fbxTexture{ fbxProperty.GetSrcObject<FbxFileTexture>() };
+                    material.textureFilenames[2] = fbxTexture ? fbxTexture->GetRelativeFileName() : "";
+                }
                 materials.emplace(material.uniqueId, std::move(material));
             }
             if (materialCount == 0)
@@ -617,7 +624,7 @@ namespace Regal::Resource
         for (std::unordered_map<uint64_t, Material>::iterator itr = materials.begin();
             itr != materials.end(); ++itr)
         {
-            for (size_t textureIndex = 0; textureIndex < 2; ++textureIndex)
+            for (size_t textureIndex = 0; textureIndex < 3; ++textureIndex)
             {
                 if (itr->second.textureFilenames[textureIndex].size() > 0)
                 {
@@ -749,6 +756,8 @@ namespace Regal::Resource
 
                 immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
                 immediateContext->PSSetShaderResources(1, 1, material.shaderResourceViews[1].GetAddressOf());
+                //エミッション用テクスチャセット
+                immediateContext->PSSetShaderResources(2, 1, material.shaderResourceViews[2].GetAddressOf());
 
                 immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);
             }
@@ -799,6 +808,8 @@ namespace Regal::Resource
 
                 immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
                 immediateContext->PSSetShaderResources(1, 1, material.shaderResourceViews[1].GetAddressOf());
+                //エミッション用テクスチャセット
+                immediateContext->PSSetShaderResources(2, 1, material.shaderResourceViews[2].GetAddressOf());
 
                 immediateContext->DrawIndexed(subset.indexCount, subset.startIndexLocation, 0);
             }
