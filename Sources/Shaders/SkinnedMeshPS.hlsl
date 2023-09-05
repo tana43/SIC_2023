@@ -14,24 +14,27 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 color = textureMaps[0].Sample(samplerStates[ANISOTROPIC], pin.texcoord);
     //float alpha = color.a;
     float alpha = materialColor.a;
-    float3 N = normalize(pin.worldNormal.xyz);
-    float3 T = normalize(pin.worldTangent.xyz);
-    float sigma = pin.worldTangent.w;
-    T = normalize(T - N * dot(N, T));
-    float3 B = normalize(cross(N, T) * sigma);
+    //float3 N = normalize(pin.worldNormal.xyz);
+    //float3 T = normalize(pin.worldTangent.xyz);
+    //float sigma = pin.worldTangent.w;
+    //T = normalize(T - N * dot(N, T));
+    //float3 B = normalize(cross(N, T) * sigma);
     
-    //Normal
-    float4 normal = textureMaps[1].Sample(samplerStates[LINEAR], pin.texcoord);
-    normal = (normal * 2.0) - 1.0;
-    N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
+    ////Normal
+    //float4 normal = textureMaps[1].Sample(samplerStates[LINEAR], pin.texcoord);
+    //normal = (normal * 2.0) - 1.0;
+    //N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
     
-    float3 L = normalize(-lightDirection.xyz);
-    float3 diffuse = color.rgb * max(0, dot(N, L));
-    float3 V = normalize(cameraPosition.xyz - pin.worldPosition.xyz);
-    float3 specular = pow(max(0, dot(N, normalize(V + L))), 128);
+    //float3 L = normalize(-lightDirection.xyz);
+    //float3 diffuse = color.rgb * max(0, dot(N, L));
+    //float3 V = normalize(cameraPosition.xyz - pin.worldPosition.xyz);
+    //float3 specular = pow(max(0, dot(N, normalize(V + L))), 128);
     
+    //return float4(diffuse + specular + emissive * /*emissiveIntensity*/10, alpha) * pin.color;
+    
+    //ç°âÒÇÕÉâÉCÉgÇÃâeãøìôÇäÆëSÇ…ñ≥éãÇ∑ÇÈ
     //Emissive
     float3 emissive = textureMaps[2].Sample(samplerStates[LINEAR], pin.texcoord).rgb;
     
-    return float4(diffuse + specular + emissive * emissiveIntensity, alpha) * pin.color;
+    return /*float4(diffuse + specular, alpha) + */color + float4(emissive * emissiveIntensity,alpha) * pin.color;
 }

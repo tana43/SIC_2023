@@ -162,7 +162,7 @@ namespace Regal::Resource
             DirectX::XMFLOAT4X4 world;
             DirectX::XMFLOAT4 materialColor;
             DirectX::XMFLOAT4X4 boneTransforms[MAX_BONES]{ {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1} };
-            float emissiveIntensity;
+            float emissiveIntensity = 2.0f;
             float dummys[3];
         };
         struct Mesh

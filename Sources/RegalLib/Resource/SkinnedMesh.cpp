@@ -787,7 +787,7 @@ namespace Regal::Resource
             //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
             Constants data;
-
+            data.emissiveIntensity = emissiveIntencity;
             DirectX::XMStoreFloat4x4(&data.world,
                 DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
             for (size_t boneIndex = 0; boneIndex < MAX_BONES; ++boneIndex)
@@ -805,6 +805,7 @@ namespace Regal::Resource
                 );
                 immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
                 immediateContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+                immediateContext->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
                 immediateContext->PSSetShaderResources(0, 1, material.shaderResourceViews[0].GetAddressOf());
                 immediateContext->PSSetShaderResources(1, 1, material.shaderResourceViews[1].GetAddressOf());
@@ -833,7 +834,7 @@ namespace Regal::Resource
             //transform.DrawDebug();
 
             ImGui::ColorEdit4("Color", &color.x);
-            ImGui::SliderFloat("Emissive Intencity", &emissiveIntencity, 0.0f, 5.0f);
+            ImGui::SliderFloat("Emissive Intencity", &emissiveIntencity, 0.0f, 10.0f);
 
             /*if (ImGui::TreeNode("Material"))
             {

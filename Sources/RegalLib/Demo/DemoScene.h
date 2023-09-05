@@ -36,5 +36,7 @@ namespace Regal::Demo
         Microsoft::WRL::ComPtr<ID3D11PixelShader> LEPixelShader;
 
         std::unique_ptr<Regal::Model::StaticModel> model;
+
+        std::unique_ptr<Regal::Resource::Sprite> sprite;
     };
 }
