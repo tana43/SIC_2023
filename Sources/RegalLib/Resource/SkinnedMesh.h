@@ -162,6 +162,8 @@ namespace Regal::Resource
             DirectX::XMFLOAT4X4 world;
             DirectX::XMFLOAT4 materialColor;
             DirectX::XMFLOAT4X4 boneTransforms[MAX_BONES]{ {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1} };
+            float emissiveIntensity;
+            float dummys[3];
         };
         struct Mesh
         {
@@ -275,6 +277,8 @@ namespace Regal::Resource
         bool renderActive{ true };
 
         float scaleFactor{ 1.0f };
+
+        float emissiveIntencity = 3.0f;
 
         void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
         void FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t, Material>& materials);

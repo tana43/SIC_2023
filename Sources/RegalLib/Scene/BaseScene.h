@@ -23,6 +23,7 @@ namespace Regal::Scene
         virtual void End()                            = 0; // –ˆƒtƒŒ[ƒ€ˆê”ÔÅŒã‚ÉŒÄ‚Î‚ê‚é
         virtual void Render(const float& elapsedTime) = 0; // •`‰æˆ—
         virtual void DrawDebug()                      = 0;
+        virtual void PostEffectDrawDebug()            = 0;
 
     public:
         // €”õŠ®—¹‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©

@@ -201,7 +201,7 @@ private:
 		}
 	}
 
-	std::unique_ptr<Regal::Resource::Sprite> sprites[8];
+	/*std::unique_ptr<Regal::Resource::Sprite> sprites[8];
 	std::unique_ptr<Regal::Resource::SpriteBatch> spritesBatches[8];
 	std::unique_ptr<Regal::Resource::GeometricPrimitive> geometricPrimitive[8];
 	std::unique_ptr<Regal::Resource::StaticMesh> staticMeshes[8];
@@ -210,7 +210,7 @@ private:
 	std::unique_ptr<Regal::Graphics::Framebuffer> framebuffers[8];
 	std::unique_ptr<Regal::Graphics::SkyBox> skybox;
 	std::unique_ptr<Regal::Resource::Sprite> skyboxSprite;
-	std::unique_ptr<Regal::Graphics::Particles> particles;
+	std::unique_ptr<Regal::Graphics::Particles> particles;*/
 
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
@@ -220,7 +220,7 @@ private:
 	//DirectX::XMFLOAT3 cameraPos{ 0.0f, 0.0f, -10.0f};
 	//DirectX::XMFLOAT3 cameraAngle{ 0.0f, 0.0f, 0.0f};
 	//DirectX::XMFLOAT3 cameraFocus{ 0.0f, 0.0f, 0.0f};
-	DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
+	//DirectX::XMFLOAT3 lightAngle{ 0,0,0 };
 
 	//float boneTranslationX{ 300.0f };
 	//float blendAnimation{ 0.5f };

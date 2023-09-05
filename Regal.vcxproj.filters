@@ -53,6 +53,9 @@
     <Filter Include="RegalLib\Demo">
       <UniqueIdentifier>{55007fd7-6791-4cb3-a241-8c3b9835ad80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Scene">
+      <UniqueIdentifier>{e452456e-6ccb-4bf6-9110-81acd5ee53ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
@@ -124,9 +127,6 @@
     <ClCompile Include="Sources\RegalLib\Scene\SceneManager.cpp">
       <Filter>RegalLib\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Scene\BaseScene.cpp">
-      <Filter>RegalLib\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp">
       <Filter>RegalLib\Graphics</Filter>
     </ClCompile>
@@ -153,6 +153,12 @@
     </ClCompile>
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp">
       <Filter>RegalLib\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\TitleScene.cpp">
+      <Filter>Game\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\GameScene.cpp">
+      <Filter>Game\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +275,12 @@
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h">
       <Filter>RegalLib\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\TitleScene.h">
+      <Filter>Game\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GameScene.h">
+      <Filter>Game\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

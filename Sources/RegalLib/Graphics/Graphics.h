@@ -13,6 +13,10 @@
 
 namespace Regal::Graphics
 {
+	enum DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
+	enum BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
+	enum RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE };
+
 	class Graphics
 	{
 	public:
@@ -76,12 +80,10 @@ namespace Regal::Graphics
 		}
 
 	public:
-		enum DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
-		enum BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
-		enum RASTER_STATE { SOLID, WIREFRAME, WIREFRAME_CULL_NONE, SOLID_REVERSE, CULL_NONE };
+		
 
 		BOOL fullscreenMode{ FALSE };
-		BOOL vsync{ FALSE };//êÇíºìØä˙
+		BOOL vsync{ TRUE };//êÇíºìØä˙
 		BOOL tearingSupported{ FALSE };
 
 	private:

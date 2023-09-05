@@ -55,7 +55,7 @@ namespace Regal::Resource
 
     SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate, float samplingRate) : myNum(num++)
     {
-        //シリアライズされたデータがある場合そちらからロード、ねければ従来通りFBXからロード
+        //シリアライズされたデータがある場合そちらからロード、なければ従来通りFBXからロード
         std::filesystem::path cerealFilename(fbxFilename);
         cerealFilename.replace_extension("cereal");
         if (std::filesystem::exists(cerealFilename.c_str()))
@@ -613,6 +613,7 @@ namespace Regal::Resource
 #endif // 1
         }
 
+        //各種テクスチャ読み込み
         for (std::unordered_map<uint64_t, Material>::iterator itr = materials.begin();
             itr != materials.end(); ++itr)
         {
@@ -703,6 +704,7 @@ namespace Regal::Resource
             //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
             Constants data;
+            data.emissiveIntensity = emissiveIntencity;
             if (keyframe && keyframe->nodes.size() > 0)
             {
                 //メッシュのglobalTransformが時間軸で変化しているので、その行列をキーフレームから取得する
@@ -805,29 +807,33 @@ namespace Regal::Resource
 
     void SkinnedMesh::DrawDebug()
     {
+        ImGui::SetNextItemOpen(true, ImGuiCond_FirstUseEver);
         std::string name = "SkinnedMesh " + std::to_string(myNum);
-        ImGui::Begin(name.c_str());
-
-        ImGui::Checkbox("RenderActive", &renderActive);
-
-        /*ImGui::DragFloat3("Position", &position.x, 0.1f);
-        ImGui::DragFloat3("Scale", &scale.x, 0.01f);
-        ImGui::DragFloat3("Angle", &angle.x, 0.01f);
-        ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);*/
-
-        transform.DrawDebug();
-
-        ImGui::ColorEdit4("Color", &color.x);
-
-        /*if (ImGui::TreeNode("Material"))
+        if (ImGui::TreeNode(name.c_str()))
         {
-            ImGui::DragFloat3("Ka", &materials[0].Ka.x,0.01f);
-            ImGui::DragFloat3("Kd", &materials[0].Kd.x,0.01f);
-            ImGui::DragFloat3("Ks", &materials[0].Ks.x,0.01f);
+
+            ImGui::Checkbox("RenderActive", &renderActive);
+
+            /*ImGui::DragFloat3("Position", &position.x, 0.1f);
+            ImGui::DragFloat3("Scale", &scale.x, 0.01f);
+            ImGui::DragFloat3("Angle", &angle.x, 0.01f);
+            ImGui::DragFloat("ScaleFactor", &scaleFactor, 0.01f);*/
+
+            //transform.DrawDebug();
+
+            ImGui::ColorEdit4("Color", &color.x);
+            ImGui::SliderFloat("Emissive Intencity", &emissiveIntencity, 0.0f, 5.0f);
+
+            /*if (ImGui::TreeNode("Material"))
+            {
+                ImGui::DragFloat3("Ka", &materials[0].Ka.x,0.01f);
+                ImGui::DragFloat3("Kd", &materials[0].Kd.x,0.01f);
+                ImGui::DragFloat3("Ks", &materials[0].Ks.x,0.01f);
+
+                ImGui::TreePop();
+            }*/
 
             ImGui::TreePop();
-        }*/
-
-        ImGui::End();
+        }
     }
 }

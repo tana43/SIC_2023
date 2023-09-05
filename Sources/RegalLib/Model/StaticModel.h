@@ -6,7 +6,7 @@ namespace Regal::Model
     class StaticModel : public Regal::Model::Model
     {
     public:
-        StaticModel(ID3D11Device* device, const char* fbxFilename, bool traiangulate = true);
+        StaticModel(const char* fbxFilename, bool traiangulate = false);
         ~StaticModel() {}
 
         void Render();

@@ -1,12 +1,24 @@
 #include "DemoScene.h"
-#include "../Graphics/Graphics.h"
 
 namespace Regal::Demo
 {
     void DemoScene::CreateResource()
     {
-		particles = std::make_unique<Regal::Graphics::Particles>(
-			Regal::Graphics::Graphics::Instance().GetDevice(), 1000);
+		auto& graphics{ Regal::Graphics::Graphics::Instance() };
+
+		particles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 1000);
+
+		framebuffer = std::make_unique<Regal::Graphics::Framebuffer>(
+			graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, true);
+		bitBlockTransfer = std::make_unique < Regal::Graphics::FullscreenQuad>(graphics.GetDevice());
+
+
+		Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/LuminanceExtractionPS.cso", LEPixelShader.GetAddressOf());
+
+		bloomer = std::make_unique<Regal::Graphics::Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
+		Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
+
+		model = std::make_unique<Regal::Model::StaticModel>("./Resources/cube.000.fbx");
     }
 
     void DemoScene::Initialize()
@@ -54,19 +66,27 @@ namespace Regal::Demo
 		immediateContext->PSSetConstantBuffers(1, 1, constantBuffers[0].GetAddressOf());*/
 		//immediateContext->RSSetState(rasterizerStates[4].Get());
 
+
+#ifndef DISABLE_OFFSCREENRENDERING
+		framebuffer->Clear(immediateContext, clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+		framebuffer->Activate(immediateContext);
+#endif // !ENABLE_OFFSCREENRENDERING
+
 		//2D
 		{
 			graphics.Set2DStates();
 		}
 
 		//パーティクル
-		graphics.SetStates(Graphics::Graphics::ZT_ON_ZW_ON, Graphics::Graphics::CULL_NONE, Graphics::Graphics::ALPHA);
+		graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
 		immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
 		particles->Render(immediateContext);
 
 		//3D
 		{
 			graphics.Set3DStates();
+
+			model->Render();
 
 			//描画エンジンの課題範囲での描画、閉じてていい
 #if 0
@@ -111,10 +131,49 @@ namespace Regal::Demo
 			gltfModels[0]->Render(immediateContext.Get(), animatedNodes);
 #endif // 0
 		}
+
+#ifndef DISABLE_OFFSCREENRENDERING
+		framebuffer->Deactivate(immediateContext);
+#endif // !DISABLE_OFFSCREENRENDERING
+
+		//ブルーム
+		{
+			bloomer->Make(immediateContext, framebuffer->shaderResourceViews[0].Get());
+			graphics.SetStates(Graphics::ZT_OFF_ZW_OFF, Graphics::CULL_NONE, Graphics::ALPHA);
+			ID3D11ShaderResourceView* shaderResourceViews[] =
+			{
+				framebuffer->shaderResourceViews[0].Get(),
+				bloomer->ShaderResourceView(),
+			};
+			bitBlockTransfer->Bilt(immediateContext, shaderResourceViews, 0, 2, LEPixelShader.Get());
+		}
     }
+
+	
 
     void DemoScene::DrawDebug()
     {
+		PostEffectDrawDebug();
+
+		if (ImGui::BeginMenu("Clear Color"))
+		{
+			ImGui::ColorEdit4("Color",&clearColor[0]);
+
+
+			ImGui::EndMenu();
+		}
+
 		particles->DrawDebug();
+
+		model->DrawDebug();
     }
+
+	void DemoScene::PostEffectDrawDebug()
+	{
+		if (ImGui::BeginMenu("PostEffect"))
+		{
+			bloomer->DrawDebug();
+			ImGui::EndMenu();
+		}
+	}
 }

@@ -23,6 +23,9 @@ cbuffer SCENE_CONSTANT_BUFFER : register(b0)
     row_major float4x4 world;
     float4 materialColor;
     row_major float4x4 boneTransforms[MAX_BONES];
+    
+    float emissiveIntensity;
+    int3 dummy;
 };
 cbuffer SCENE_CONSTANT_BUFFER : register(b1)
 {

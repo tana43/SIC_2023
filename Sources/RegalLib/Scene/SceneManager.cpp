@@ -44,6 +44,14 @@ namespace Regal::Scene
     {
         if (!currentScene)return;
 
+        //ポストエフェクトデバッグ表示
+        if (ImGui::BeginMenu("PostEffect"))
+        {
+            currentScene->PostEffectDrawDebug();
+
+            ImGui::EndMenu();
+        }
+
         //各シーンのデバッグ表示
         if (ImGui::BeginMenu("Scene"))
         {

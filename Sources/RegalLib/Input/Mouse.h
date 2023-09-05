@@ -27,13 +27,13 @@ namespace Regal::Input
         void Update();
 
         //それぞれのマウスの入力状態を持った構造体を返す(例:if(GetButtonState().Space))
-        DirectX::Mouse::State& GetButtonState() { return state; }
+        static DirectX::Mouse::State& GetButtonState() { return Instance().state; }
 
         //キーを押した瞬間かどうかを返す
-        const bool GetButtonDown(const MouseButton button);
+        static const bool GetButtonDown(const MouseButton button);
 
         //キーを離した瞬間かどうかを返す
-        const bool GetButtonUp(const MouseButton button);
+        static const bool GetButtonUp(const MouseButton button);
 
         const int GetPosX() const { return state.x; }
         const int GetPosY() const { return state.y; }

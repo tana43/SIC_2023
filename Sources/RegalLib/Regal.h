@@ -1,5 +1,11 @@
 #pragma once
 
+//オフスクリーンレンダリング無効
+//#define DISABLE_OFFSCREENRENDERING 
+
+//デモモードに切り替え
+//#define DEMO_MODE
+
 #include "Other/Misc.h"
 
 #include <d3d11.h>

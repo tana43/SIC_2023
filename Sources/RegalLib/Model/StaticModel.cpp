@@ -1,11 +1,14 @@
 #include "StaticModel.h"
 #include "../Graphics/Graphics.h"
+#include "../../../External/imgui/imgui.h"
 
 namespace Regal::Model
 {
-    StaticModel::StaticModel(ID3D11Device* device, const char* fbxFilename, bool traiangulate)
+    StaticModel::StaticModel(const char* fbxFilename, bool traiangulate)
     {
-        skinnedMesh = std::make_unique<Regal::Resource::SkinnedMesh>(device,fbxFilename,traiangulate);
+        skinnedMesh = std::make_unique<Regal::Resource::SkinnedMesh>(
+            Regal::Graphics::Graphics::Instance().GetDevice()
+            ,fbxFilename,traiangulate);
     }
 
     void StaticModel::Render()
@@ -15,6 +18,11 @@ namespace Regal::Model
 
     void StaticModel::DrawDebug()
     {
-        transform.DrawDebug();
+        if (ImGui::BeginMenu("Model"))
+        {
+            skinnedMesh->DrawDebug();
+            transform.DrawDebug();
+            ImGui::EndMenu();
+        }
     }
 }

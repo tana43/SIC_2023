@@ -13,6 +13,9 @@ namespace Regal::Resource
         ~Sprite();
 
         void Render(ID3D11DeviceContext* immediateContext,
+            float dx, float dy, float dw, float dh, float angle);
+
+        void Render(ID3D11DeviceContext* immediateContext,
             float dx, float dy, float dw, float dh,
             float r, float g, float b, float a,
             float angle/*degree*/
@@ -47,7 +50,7 @@ namespace Regal::Resource
         };
 
     private:
-
+        float color[4] = {1,1,1,1};
 
         Microsoft::WRL::ComPtr<ID3D11VertexShader>  vertexShader;
         Microsoft::WRL::ComPtr<ID3D11PixelShader>   pixelShader;

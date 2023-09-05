@@ -91,6 +91,12 @@ namespace Regal::Resource
     {
     }
 
+    void Sprite::Render(ID3D11DeviceContext* immediateContext, float dx, float dy, float dw, float dh, float angle)
+    {
+        Render(immediateContext, dx, dy, dw, dh,
+            color[0], color[1], color[2], color[3], angle);
+    }
+
     void Sprite::Render(ID3D11DeviceContext* immediateContext,
         float dx, float dy, float dw, float dh,
         float r, float g, float b, float a,
@@ -215,10 +221,14 @@ namespace Regal::Resource
     {
 #ifdef USE_IMGUI
 
-        ImGui::Begin("Sprite");
+        if (ImGui::BeginMenu("Sprite"))
+        {
+            ImGui::ColorEdit4("Color", &color[0]);
+
+            ImGui::EndMenu();
+        }
 
 
-        ImGui::End();
 #endif
     }
 }

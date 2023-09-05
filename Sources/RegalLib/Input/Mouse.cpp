@@ -16,6 +16,7 @@ namespace Regal::Input
     const bool Mouse::GetButtonDown(const MouseButton button)
     {
         DirectX::Mouse::ButtonStateTracker::ButtonState thisButton;
+        auto tracker{ Instance().tracker };
         switch (button)
         {
         case BTN_LEFT:  thisButton = tracker.leftButton;   break;
@@ -29,6 +30,7 @@ namespace Regal::Input
     const bool Mouse::GetButtonUp(const MouseButton button)
     {
         DirectX::Mouse::ButtonStateTracker::ButtonState thisButton;
+        auto tracker{ Instance().tracker };
         switch (button)
         {
         case BTN_LEFT:  thisButton = tracker.leftButton;   break;

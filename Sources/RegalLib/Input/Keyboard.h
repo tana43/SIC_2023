@@ -22,13 +22,13 @@ namespace Regal::Input
         void Update();
 
         //それぞれのキーの入力状態を持った構造体を返す(例:if(GetKeyState().Space))
-        DirectX::Keyboard::State& GetKeyState() { return state; }
+        static DirectX::Keyboard::State& GetKeyState() { return Instance().state; }
 
         //キーを押した瞬間かどうかを返す
-        const bool GetKeyDown(const DirectX::Keyboard::Keys key);
+        static const bool GetKeyDown(const DirectX::Keyboard::Keys key);
 
         //キーを離した瞬間かどうかを返す
-        const bool GetKeyUp(const DirectX::Keyboard::Keys key);
+        static const bool GetKeyUp(const DirectX::Keyboard::Keys key);
 
     private:
         //DirectX::Keyboardクラスを生成するためのポインタ

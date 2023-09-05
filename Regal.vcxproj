@@ -215,6 +215,7 @@
     <ClCompile Include="External\imgui\imgui_tables.cpp" />
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Sources\Framework.cpp" />
+    <ClCompile Include="Sources\GameScene.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp" />
     <ClCompile Include="Sources\RegalLib\Game\Camera.cpp" />
@@ -237,8 +238,8 @@
     <ClCompile Include="Sources\RegalLib\Resource\SpriteBatch.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\StaticMesh.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Texture.cpp" />
-    <ClCompile Include="Sources\RegalLib\Scene\BaseScene.cpp" />
     <ClCompile Include="Sources\RegalLib\Scene\SceneManager.cpp" />
+    <ClCompile Include="Sources\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h" />
@@ -251,6 +252,7 @@
     <ClInclude Include="External\imgui\imstb_textedit.h" />
     <ClInclude Include="External\imgui\imstb_truetype.h" />
     <ClInclude Include="Sources\Framework.h" />
+    <ClInclude Include="Sources\GameScene.h" />
     <ClInclude Include="Sources\HighResolutionTimer.h" />
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h" />
     <ClInclude Include="Sources\RegalLib\Game\Camera.h" />
@@ -279,6 +281,7 @@
     <ClInclude Include="Sources\RegalLib\Resource\Texture.h" />
     <ClInclude Include="Sources\RegalLib\Scene\BaseScene.h" />
     <ClInclude Include="Sources\RegalLib\Scene\SceneManager.h" />
+    <ClInclude Include="Sources\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\BidirectionalReflectanceDistributionFunction.hlsli" />

@@ -1,7 +1,5 @@
 #include "framework.h"
-
-//オフスクリーンレンダリング無効
-//#define DISABLE_OFFSCREENRENDERING 
+#include "TitleScene.h"
 
 using namespace Regal::Resource;
 using namespace Regal::Graphics;
@@ -39,7 +37,7 @@ bool Framework::Initialize()
 
 	Camera::Instance().Initialize();
 
-	//各リソースクラスの生成
+	//描画エンジン等の各クラスの生成
 	//一応残してるだけ、閉じてていい
 #if 0 
 	sprites[0] = std::make_unique<Sprite>(device.Get(), L"./Resources/cyberpunk.jpg");
@@ -62,9 +60,9 @@ bool Framework::Initialize()
 		//"./Resources/Crunch/Crunch.gltf"
 		//"./Resources/Stage/Showcase.gltf"
 	);
-#endif // 0
+
 	framebuffers[0] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, true);
-	framebuffers[1] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth()/2, graphics.GetScreenHeight()/2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
+	//framebuffers[1] = std::make_unique<Framebuffer>(graphics.GetDevice(), graphics.GetScreenWidth() / 2, graphics.GetScreenHeight() / 2, DXGI_FORMAT_R16G16B16A16_FLOAT, false);
 
 	bitBlockTransfer = std::make_unique<FullscreenQuad>(graphics.GetDevice());
 
@@ -89,7 +87,7 @@ bool Framework::Initialize()
 	Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/BlurPS.cso", pixelShaders[1].GetAddressOf());
 
 	D3D11_TEXTURE2D_DESC texture2dDesc;
-	LoadTextureFromFile(graphics.GetDevice(), L"./Resources/environments/sunset_jhbcentral_4k/sunset_jhbcentral_4k.dds", 
+	LoadTextureFromFile(graphics.GetDevice(), L"./Resources/environments/sunset_jhbcentral_4k/sunset_jhbcentral_4k.dds",
 		shaderResourceViews[0].GetAddressOf(), &texture2dDesc);
 	LoadTextureFromFile(graphics.GetDevice(), L"./Resources/environments/sunset_jhbcentral_4k/diffuse_iem.dds",
 		shaderResourceViews[1].GetAddressOf(), &texture2dDesc);
@@ -104,7 +102,13 @@ bool Framework::Initialize()
 	particles = std::make_unique<decltype(particles)::element_type>(graphics.GetDevice(), 1000);
 	particles->Initialize(graphics.GetDeviceContext(), 0);
 
+#endif // 0
+	
+#ifdef DEMO_MODE
 	SceneManager::Instance().ChangeScene(new DemoScene);
+#else
+	SceneManager::Instance().ChangeScene(new TitleScene);
+#endif
 
 	return true;
 }
@@ -152,11 +156,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	immediateContext->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	immediateContext->OMSetRenderTargets(1, &rtv, dsv);
 
-	//テクスチャバインド
-	immediateContext->PSSetShaderResources(32, 1, shaderResourceViews[0].GetAddressOf());
-	immediateContext->PSSetShaderResources(33, 1, shaderResourceViews[1].GetAddressOf());
-	immediateContext->PSSetShaderResources(34, 1, shaderResourceViews[2].GetAddressOf());
-	immediateContext->PSSetShaderResources(35, 1, shaderResourceViews[3].GetAddressOf());
+	//PBRテクスチャバインド
+	//immediateContext->PSSetShaderResources(32, 1, shaderResourceViews[0].GetAddressOf());
+	//immediateContext->PSSetShaderResources(33, 1, shaderResourceViews[1].GetAddressOf());
+	//immediateContext->PSSetShaderResources(34, 1, shaderResourceViews[2].GetAddressOf());
+	//immediateContext->PSSetShaderResources(35, 1, shaderResourceViews[3].GetAddressOf());
 
 	//サンプラーステートオブジェクトをバインド
 	graphics.BindSamplersState();
@@ -164,36 +168,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	//シーン用バッファ更新
 	graphics.GetShader()->UpdateSceneConstants(immediateContext);
 	
-	/*immediateContext->UpdateSubresource(constantBuffers[1].Get(), 0, 0, &parametricConstants, 0, 0);
-	immediateContext->PSSetConstantBuffers(2, 1, constantBuffers[1].GetAddressOf());*/
-#ifndef DISABLE_OFFSCREENRENDERING
-	framebuffers[0]->Clear(immediateContext,color[0], color[1], color[2], color[3]);
-	framebuffers[0]->Activate(immediateContext);
-#endif // !ENABLE_OFFSCREENRENDERING
-
 	SceneManager::Instance().Render(elapsedTime);
-
-
-#ifndef DISABLE_OFFSCREENRENDERING
-	framebuffers[0]->Deactivate(immediateContext);
-#endif // !DISABLE_OFFSCREENRENDERING
 
 #ifdef _DEBUG
 		
 #endif // _DEBUG
-	
-
-	//ブルーム
-	{
-		bloomer->Make(immediateContext, framebuffers[0]->shaderResourceViews[0].Get());
-		graphics.SetStates(Graphics::ZT_OFF_ZW_OFF, Graphics::CULL_NONE, Graphics::ALPHA);
-		ID3D11ShaderResourceView* shaderResourceViews[] =
-		{
-			framebuffers[0]->shaderResourceViews[0].Get(),
-			bloomer->ShaderResourceView(),
-		};
-		bitBlockTransfer->Bilt(immediateContext, shaderResourceViews, 0, 2, pixelShaders[0].Get());
-	}
 
 	IMGUI_CTRL_DISPLAY();
 
@@ -205,6 +184,8 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 bool Framework::Uninitialize()
 {
+	SceneManager::Instance().Clear();
+
 	return true;
 }
 
@@ -223,8 +204,6 @@ void Framework::DrawDebug()
 
 			Camera::Instance().DrawDebug();
 
-			
-
 			if (ImGui::BeginMenu("ClearColor"))
 			{
 				ImGui::ColorPicker4("color",color);
@@ -234,18 +213,6 @@ void Framework::DrawDebug()
 		}
 
 		graphics.DrawDebug();
-
-		if (ImGui::BeginMenu("PostEffect"))
-		{
-			/*ImGui::SliderFloat("ExtractionThreshold", &parametricConstants.extractionThreshold,0,1);
-			ImGui::SliderFloat("GaussianSigma", &parametricConstants.gaussianSigma,0.001f,10);
-			ImGui::SliderFloat("BloomIntensity", &parametricConstants.bloomIntensity,0,5);
-			ImGui::SliderFloat("Exposure", &parametricConstants.exposure, 0.0f, 2.2f);*/
-
-			bloomer->DrawDebug();
-
-			ImGui::EndMenu();
-		}
 
 		SceneManager::Instance().DrawDebug();
 

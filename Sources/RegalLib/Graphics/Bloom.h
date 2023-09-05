@@ -29,7 +29,7 @@ namespace Regal::Graphics
 
     public:
         float bloomExtractionThreshold = 0.85f;
-        float bloomIntensity = 1.0f;
+        float bloomIntensity = 0.15f;
 
     private:
         std::unique_ptr<FullscreenQuad> bitBlockTransfer;
