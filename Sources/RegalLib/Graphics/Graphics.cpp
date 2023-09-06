@@ -214,6 +214,8 @@ namespace Regal::Graphics
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 		immediateContext->RSSetViewports(1, &viewport);
+
+		CreateStates();
     }
 
 	void Graphics::FullscreenState(BOOL fullscreen)

@@ -18,7 +18,9 @@ namespace Regal::Demo
 		bloomer = std::make_unique<Regal::Graphics::Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
 		Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
-		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
+		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/Stage02.fbx");
 
 		sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Demo.png");
     }
@@ -26,7 +28,7 @@ namespace Regal::Demo
     void DemoScene::Initialize()
     {
 		particles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
-		sprite->SetColor(1, 1, 1, 0.1f);
+		sprite->SetColor(1, 1, 1, 0.01f);
     }
 
     void DemoScene::Finalize()
@@ -75,15 +77,15 @@ namespace Regal::Demo
 		framebuffer->Activate(immediateContext);
 #endif // !ENABLE_OFFSCREENRENDERING
 
-		graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::SOLID, Graphics::ALPHA);
-		sprite->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+		//graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::SOLID, Graphics::ALPHA);
+		
 
 		//2D
 		{
 			graphics.Set2DStates();
 
-			
+			sprite->Render(graphics.GetDeviceContext(), 0, 0,
+				graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 		}
 
 		//パーティクル
