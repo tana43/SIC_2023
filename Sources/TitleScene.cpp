@@ -33,7 +33,7 @@ void TitleScene::Begin()
 
 void TitleScene::Update(const float& elapsedTime)
 {
-	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Enter))
+	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
 	{
 		Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
 	}

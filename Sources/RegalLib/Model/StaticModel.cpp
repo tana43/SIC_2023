@@ -18,11 +18,13 @@ namespace Regal::Model
 
     void StaticModel::DrawDebug()
     {
-        if (ImGui::BeginMenu("Model"))
+        //if (ImGui::BeginMenu("Model"))
+        if (ImGui::TreeNode("Model"))
         {
             skinnedMesh->DrawDebug();
             transform.DrawDebug();
-            ImGui::EndMenu();
+            ImGui::TreePop();
+            //ImGui::EndMenu();
         }
     }
 }

@@ -62,6 +62,12 @@
     <Filter Include="Game\Object">
       <UniqueIdentifier>{2e22c9f0-26ee-4e81-a7bc-00eb95837da1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Stage">
+      <UniqueIdentifier>{f1b297bb-8281-47ea-a7b1-f3a9170d6046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Effect">
+      <UniqueIdentifier>{d2907c6b-b9a7-4763-b8d0-527a7410a728}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
@@ -166,7 +172,15 @@
     <ClCompile Include="Sources\Main.cpp">
       <Filter>Game\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Hexagon.cpp" />
+    <ClCompile Include="Sources\Hexagon.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\PuzzleFrame.cpp">
+      <Filter>Game\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\BaseColorController.cpp">
+      <Filter>Game\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -289,7 +303,18 @@
     <ClInclude Include="Sources\HighResolutionTimer.h">
       <Filter>Game\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Hexagon.h" />
+    <ClInclude Include="Sources\Hexagon.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\PuzzleFrame.h">
+      <Filter>Game\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Game\GameObject.h">
+      <Filter>RegalLib\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\BaseColorController.h">
+      <Filter>Game\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">

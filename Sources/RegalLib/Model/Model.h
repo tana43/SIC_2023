@@ -14,6 +14,8 @@ namespace Regal::Model
 
         virtual void DrawDebug() = 0;
 
+        Regal::Resource::SkinnedMesh* GetSkinnedMesh() { return skinnedMesh.get(); }
+
     protected:
         Regal::Game::TransformEuler transform;
 

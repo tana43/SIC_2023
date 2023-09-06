@@ -242,9 +242,6 @@ namespace Regal::Resource
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
         Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
-        DirectX::XMFLOAT3 position{ 0, 0, 0 };
-        DirectX::XMFLOAT3 angle{ 0, 0, 0 };
-        DirectX::XMFLOAT3 scale{ 1, 1, 1 };
         DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
 
     public:
@@ -270,6 +267,12 @@ namespace Regal::Resource
         bool AppendAnimations(const char* animationFilename, float samplingRate);
 
         void BlendAnimations(const Animation::Keyframe* keyframes[2], float factor, Animation::Keyframe& keyframe);
+
+        void SetColor(const DirectX::XMFLOAT4 col) { color = col; }
+        const DirectX::XMFLOAT4 GetColor() const { return color; }
+
+        void SetEmissiveIntensity(const float intensity) { emissiveIntencity = intensity; }
+        const float GetEmissiveIntensity() const { return emissiveIntencity; }
 
     protected:
         Scene sceneView;

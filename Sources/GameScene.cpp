@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "TitleScene.h"
+#include "PuzzleFrame.h"
 
 void GameScene::CreateResource()
 {
@@ -15,12 +16,25 @@ void GameScene::CreateResource()
 	bloomer = std::make_unique<Regal::Graphics::Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
 	Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
+#if _DEBUG
 	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game.png");
+#endif // _DEBUG
+
+
+	hexagon.CreateResource();
+
+	PuzzleFrame::Instance().CreateResource();
 }
 
 void GameScene::Initialize()
 {
+#if _DEBUG
 	sprite->SetColor(1, 1, 1, 0.01f);
+#endif // _DEBUG
+
+	hexagon.Initialize();
+
+	PuzzleFrame::Instance().Initialize();
 }
 
 void GameScene::Finalize()
@@ -33,10 +47,14 @@ void GameScene::Begin()
 
 void GameScene::Update(const float& elapsedTime)
 {
-	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Back))
+	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
 	{
 		Regal::Scene::SceneManager::Instance().ChangeScene(new TitleScene);
 	}
+
+	hexagon.Update(elapsedTime);
+
+	PuzzleFrame::Instance().Update(elapsedTime);
 }
 
 void GameScene::End()
@@ -59,8 +77,10 @@ void GameScene::Render(const float& elapsedTime)
 	{
 		graphics.Set2DStates();
 
+#if _DEBUG
 		sprite->Render(graphics.GetDeviceContext(), 0, 0,
 			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+#endif // _DEBUG
 	}
 
 	//パーティクル
@@ -71,6 +91,10 @@ void GameScene::Render(const float& elapsedTime)
 	{
 		graphics.Set3DStates();
 
+		hexagon.Render();
+
+
+		PuzzleFrame::Instance().Render();
 	}
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffer->Deactivate(immediateContext);
@@ -100,6 +124,10 @@ void GameScene::DrawDebug()
 
 
 	sprite->DrawDebug();
+
+	hexagon.DrawDebug();
+
+	PuzzleFrame::Instance().DrawDebug();
 }
 
 void GameScene::PostEffectDrawDebug()

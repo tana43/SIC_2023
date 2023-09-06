@@ -32,6 +32,7 @@
 
 #include "Game/Transform.h"
 #include "Game/Camera.h"
+#include "Game/GameObject.h"
 
 #include "Helper/MathHelper.h"
 
