@@ -37,6 +37,8 @@ namespace Regal::Demo
 
         std::unique_ptr<Regal::Model::StaticModel> model;
 
+        //std::unique_ptr<Regal::Model::StaticModel> hexagons[500];
+
         std::unique_ptr<Regal::Resource::Sprite> sprite;
     };
 }

@@ -22,6 +22,12 @@ namespace Regal::Demo
 		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
 		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/Stage02.fbx");
 
+		/*for (size_t i = 0; i < 500; i++)
+		{
+			hexagons[i] = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
+			hexagons[i]->GetTransform()->SetPositionX(static_cast<float>(i * 2));
+		}*/
+
 		sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Demo.png");
     }
 
@@ -96,6 +102,11 @@ namespace Regal::Demo
 		//3D
 		{
 			graphics.Set3DStates();
+
+			/*for (size_t i = 0; i < 500; i++)
+			{
+				hexagons[i]->Render();
+			}*/
 
 			model->Render();
 

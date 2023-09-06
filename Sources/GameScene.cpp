@@ -20,6 +20,7 @@ void GameScene::CreateResource()
 
 void GameScene::Initialize()
 {
+	sprite->SetColor(1, 1, 1, 0.01f);
 }
 
 void GameScene::Finalize()

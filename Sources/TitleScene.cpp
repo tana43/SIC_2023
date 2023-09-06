@@ -20,6 +20,7 @@ void TitleScene::CreateResource()
 
 void TitleScene::Initialize()
 {
+	sprite->SetColor(1, 1, 1, 0.01f);
 }
 
 void TitleScene::Finalize()

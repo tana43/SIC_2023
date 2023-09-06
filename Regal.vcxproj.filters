@@ -56,6 +56,12 @@
     <Filter Include="Game\Scene">
       <UniqueIdentifier>{e452456e-6ccb-4bf6-9110-81acd5ee53ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Core">
+      <UniqueIdentifier>{db8265dd-028d-479b-892c-356dba468cdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object">
+      <UniqueIdentifier>{2e22c9f0-26ee-4e81-a7bc-00eb95837da1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
@@ -115,12 +121,6 @@
     <ClCompile Include="External\imgui\imgui_widgets.cpp">
       <Filter>External\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Framework.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Main.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp">
       <Filter>RegalLib\Resource</Filter>
     </ClCompile>
@@ -160,6 +160,13 @@
     <ClCompile Include="Sources\GameScene.cpp">
       <Filter>Game\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Framework.cpp">
+      <Filter>Game\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Main.cpp">
+      <Filter>Game\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Hexagon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -228,12 +235,6 @@
     <ClInclude Include="External\imgui\imstb_truetype.h">
       <Filter>External\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Framework.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\HighResolutionTimer.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\RegalLib\Regal.h">
       <Filter>RegalLib</Filter>
     </ClInclude>
@@ -282,6 +283,13 @@
     <ClInclude Include="Sources\GameScene.h">
       <Filter>Game\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Framework.h">
+      <Filter>Game\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\HighResolutionTimer.h">
+      <Filter>Game\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Hexagon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">
