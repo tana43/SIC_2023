@@ -20,7 +20,7 @@ public:
     void PostEffectDrawDebug()override;
 
 private:
-    float clearColor[4] = { 0.1f,0.1f,0.1f,1.0f };
+    float clearColor[4] = { 0.3f,0.3f,0.3f,1.0f };
     std::unique_ptr<Regal::Graphics::Framebuffer> framebuffer;
     std::unique_ptr<Regal::Graphics::Bloom> bloomer;
     std::unique_ptr<Regal::Graphics::FullscreenQuad> bitBlockTransfer;

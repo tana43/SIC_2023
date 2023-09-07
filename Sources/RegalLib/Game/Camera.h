@@ -36,6 +36,8 @@ namespace Regal::Game
         DirectX::XMMATRIX CalcViewMatrix() const;
         DirectX::XMMATRIX CalcProjectionMatrix() const;
 
+        TransformEuler* GetTransform() { return &transform; }
+
         //シーン用バッファに必要な項目だけゲッター作った。あとで変更するかも
         const DirectX::XMMATRIX GetViewProjectionMatrix() const { return ViewProjection; }
         const DirectX::XMFLOAT4 GetPosition() const 

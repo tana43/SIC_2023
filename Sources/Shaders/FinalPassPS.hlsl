@@ -29,8 +29,8 @@ float4 main(VS_OUT pin) : SV_TARGET
     fragmentColor = reinhardToneMapping(fragmentColor);
 
 	//ÉKÉìÉ}ï‚ê≥
-    const float INV_GAMMA = 1.0 / 2.2;
-    fragmentColor = pow(fragmentColor, INV_GAMMA);
+    //const float INV_GAMMA = 1.0 / 2.2;
+    //fragmentColor = pow(fragmentColor, INV_GAMMA);
 
     return float4(fragmentColor, alpha);
 }

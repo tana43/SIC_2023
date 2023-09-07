@@ -19,7 +19,7 @@ namespace Regal::Graphics
         Bloom(Bloom&&) noexcept = delete;
         Bloom& operator = (Bloom&&) noexcept = delete;
 
-        void Bloom::Make(ID3D11DeviceContext* immediateContext, ID3D11ShaderResourceView* colorMap);
+        void Make(ID3D11DeviceContext* immediateContext, ID3D11ShaderResourceView* colorMap);
         ID3D11ShaderResourceView* ShaderResourceView() const
         {
             return glowExtraction->shaderResourceViews[0].Get();

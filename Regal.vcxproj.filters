@@ -68,6 +68,9 @@
     <Filter Include="Game\Effect">
       <UniqueIdentifier>{d2907c6b-b9a7-4763-b8d0-527a7410a728}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Manager">
+      <UniqueIdentifier>{7dc0587c-c6a8-4690-a6fd-0e9f7acf8ef0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp">
@@ -180,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="Sources\BaseColorController.cpp">
       <Filter>Game\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\BlocksManager.cpp">
+      <Filter>Game\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,6 +320,9 @@
     </ClInclude>
     <ClInclude Include="Sources\BaseColorController.h">
       <Filter>Game\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\BlocksManager.h">
+      <Filter>Game\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

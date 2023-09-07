@@ -43,7 +43,7 @@ private:
     float fallTimer;//落下する時間計測用のタイマー
     float fallingTime;//１回落下するのにかかる時間
 
-    //DirectX::XMFLOAT3 veloxity{0,0,0};
+    //DirectX::XMFLOAT3 velocity{0,0,0};
 
     bool onGround{ false };
 

@@ -29,12 +29,13 @@ void GameScene::CreateResource()
 void GameScene::Initialize()
 {
 #if _DEBUG
-	sprite->SetColor(1, 1, 1, 0.01f);
+	sprite->SetColor(1, 1, 1, 0.3f);
 #endif // _DEBUG
+
+	PuzzleFrame::Instance().Initialize();
 
 	hexagon.Initialize();
 
-	PuzzleFrame::Instance().Initialize();
 }
 
 void GameScene::Finalize()
