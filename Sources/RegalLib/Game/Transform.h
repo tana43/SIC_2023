@@ -40,7 +40,9 @@ namespace Regal::Game
         void SetScale(const DirectX::XMFLOAT3& scl) { scale = scl; }
 
         void SetRotation(const DirectX::XMFLOAT3& rot) { rotation = rot; }
+        void SetRotationX(const float rotX) { rotation.x = rotX; }
         void SetRotationY(const float rotY) { rotation.y = rotY; }
+        void SetRotationZ(const float rotZ) { rotation.z = rotZ; }
         void AddRotation(const DirectX::XMFLOAT3& rot) { rotation = rotation + rot; }
         void AddRotationY(const float rotY) { rotation.y += rotY; }
 

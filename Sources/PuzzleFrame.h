@@ -1,7 +1,24 @@
 #pragma once
 #include "RegalLib/Regal.h"
+#include "Block.h"
 
-using GridState = unsigned int;
+using GridState = int;
+
+//各グリッド位置のデータイメージ
+// -1は何があっても変わることのない範囲、枠の形の都合上 二次元配列で表現するにはこうなってしまう
+//  0はブロックが出入りする場所ここのｘ軸、ｙ軸が全て埋まっている場合 その列のブロックを削除する
+//Ctrl + Fで０入れたら見えやすい
+/*
+* -1.-1,-1,-1,-1, 0,-1,-1,-1,
+* -1,-1,-1,-1, 0, 0, 0,-1,-1,
+* -1,-1,-1, 0, 0, 0, 0, 0,-1,
+* -1,-1, 0, 0, 0, 0, 0, 0, 0,
+* -1, 0, 0, 0, 0, 0, 0, 0,-1,
+*  0, 0, 0, 0, 0, 0, 0,-1,-1,
+*  0, 0, 0, 0, 0, 0,-1,-1,-1,
+*  0, 0, 0, 0, 0,-1,-1,-1,-1,
+*  0, 0, 0, 0,-1,-1,-1,-1,-1,
+*/
 
 class PuzzleFrame : public Regal::Game::GameObject
 {
@@ -10,12 +27,43 @@ private:
     ~PuzzleFrame() {}
 
 public:
-    //枠の大きさ
-    static const int MAX_FRAME_WIDTH = 10;
-    static const int MAX_FRAME_HEIGHT = 15;
 
-    static const GridState NONE     = (1 << 0);
-    static const GridState ON_BLOCK = (1 << 1);
+    //枠の大きさ
+    static const int MAX_FRAME_WIDTH = 18;
+    static const int MAX_FRAME_HEIGHT = 18;
+
+    //最下段に入るブロック数は片側で８つ
+    //枠に入るブロックの許容できる範囲（どちらかを越えた時点で全てブロックをクリアする）
+    static const int FRAME_LIMIT_WIDTH = 16;
+    static const int FRAME_LIMIT_HEIGHT = 16;
+
+    //枠内の初期状態
+    static inline const int INIT_GRID_STATES[MAX_FRAME_WIDTH][MAX_FRAME_HEIGHT] =
+    {   //1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
+        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 2,-1,-1,-1,-1,-1,-1,-1},//1
+        {-1,-1,-1,-1,-1,-1,-1,-1,-1, 2, 2, 2,-1,-1,-1,-1,-1,-1},//2
+        {-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 2, 2, 2,-1,-1,-1,-1,-1},//3
+        {-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 2, 2, 2,-1,-1,-1,-1},//4
+        {-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 0, 2, 2, 2,-1,-1,-1},//5
+        {-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2,-1,-1},//6
+        {-1,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2,-1},//7
+        {-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},//8
+        {-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,-1},//9
+        {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1},//10
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1},//11
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1},//12
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1},//13
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1},//14
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1},//15
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1},//16
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1},//17
+        { 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}//18
+    };
+
+    static const GridState OUT_RANGE     = -1;//範囲外
+    static const GridState NONE          = 0;//ブロックなし
+    static const GridState ON_BLOCK      = 1;//ブロックあり
+    static const GridState LIMIT         = 2;//天井越え
 
     static PuzzleFrame& Instance() 
     {
@@ -29,10 +77,38 @@ public:
     void Render()override;
     void DrawDebug()override;
 
+    //設置されている各ブロックと内部的なデータの同期
     void CheckBlocks();
 
+    //ブロックを設置
+    bool SetBlockOnGrid(Block* block);
+
+    //ブロックが枠を越えた場所に設置されているかの判定 範囲越えならtrue
+    bool IsOverToleranceLimit();
+    //とそのときの処理
+    void OverToleranceLimit();
+
+    //引数のマス目にブロックを置ける状態かどうかを返す、おけるならtrue
+    bool SetBlockDetection(int gridX,int gridY);
+
+    //マス目上のX座標、y座標からmapのキーに対応したint値に変換する
+   /* int ConvertToCombindGridXY(int gridX, int gridY)
+    {
+        if (gridX < 0 || gridX < MAX_FRAME_WIDTH ||
+            gridY < 0 || gridY < MAX_FRAME_HEIGHT)
+        {
+            assert(0, "範囲外のグリッド座標にアクセスされました");
+        }
+        return gridX + MAX_FRAME_WIDTH * gridY;
+    }*/
+
+    void Clear();
+
 private:
-    char frameStates[MAX_FRAME_HEIGHT][MAX_FRAME_WIDTH];
+    //そのマス目の状態を管理する　ブロックがないならnullptrを入れる
+    Block* gridsBlock[MAX_FRAME_HEIGHT][MAX_FRAME_WIDTH];
+    char gridsState[MAX_FRAME_HEIGHT][MAX_FRAME_WIDTH];
+
     std::unique_ptr<Regal::Model::StaticModel> frameModel;
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "./RegalLib/Regal.h"
-#include "Hexagon.h"
+#include "Block.h"
 
 class GameScene final : public Regal::Scene::BaseScene
 {
@@ -34,6 +34,6 @@ private:
 #endif // _DEBUG
 
 
-    Hexagon hexagon;
+    //Hexagon hexagon;
 };
 

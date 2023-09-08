@@ -91,9 +91,6 @@
     <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp">
       <Filter>RegalLib\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp">
-      <Filter>RegalLib\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\RegalLib\Resource\SkinnedMesh.cpp">
       <Filter>RegalLib\Resource</Filter>
     </ClCompile>
@@ -175,7 +172,7 @@
     <ClCompile Include="Sources\Main.cpp">
       <Filter>Game\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Hexagon.cpp">
+    <ClCompile Include="Sources\Block.cpp">
       <Filter>Game\Object</Filter>
     </ClCompile>
     <ClCompile Include="Sources\PuzzleFrame.cpp">
@@ -184,8 +181,17 @@
     <ClCompile Include="Sources\BaseColorController.cpp">
       <Filter>Game\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\BlocksManager.cpp">
+    <ClCompile Include="Sources\BlockManager.cpp">
       <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\GameManager.cpp">
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\BlocksGroup.cpp">
+      <Filter>Game\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -208,9 +214,6 @@
       <Filter>RegalLib\Helper</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h">
-      <Filter>RegalLib\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h">
       <Filter>RegalLib\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Sources\RegalLib\Resource\SkinnedMesh.h">
@@ -309,7 +312,7 @@
     <ClInclude Include="Sources\HighResolutionTimer.h">
       <Filter>Game\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Hexagon.h">
+    <ClInclude Include="Sources\Block.h">
       <Filter>Game\Object</Filter>
     </ClInclude>
     <ClInclude Include="Sources\PuzzleFrame.h">
@@ -321,8 +324,17 @@
     <ClInclude Include="Sources\BaseColorController.h">
       <Filter>Game\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\BlocksManager.h">
+    <ClInclude Include="Sources\BlockManager.h">
       <Filter>Game\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GameManager.h">
+      <Filter>Game\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\BlocksGroup.h">
+      <Filter>Game\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

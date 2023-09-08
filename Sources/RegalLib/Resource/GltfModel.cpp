@@ -435,7 +435,7 @@ namespace Regal::Resource
                 const tinygltf::Accessor& gltfAccessor{gltfModel.accessors.at(gltfSampler.input)};
                 const tinygltf::BufferView& gltfBufferView{gltfModel.bufferViews.at(gltfAccessor.bufferView)};
 
-                pair<unordered_map<int, vector<float>>::iterator, bool>& timelines{
+                const pair<unordered_map<int, vector<float>>::iterator, bool>& timelines{
                     animation.timelines.emplace(gltfSampler.input, gltfAccessor.count)
                 };
                 if (timelines.second)
@@ -456,7 +456,7 @@ namespace Regal::Resource
                 const tinygltf::BufferView& gltfBufferView{gltfModel.bufferViews.at(gltfAccessor.bufferView)};
                 if (gltfChannel.target_path == "scale")
                 {
-                    pair<unordered_map<int, vector<XMFLOAT3>>::iterator, bool>& scales{
+                    const pair<unordered_map<int, vector<XMFLOAT3>>::iterator, bool> scales{
                         animation.scales.emplace(gltfSampler.output, gltfAccessor.count)
                     };
                     if (scales.second)
@@ -467,7 +467,7 @@ namespace Regal::Resource
                 }
                 else if (gltfChannel.target_path == "rotation")
                 {
-                    pair<unordered_map<int, vector<XMFLOAT4>>::iterator, bool>& rotations{
+                    const pair<unordered_map<int, vector<XMFLOAT4>>::iterator, bool>& rotations{
                         animation.rotations.emplace(gltfSampler.output, gltfAccessor.count)
                     };
                     if (rotations.second)
@@ -478,7 +478,7 @@ namespace Regal::Resource
                 }
                 else if (gltfChannel.target_path == "translation")
                 {
-                    pair<unordered_map<int, vector<XMFLOAT3>>::iterator, bool>& translations{
+                    const pair<unordered_map<int, vector<XMFLOAT3>>::iterator, bool>& translations{
                         animation.translations.emplace(gltfSampler.output, gltfAccessor.count)
                     };
                     if (translations.second)

@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "TitleScene.h"
 #include "PuzzleFrame.h"
+#include "BlockManager.h"
 
 void GameScene::CreateResource()
 {
@@ -20,9 +21,6 @@ void GameScene::CreateResource()
 	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game.png");
 #endif // _DEBUG
 
-
-	hexagon.CreateResource();
-
 	PuzzleFrame::Instance().CreateResource();
 }
 
@@ -34,7 +32,11 @@ void GameScene::Initialize()
 
 	PuzzleFrame::Instance().Initialize();
 
-	hexagon.Initialize();
+	BlockManager::Instance().Initialize();
+	/*for (int i = 0; i < 10; i++)
+	{
+		BlockManager::Instance().Register(new Block);
+	}*/
 
 }
 
@@ -53,7 +55,7 @@ void GameScene::Update(const float& elapsedTime)
 		Regal::Scene::SceneManager::Instance().ChangeScene(new TitleScene);
 	}
 
-	hexagon.Update(elapsedTime);
+	BlockManager::Instance().Update(elapsedTime);
 
 	PuzzleFrame::Instance().Update(elapsedTime);
 }
@@ -92,7 +94,7 @@ void GameScene::Render(const float& elapsedTime)
 	{
 		graphics.Set3DStates();
 
-		hexagon.Render();
+		BlockManager::Instance().Render();
 
 
 		PuzzleFrame::Instance().Render();
@@ -126,7 +128,7 @@ void GameScene::DrawDebug()
 
 	sprite->DrawDebug();
 
-	hexagon.DrawDebug();
+	BlockManager::Instance().DrawDebug();
 
 	PuzzleFrame::Instance().DrawDebug();
 }
