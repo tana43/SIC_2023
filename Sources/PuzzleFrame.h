@@ -110,5 +110,6 @@ private:
     char gridsState[MAX_FRAME_HEIGHT][MAX_FRAME_WIDTH];
 
     std::unique_ptr<Regal::Model::StaticModel> frameModel;
+
 };
 

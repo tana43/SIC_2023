@@ -1,5 +1,6 @@
 #include "BlocksGroup.h"
 #include "BlockManager.h"
+#include "PuzzleFrame.h"
 
 BlocksGroup::BlocksGroup() : GameObject("BlocksGroup")
 {
@@ -17,28 +18,48 @@ void BlocksGroup::CreateResource()
 
 void BlocksGroup::Initialize()
 {
-	for (auto& block :blocks)
-	{
-		block->Initialize();
-	}
+	gridPos.x = GenerationPosX;
+	gridPos.y = GenerationPosY;
+
+	auto blockGridPos = gridPos;
+	blocks[0]->SetGridPos(gridPos);
+
+	blockGridPos = { gridPos.x - 1,gridPos.y };
+	blocks[1]->SetGridPos(gridPos);
+
+	blockGridPos = { gridPos.x, gridPos.y - 1};
+	blocks[2]->SetGridPos(gridPos);
+
+	blockGridPos = { gridPos.x - 1, gridPos.y - 1};
+	blocks[3]->SetGridPos(gridPos);
 }
 
 void BlocksGroup::Update(float elapsedTime)
 {
-	for (auto& block : blocks)
-	{
-		block->Update(elapsedTime);
-	}
+	auto blockGridPos = gridPos;
+	blocks[0]->SetGridPos(gridPos);
+
+	blockGridPos = { gridPos.x - 1,gridPos.y };
+	blocks[1]->SetGridPos(gridPos);
+
+	blockGridPos = { gridPos.x, gridPos.y - 1 };
+	blocks[2]->SetGridPos(gridPos);
+
+	blockGridPos = { gridPos.x - 1, gridPos.y - 1 };
+	blocks[3]->SetGridPos(gridPos);
+}
+
+void BlocksGroup::Render()
+{
+	
 }
 
 void BlocksGroup::DrawDebug()
 {
 	if (ImGui::BeginMenu(name.c_str()))
 	{
-		for (auto& block : blocks)
-		{
-			block->DrawDebug();
-		}
+		ImGui::SliderInt("GridPosX", &gridPos.x,0,PuzzleFrame::MAX_FRAME_WIDTH);
+		ImGui::SliderInt("GridPosY", &gridPos.y,0,PuzzleFrame::MAX_FRAME_HEIGHT);
 		ImGui::EndMenu();
 	}
 }

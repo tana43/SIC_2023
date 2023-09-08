@@ -30,7 +30,7 @@ void BlockManager::Update(float elapsedTime)
 		{
 			blocks.erase(it);
 		}
-		//弾丸の破棄処理
+		//ブロックの破棄処理
 		delete block;
 	}
 	//破棄リストクリア

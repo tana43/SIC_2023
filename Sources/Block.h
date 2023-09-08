@@ -11,8 +11,18 @@ public:
         int x{};
         int y{};
     };
+    
+    enum BlockType
+    {
+        RED,
+        CYAN,
+        GREEN,
+        PURPLE,
+        END
+    };
 
-    Block():GameObject("Block") {}
+    //デフォルト引数の場合乱数で決める
+    Block(int type = -1);
     ~Block() {}
 
     void CreateResource()override;
@@ -44,6 +54,8 @@ public:
     void SetGridPos(const GridPosition pos) { gridPos = pos; }
 
     const bool GetIsPlaced() const { return isPlaced; }
+
+    const int GetType() const { return type; }
     
 private:
     std::unique_ptr<Regal::Model::StaticModel> model;
@@ -61,5 +73,7 @@ private:
 
     //DirectX::XMFLOAT2 blockInterval{DirectX::XMFLOAT2(2.5f,4.0f)};
     float blockInterval{2.5f};
+
+    int type;
 };
 

@@ -57,6 +57,8 @@ public:
 			return 0;
 		}
 
+		std::srand(time(NULL));
+
 		// ImGui‰Šú‰»(DirectX11‚Ì‰Šú‰»‚Ì‰º‚É’u‚­‚±‚Æ)
 		IMGUI_CTRL_INITIALIZE(hwnd, graphics.GetDevice(), graphics.GetDeviceContext());
 

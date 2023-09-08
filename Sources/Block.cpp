@@ -3,6 +3,11 @@
 
 DirectX::XMFLOAT2 Block::STARTING_POS = DirectX::XMFLOAT2(5.0f, 2.0f);
 
+Block::Block(int type) : GameObject("GameObject"),type(type)
+{
+	if (type == -1)this->type = rand() % BlockType::END;
+}
+
 void Block::CreateResource()
 {
     //model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
@@ -14,6 +19,22 @@ void Block::Initialize()
 	model->GetTransform()->SetRotationX(DirectX::XMConvertToRadians(45));
 	model->GetTransform()->SetRotationY(DirectX::XMConvertToRadians(90));
 	model->GetTransform()->SetScale(DirectX::XMFLOAT3(0.8f,1,1));
+
+	switch (type)
+	{
+	case BlockType::RED:
+		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f));
+		break;
+	case BlockType::CYAN:
+		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0.0f,1.0f,1.0f,1.0f));
+		break;
+	case BlockType::GREEN:
+		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0.4f,1.0f,0.0f,1.0f));
+		break;
+	case BlockType::PURPLE:
+		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f));
+		break;
+	}
 }
 
 void Block::Update(float elapsedTime)

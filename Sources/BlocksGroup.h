@@ -5,6 +5,10 @@
 class BlocksGroup : Regal::Game::GameObject
 {
 public:
+    //生成グリッド座標
+    static const int GenerationPosX = 12;
+    static const int GenerationPosY = 10;
+
     BlocksGroup();
     ~BlocksGroup() {}
 
@@ -16,5 +20,7 @@ public:
 
 private:
     Block* blocks[4];
+
+    Block::GridPosition gridPos{GenerationPosX,GenerationPosY};
 };
 
