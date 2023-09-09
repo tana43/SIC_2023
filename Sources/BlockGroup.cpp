@@ -93,12 +93,12 @@ void BlockGroup::DrawDebug()
 	}
 }
 
-void BlockGroup::MoveDown(int moveDistance)
+bool BlockGroup::MoveDown(int moveDistance)
 {
 	//ブロックが下に動いても枠の外に出ないかチェック
 	for (auto& block : blocks)
 	{
-		if (!block->CanMoveDown(moveDistance))return;
+		if (!block->CanMoveDown(moveDistance))return false;
 	}
 
 	Block::GridPosition moveGridPos{
@@ -114,6 +114,8 @@ void BlockGroup::MoveDown(int moveDistance)
 	{
 		block->MoveDown(moveDistance);
 	}
+
+	return true;
 }
 
 void BlockGroup::MoveRight(int moveDistance)

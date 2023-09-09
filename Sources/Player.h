@@ -16,6 +16,8 @@ public:
 
     void UseBlocksMove();
 
+    void AutoFallBlock(float elapsedTime);
+
     //----------------------------INPUT-------------------------------------
     
     //決定ボタン
@@ -70,5 +72,9 @@ private:
 
     int hp;
     int power;//攻撃力
+
+    //ブロックの自動落下
+    float autoFallTime;
+    float autoFallTimer;
 };
 

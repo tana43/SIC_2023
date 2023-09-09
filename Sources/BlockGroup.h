@@ -18,7 +18,7 @@ public:
     void Render()override;
     void DrawDebug()override;
 
-    void MoveDown(int moveDistance);
+    bool MoveDown(int moveDistance);
     void MoveRight(int moveDistance);
     void MoveLeft(int moveDistance);
 
