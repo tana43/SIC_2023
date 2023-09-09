@@ -2,6 +2,9 @@
 #include "TitleScene.h"
 #include "PuzzleFrame.h"
 #include "BlockManager.h"
+#include "GameManager.h"
+
+#define ENABLE_PARTICLE 1
 
 void GameScene::CreateResource()
 {
@@ -22,6 +25,11 @@ void GameScene::CreateResource()
 #endif // _DEBUG
 
 	PuzzleFrame::Instance().CreateResource();
+
+#if ENABLE_PARTICLE
+	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
+#endif // ENABLE_PARTICLE
+
 }
 
 void GameScene::Initialize()
@@ -37,6 +45,16 @@ void GameScene::Initialize()
 	{
 		BlockManager::Instance().Register(new Block);
 	}*/
+
+	blockGroup.CreateResource();
+	blockGroup.Initialize();
+
+	GameManager::Instance().Initialize();
+	GameManager::GetPlayer().SetUseBlockGroup(&blockGroup);
+	
+#if ENABLE_PARTICLE
+	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
+#endif // ENABLE_PARTICLE
 
 }
 
@@ -58,6 +76,14 @@ void GameScene::Update(const float& elapsedTime)
 	BlockManager::Instance().Update(elapsedTime);
 
 	PuzzleFrame::Instance().Update(elapsedTime);
+
+	blockGroup.Update(elapsedTime);
+
+	GameManager::Instance().Update(elapsedTime);
+#if ENABLE_PARTICLE
+	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
+#endif // ENABLE_PARTICLE
+
 }
 
 void GameScene::End()
@@ -86,9 +112,12 @@ void GameScene::Render(const float& elapsedTime)
 #endif // _DEBUG
 	}
 
+#if ENABLE_PARTICLE
 	//パーティクル
 	graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
 	immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
+	BGParticles->Render(graphics.GetDeviceContext());
+#endif // ENABLE_PARTICLE
 
 	//3D
 	{
@@ -98,6 +127,8 @@ void GameScene::Render(const float& elapsedTime)
 
 
 		PuzzleFrame::Instance().Render();
+
+		GameManager::Instance().Render();
 	}
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffer->Deactivate(immediateContext);
@@ -131,6 +162,12 @@ void GameScene::DrawDebug()
 	BlockManager::Instance().DrawDebug();
 
 	PuzzleFrame::Instance().DrawDebug();
+
+	blockGroup.DrawDebug();
+
+	GameManager::Instance().DrawDebug();
+
+	BGParticles->DrawDebug();
 }
 
 void GameScene::PostEffectDrawDebug()

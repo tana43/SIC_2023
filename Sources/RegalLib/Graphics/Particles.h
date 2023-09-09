@@ -24,7 +24,7 @@ namespace Regal::Graphics
         struct  ParticleConstants
         {
             DirectX::XMFLOAT3 emitterPosition{};
-            float particleSize{ 0.02f };
+            float particleSize{ 0.08f };
             float time{};
             float deltaTime{};
             float something[2];

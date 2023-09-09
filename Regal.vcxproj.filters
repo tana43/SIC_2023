@@ -190,8 +190,11 @@
     <ClCompile Include="Sources\GameManager.cpp">
       <Filter>Game\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\BlocksGroup.cpp">
+    <ClCompile Include="Sources\BlockGroup.cpp">
       <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Player.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -333,8 +336,11 @@
     <ClInclude Include="Sources\GameManager.h">
       <Filter>Game\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\BlocksGroup.h">
+    <ClInclude Include="Sources\BlockGroup.h">
       <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Player.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

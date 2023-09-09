@@ -13,9 +13,9 @@ void PuzzleFrame::Initialize()
     //TransformŠe€–ÚÝ’è
     auto* transform{ frameModel->GetTransform() };
     //transform->SetRotationY(DirectX::XMConvertToRadians(90));
-    transform->SetScaleFactor(0.7f);
+    transform->SetScaleFactor(0.75f);
     //transform->SetScale(DirectX::XMFLOAT3(0.5f, 1, 0.8f));
-    transform->SetPosition(DirectX::XMFLOAT3(5.0f,-2.8f,0));
+    transform->SetPosition(DirectX::XMFLOAT3(2.1f,1.2f,0));
 
     //ƒJƒƒ‰ˆÊ’u‚ðÝ’è
     {
@@ -24,8 +24,8 @@ void PuzzleFrame::Initialize()
 
         DirectX::XMFLOAT3 eyePos;
         eyePos = transform->GetPosition();
-        eyePos.y += 20.0f;
-        eyePos.z -= 60.0f;
+        eyePos.y += 30.0f;
+        eyePos.z -= 70.0f;
         cTransform->SetPosition(eyePos);
     }
 }
@@ -111,8 +111,19 @@ bool PuzzleFrame::SetBlockDetection(int gridX, int gridY)
     if (gridX < 0 || gridX >= MAX_FRAME_WIDTH)return false;
     if (gridY < 0 || gridY >= MAX_FRAME_HEIGHT)return false;
 
-    if (gridsState[gridY][gridX] == 0) return true;
+    if (gridsState[gridY][gridX] == NONE) return true;
 
+    return false;
+}
+
+bool PuzzleFrame::MoveBlockDetection(int gridX, int gridY)
+{
+    if (gridX < 0 || gridX >= MAX_FRAME_WIDTH)return false;
+    if (gridY < 0 || gridY >= MAX_FRAME_HEIGHT)return false;
+
+    if (gridsState[gridY][gridX] == NONE || gridsState[gridY][gridX] == LIMIT) return true;
+
+    return false;
     return false;
 }
 

@@ -2,6 +2,7 @@
 
 #include "./RegalLib/Regal.h"
 #include "Block.h"
+#include "BlockGroup.h"
 
 class GameScene final : public Regal::Scene::BaseScene
 {
@@ -33,7 +34,11 @@ private:
     std::unique_ptr<Regal::Resource::Sprite> sprite;
 #endif // _DEBUG
 
+    BlockGroup blockGroup;
 
     //Hexagon hexagon;
+
+    //背景用パーティクル
+    std::unique_ptr<Regal::Graphics::Particles> BGParticles;
 };
 

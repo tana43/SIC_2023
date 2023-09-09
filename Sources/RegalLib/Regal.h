@@ -11,6 +11,8 @@
 #include <d3d11.h>
 #include <wrl.h>
 
+//std::clamp‚Æ‚©Žg‚¦‚é‚æ‚¤‚É‚·‚é‚â‚Â
+#include <algorithm>
 
 #include "Resource/Sprite.h"
 #include "Resource/SpriteBatch.h"

@@ -5,6 +5,7 @@ class Block : public Regal::Game::GameObject
 {
 public:
     static DirectX::XMFLOAT2 STARTING_POS;
+    static constexpr float blockInterval = 2.5f;
 
     struct GridPosition
     {
@@ -22,7 +23,7 @@ public:
     };
 
     //デフォルト引数の場合乱数で決める
-    Block(int type = -1);
+    Block(bool onGrid = true,int type = -1);
     ~Block() {}
 
     void CreateResource()override;
@@ -39,10 +40,14 @@ public:
 
     //下方向に移動できるかを返す　引数は移動距離
     bool CanMoveDown(int moveDistance);
+    bool CanMoveRight(int moveDistance);
+    bool CanMoveLeft(int moveDistance);
     //下方向に移動
     void MoveDown(int moveDistance);
+    void MoveRight(int moveDistance);
+    void MoveLeft(int moveDistance);
 
-    const Regal::Game::Transform* GetTransform() const { return model->GetTransform(); }
+    Regal::Game::Transform* GetTransform() const { return model->GetTransform(); }
 
     Regal::Resource::SkinnedMesh* GetSkinnedMesh() { return model->GetSkinnedMesh(); }
 
@@ -56,6 +61,8 @@ public:
     const bool GetIsPlaced() const { return isPlaced; }
 
     const int GetType() const { return type; }
+
+    void SetOnGrid(const bool og) { onGrid = og; }
     
 private:
     std::unique_ptr<Regal::Model::StaticModel> model;
@@ -72,8 +79,10 @@ private:
     GridPosition gridPos;//マス目でみた現在の座標
 
     //DirectX::XMFLOAT2 blockInterval{DirectX::XMFLOAT2(2.5f,4.0f)};
-    float blockInterval{2.5f};
 
     int type;
+
+    //マス目上にそって動くかどうかのフラグ
+    bool onGrid;
 };
 
