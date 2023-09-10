@@ -788,6 +788,7 @@ namespace Regal::Resource
 
             Constants data;
             data.emissiveIntensity = emissiveIntencity;
+            data.emissiveColor = emissiveColor;
             DirectX::XMStoreFloat4x4(&data.world,
                 DirectX::XMLoadFloat4x4(&mesh.defaultGlobalTransform) * DirectX::XMLoadFloat4x4(&world));
             for (size_t boneIndex = 0; boneIndex < MAX_BONES; ++boneIndex)
@@ -834,6 +835,7 @@ namespace Regal::Resource
             //transform.DrawDebug();
 
             ImGui::ColorEdit4("Color", &color.x);
+            ImGui::ColorEdit4("Emissive Color", &emissiveColor.x);
             ImGui::SliderFloat("Emissive Intencity", &emissiveIntencity, 0.0f, 10.0f);
 
             /*if (ImGui::TreeNode("Material"))

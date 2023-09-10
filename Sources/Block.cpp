@@ -23,16 +23,16 @@ void Block::Initialize()
 	switch (type)
 	{
 	case BlockType::RED:
-		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f));
+		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f));
 		break;
 	case BlockType::CYAN:
-		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0.0f,1.0f,1.0f,1.0f));
+		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.0f,1.0f,1.0f,1.0f));
 		break;
 	case BlockType::GREEN:
-		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0.4f,1.0f,0.0f,1.0f));
+		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.4f,1.0f,0.0f,1.0f));
 		break;
 	case BlockType::PURPLE:
-		model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f));
+		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f));
 		break;
 	}
 }

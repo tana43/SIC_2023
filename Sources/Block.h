@@ -1,5 +1,6 @@
 #pragma once
 #include "RegalLib/Regal.h"
+#include "PuzzleFrame.h"
 
 class Block : public Regal::Game::GameObject
 {
@@ -55,7 +56,7 @@ public:
 
     Regal::Resource::SkinnedMesh* GetSkinnedMesh() { return model->GetSkinnedMesh(); }
 
-    void SetEmissiveColor(const DirectX::XMFLOAT4 color) { model->GetSkinnedMesh()->SetColor(color); }
+    void SetEmissiveColor(const DirectX::XMFLOAT4 color) { model->GetSkinnedMesh()->SetEmissiveColor(color); }
 
     void SetEmissiveIntensity(const float intensity) { model->GetSkinnedMesh()->SetEmissiveIntensity(intensity); }
 

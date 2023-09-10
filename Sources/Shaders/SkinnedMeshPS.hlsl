@@ -36,5 +36,5 @@ float4 main(VS_OUT pin) : SV_TARGET
     //Emissive
     float3 emissive = textureMaps[2].Sample(samplerStates[LINEAR], pin.texcoord).rgb;
     
-    return /*float4(diffuse + specular, alpha) + */color + float4(emissive * emissiveIntensity,alpha) * pin.color;
+    return /*float4(diffuse + specular, alpha) + */color * pin.color + float4(emissive * emissiveIntensity,alpha) * emissiveColor;
 }

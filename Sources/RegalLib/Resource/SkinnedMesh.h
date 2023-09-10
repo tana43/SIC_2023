@@ -161,6 +161,7 @@ namespace Regal::Resource
         {
             DirectX::XMFLOAT4X4 world;
             DirectX::XMFLOAT4 materialColor;
+            DirectX::XMFLOAT4 emissiveColor;
             DirectX::XMFLOAT4X4 boneTransforms[MAX_BONES]{ {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1} };
             float emissiveIntensity = 2.0f;
             float dummys[3];
@@ -243,6 +244,7 @@ namespace Regal::Resource
         Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
         DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
+        DirectX::XMFLOAT4 emissiveColor{ 1, 1, 1, 1 };
 
     public:
         SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate = false, float samplingRate = 0);
@@ -267,6 +269,9 @@ namespace Regal::Resource
         bool AppendAnimations(const char* animationFilename, float samplingRate);
 
         void BlendAnimations(const Animation::Keyframe* keyframes[2], float factor, Animation::Keyframe& keyframe);
+
+        void SetEmissiveColor(const DirectX::XMFLOAT4 col) { emissiveColor = col; }
+        const DirectX::XMFLOAT4 GetEmissiveColor() const { return emissiveColor; }
 
         void SetColor(const DirectX::XMFLOAT4 col) { color = col; }
         const DirectX::XMFLOAT4 GetColor() const { return color; }

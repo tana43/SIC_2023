@@ -1,6 +1,6 @@
 #include "PuzzleFrame.h"
-#include "BlockManager.h"
 #include "Easing.h"
+#include "BlockManager.h"
 
 void PuzzleFrame::CreateResource()
 {
@@ -125,12 +125,13 @@ void PuzzleFrame::CheckChainBlock(Block* block)
             if (b->GetAbility()) 
             {
                 //アドレスが異なるアビリティを持っているので、どちらかに統合する
-                auto saBlocks{ BlockManager::Instance().GetSameAbilityBlocks(b->GetAbility()) };
+                std::vector<Block*> saBlocks;
+                BlockManager::Instance().FindSameAbilityBlocks(b->GetAbility(),saBlocks);
 
                 for (auto& saBlock : saBlocks)
                 {
                     //アビリティ統合
-                    saBlock.SetAbility(block->GetAbility());
+                    saBlock->SetAbility(block->GetAbility());
                 }
             }
         }
@@ -152,11 +153,11 @@ void PuzzleFrame::CheckChainBlock(Block* block)
         }
         else//隣接しているブロックがチェインしていない
         {
-            auto cAbility{std::make_unique<ChainAbility>()};
+            auto cAbility{new ChainAbility};
             cAbility->type = block->GetType();
 
-            block->SetAbility(cAbility.get());
-            b->SetAbility(cAbility.get());
+            block->SetAbility(cAbility);
+            b->SetAbility(cAbility);
             chainAbilitys.emplace_back(cAbility);
 
             //チェイン数は同アドレスのアビリティを持ったブロックの個数で算出する！！
@@ -253,4 +254,7 @@ void PuzzleFrame::Clear()
             gridsState[y][x] = INIT_GRID_STATES[y][x];
         }
     }
+
+    //アビリティ配列リセット
+    chainAbilitys.clear();
 }

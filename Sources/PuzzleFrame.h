@@ -1,6 +1,7 @@
 #pragma once
 #include "RegalLib/Regal.h"
-#include "Block.h"
+
+class Block;
 
 using GridState = int;
 
