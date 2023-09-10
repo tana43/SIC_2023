@@ -98,6 +98,16 @@ public:
     //引数のマス目にブロックが通過できる状態かどうかを返す、できるならtrue
     bool MoveBlockDetection(int gridX,int gridY);
 
+    char GetGridState(int gridX, int gridY) 
+    {
+        if (gridX < 0 || gridX >= MAX_FRAME_WIDTH)return OUT_RANGE;
+        if (gridY < 0 || gridY >= MAX_FRAME_WIDTH)return OUT_RANGE;
+        return gridsState[gridY][gridX]; 
+    }
+
+    //引数のマス目が設置されたブロックも含めた枠の底についているかを返す
+    //bool IsBlockOnButtom(int gridX,int gridY);
+
     //マス目上のX座標、y座標からmapのキーに対応したint値に変換する
    /* int ConvertToCombindGridXY(int gridX, int gridY)
     {

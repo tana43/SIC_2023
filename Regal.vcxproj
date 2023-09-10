@@ -215,6 +215,7 @@
     <ClCompile Include="External\imgui\imgui_tables.cpp" />
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Sources\BaseColorController.cpp" />
+    <ClCompile Include="Sources\BlockGroupManager.cpp" />
     <ClCompile Include="Sources\BlockManager.cpp" />
     <ClCompile Include="Sources\BlockGroup.cpp" />
     <ClCompile Include="Sources\Framework.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="External\imgui\imstb_textedit.h" />
     <ClInclude Include="External\imgui\imstb_truetype.h" />
     <ClInclude Include="Sources\BaseColorController.h" />
+    <ClInclude Include="Sources\BlockGroupManager.h" />
     <ClInclude Include="Sources\BlockManager.h" />
     <ClInclude Include="Sources\BlockGroup.h" />
     <ClInclude Include="Sources\Framework.h" />

@@ -74,10 +74,13 @@ bool PuzzleFrame::SetBlockOnGrid(Block* block)
     auto gridPos{ block->GetGridPos() };
 
     //ê›íuÇ≈Ç´Ç»Ç¢
-    if (!SetBlockDetection(gridPos.x, gridPos.y))return false;
+   /* if (!SetBlockDetection(gridPos.x, gridPos.y))
+    {
+        return false;
+    }*/
 
-    gridsState[gridPos.x][gridPos.y] = 1;
-    gridsBlock[gridPos.x][gridPos.y] = block;
+    gridsState[gridPos.y][gridPos.x] = 1;
+    gridsBlock[gridPos.y][gridPos.x] = block;
 
     return true;
 }
@@ -124,8 +127,19 @@ bool PuzzleFrame::MoveBlockDetection(int gridX, int gridY)
     if (gridsState[gridY][gridX] == NONE || gridsState[gridY][gridX] == LIMIT) return true;
 
     return false;
-    return false;
 }
+
+//bool PuzzleFrame::IsBlockOnButtom(int gridX, int gridY)
+//{
+//    gridX -= 1;
+//    gridY -= 1;
+//    if (gridX < 0)return true;
+//    if (gridY < 0)return true;
+//
+//    if (gridsState[gridY][gridX] == ON_BLOCK || gridsState[gridY][gridX] == OUT_RANGE) return true;
+//
+//    return false;
+//}
 
 void PuzzleFrame::Clear()
 {

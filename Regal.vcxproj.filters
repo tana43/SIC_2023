@@ -196,6 +196,9 @@
     <ClCompile Include="Sources\Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\BlockGroupManager.cpp">
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -341,6 +344,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Player.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\BlockGroupManager.h">
+      <Filter>Game\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

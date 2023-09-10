@@ -33,7 +33,7 @@ public:
     void DrawDebug()override;
 
     //ブロックが地面に設置された時に呼ぶ
-    void SetOnGrid();
+    void PutOnGrid();
 
     //グリッド座標からワールド座標に変換し、Transformに入れる
     void ConvertToWorldPos();

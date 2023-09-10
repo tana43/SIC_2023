@@ -2,6 +2,7 @@
 #include "TitleScene.h"
 #include "PuzzleFrame.h"
 #include "BlockManager.h"
+#include "BlockGroupManager.h"
 #include "GameManager.h"
 
 #define ENABLE_PARTICLE 1
@@ -41,16 +42,13 @@ void GameScene::Initialize()
 	PuzzleFrame::Instance().Initialize();
 
 	BlockManager::Instance().Initialize();
+
+	BlockGroupManager::Instance().Initialize();
 	/*for (int i = 0; i < 10; i++)
 	{
 		BlockManager::Instance().Register(new Block);
 	}*/
-
-	blockGroup.CreateResource();
-	blockGroup.Initialize();
-
 	GameManager::Instance().Initialize();
-	GameManager::GetPlayer().SetUseBlockGroup(&blockGroup);
 	
 #if ENABLE_PARTICLE
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
@@ -75,9 +73,11 @@ void GameScene::Update(const float& elapsedTime)
 
 	BlockManager::Instance().Update(elapsedTime);
 
+	BlockGroupManager::Instance().Update(elapsedTime);
+
 	PuzzleFrame::Instance().Update(elapsedTime);
 
-	blockGroup.Update(elapsedTime);
+	//blockGroup.Update(elapsedTime);
 
 	GameManager::Instance().Update(elapsedTime);
 #if ENABLE_PARTICLE
@@ -160,6 +160,8 @@ void GameScene::DrawDebug()
 	sprite->DrawDebug();
 
 	BlockManager::Instance().DrawDebug();
+
+	BlockGroupManager::Instance().DrawDebug();
 
 	PuzzleFrame::Instance().DrawDebug();
 

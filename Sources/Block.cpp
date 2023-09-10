@@ -71,7 +71,7 @@ void Block::DrawDebug()
 	ImGui::End();
 }
 
-void Block::SetOnGrid()
+void Block::PutOnGrid()
 {
 	PuzzleFrame::Instance().SetBlockOnGrid(this);
 

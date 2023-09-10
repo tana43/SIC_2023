@@ -37,6 +37,14 @@ public:
         }
     }
 
+    //設置されたブロックか底についているか
+    bool IsButtom();
+
+    //ブロックを枠内に設置、固定
+    void PutOnGrid();
+
+    const bool CanMoveDown();
+
 private:
     Block* blocks[4];
 

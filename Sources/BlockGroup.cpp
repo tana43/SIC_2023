@@ -183,3 +183,39 @@ void BlockGroup::RotLeft()
 	blocks[0] = blocks[3];
 	blocks[3] = temp;
 }
+
+bool BlockGroup::IsButtom()
+{
+	char checkStates[5]{
+		PuzzleFrame::Instance().GetGridState(blocks[0]->GetGridPos().x - 1, blocks[0]->GetGridPos().y - 1),
+		PuzzleFrame::Instance().GetGridState(blocks[0]->GetGridPos().x - 1, blocks[0]->GetGridPos().y),
+		PuzzleFrame::Instance().GetGridState(blocks[0]->GetGridPos().x, blocks[0]->GetGridPos().y - 1),
+		PuzzleFrame::Instance().GetGridState(blocks[1]->GetGridPos().x, blocks[1]->GetGridPos().y - 1),
+		PuzzleFrame::Instance().GetGridState(blocks[3]->GetGridPos().x - 1, blocks[3]->GetGridPos().y)
+	};
+
+	for (auto& state : checkStates)
+	{
+		if (state == PuzzleFrame::ON_BLOCK || state == PuzzleFrame::OUT_RANGE)return true;
+	}
+	return false;
+}
+
+void BlockGroup::PutOnGrid()
+{
+	for (auto& block : blocks)
+	{
+		PuzzleFrame::Instance().SetBlockOnGrid(block);
+		block->PutOnGrid();
+	}
+}
+
+const bool BlockGroup::CanMoveDown()
+{
+	//ブロックが下に動いても枠の外に出ないかチェック
+	for (auto& block : blocks)
+	{
+		if (!block->CanMoveDown(1))return false;
+	}
+	return true;
+}

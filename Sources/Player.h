@@ -17,6 +17,10 @@ public:
     void UseBlocksMove();
 
     void AutoFallBlock(float elapsedTime);
+    void AutoSetBlock(float elapsedTime);
+
+    //使用ブロックを切り替えるときに呼ぶ
+    void ChangeUseBG();
 
     //----------------------------INPUT-------------------------------------
     
@@ -62,10 +66,12 @@ public:
 
     //----------------------------------------------------------------------
 
-    void SetUseBlockGroup(BlockGroup* blockGroup) { useBlockGroup = blockGroup; }
+    void SetUseBlockGroup(BlockGroup* blockGroup) 
+    { 
+        useBlockGroup = blockGroup;
+        useBlockGroup->SetOnGrid(true);
+    }
     BlockGroup* GetUseBlockGroup() { return useBlockGroup; }
-
-    void DestroyUseBlock() { delete useBlockGroup; }
 
 private:
     BlockGroup* useBlockGroup;
@@ -76,5 +82,9 @@ private:
     //ブロックの自動落下
     float autoFallTime;
     float autoFallTimer;
+
+    //ブロック強制設置時間
+    float autoSetTime;
+    float autoSetTimer;
 };
 

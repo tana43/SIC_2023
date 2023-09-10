@@ -1,4 +1,5 @@
 #include "GameManager.h"
+#include "BlockGroupManager.h"
 
 //スコアの管理、ゲームの進行を担うクラス
 
@@ -14,8 +15,11 @@ void GameManager::Initialize()
     for (auto& group : nextBlockGroups)
     {
         group = new BlockGroup(false);
-        group->CreateResource();
+        BlockGroupManager::Instance().Register(group);
     }
+
+    //プレイヤーに使用ブロックセット
+    NextBlockUse();
 }
 
 void GameManager::Update(float elapsedTime)
@@ -28,7 +32,7 @@ void GameManager::Update(float elapsedTime)
             nBlockPos.x, nBlockPos.y - nBlockInterval * i,nBlockPos.z
         ));
 
-        nextBlockGroups[i]->Update(elapsedTime);
+        //nextBlockGroups[i]->Update(elapsedTime);
     }
 }
 
@@ -60,18 +64,12 @@ void GameManager::DrawDebug()
 
 void GameManager::Render()
 {
-    for (auto& group : nextBlockGroups)
-    {
-        group->Render();
-    }
 }
 
 void GameManager::NextBlockUse()
 {
-    //すでにプレイヤーがブロックの操作権を持っている場合破棄
-    if (player->GetUseBlockGroup())player->DestroyUseBlock();
-
     //プレイヤーが次のブロックを操作できるようにする
+    nextBlockGroups[0]->Initialize();
     player->SetUseBlockGroup(nextBlockGroups[0]);
 
     //次のブロックを１つ上げる
@@ -79,7 +77,8 @@ void GameManager::NextBlockUse()
     nextBlockGroups[1] = nextBlockGroups[2];
     nextBlockGroups[2] = nextBlockGroups[3];
     nextBlockGroups[3] = new BlockGroup(false);
+    BlockGroupManager::Instance().Register(nextBlockGroups[3]);
 
     //ブロックがなめらかに動いてるように見せたいだけ
-    nBlockInterval = OFFSET_Y;
+    //nBlockInterval = OFFSET_Y;
 }

@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "PuzzleFrame.h"
+#include "GameManager.h"
 
 void Player::Initialize()
 {
@@ -6,13 +8,19 @@ void Player::Initialize()
     power = 0;
     autoFallTime = 1.5f;
     autoFallTimer = 0;
+    autoSetTime = 0.5f;
+    autoSetTimer = 0;
 }
 
 void Player::Update(float elapsedTime)
 {
+    //useBlockGroup->Update(elapsedTime);
+
     UseBlocksMove();
 
     AutoFallBlock(elapsedTime);
+
+    AutoSetBlock(elapsedTime);
 }
 
 void Player::DrawDebug()
@@ -71,4 +79,34 @@ void Player::AutoFallBlock(float elapsedTime)
     }
 
     autoFallTimer += elapsedTime;
+}
+
+void Player::AutoSetBlock(float elapsedTime)
+{
+    //接地している
+    if (useBlockGroup->IsButtom() && !useBlockGroup->CanMoveDown())
+    {
+        autoSetTimer += elapsedTime;
+        autoFallTimer = 0;
+    }
+    else//接地していない
+    {
+        autoSetTimer = 0;
+    }
+
+    //ブロックを設置
+    if (autoSetTimer > autoSetTime)
+    {
+        useBlockGroup->PutOnGrid();
+        autoSetTimer = 0;
+
+        ChangeUseBG();
+    }
+}
+
+void Player::ChangeUseBG()
+{
+    GameManager::Instance().NextBlockUse();
+
+
 }

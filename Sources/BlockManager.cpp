@@ -80,6 +80,7 @@ void BlockManager::Clear()
 	{
 		delete block;
 	}
+	blocks.clear();
 }
 
 void BlockManager::Register(Block* block)
