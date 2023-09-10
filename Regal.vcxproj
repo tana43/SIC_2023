@@ -263,6 +263,7 @@
     <ClInclude Include="Sources\BlockGroupManager.h" />
     <ClInclude Include="Sources\BlockManager.h" />
     <ClInclude Include="Sources\BlockGroup.h" />
+    <ClInclude Include="Sources\Easing.h" />
     <ClInclude Include="Sources\Framework.h" />
     <ClInclude Include="Sources\GameManager.h" />
     <ClInclude Include="Sources\GameScene.h" />

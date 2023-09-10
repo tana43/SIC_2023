@@ -48,6 +48,16 @@ public:
         return Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::D);
     }
 
+    //‰E‰ºA¶‰ºˆÚ“®
+    static const bool MoveBottomRightButton()
+    {
+        return Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::C);
+    }
+    static const bool MoveBottomLeftButton()
+    {
+        return Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Z);
+    }
+
     //¶‰E‰ñ“]
     static const bool RotRightButton()
     {

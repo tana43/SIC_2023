@@ -28,6 +28,17 @@ private:
 
 public:
 
+    //役が揃っている場合、チェイン + 追加効果 とかにする
+    //チェイン数は４つ以上にならない効果を発揮しないが２つ以上の時点でブロックにアビリティ自体は付与される
+    struct ChainAbility
+    {
+        int chain;//チェイン数
+        int basePower;//効果に応じた攻撃力
+        int lastPower;//消去時に与える攻撃力
+
+        char type;
+    };
+
     //枠の大きさ
     static const int MAX_FRAME_WIDTH = 22;
     static const int MAX_FRAME_HEIGHT = 22;
@@ -84,6 +95,9 @@ public:
     //設置されている各ブロックと内部的なデータの同期
     void CheckBlocks();
 
+    //対象のブロックからチェインしているブロックがあるならアビリティ生成
+    void CheckChainBlock(Block* block);
+
     //ブロックを設置
     bool SetBlockOnGrid(Block* block);
 
@@ -121,6 +135,8 @@ public:
 
     void Clear();
 
+    std::vector<std::unique_ptr<ChainAbility>>& GetChainAbilitys() { return chainAbilitys; }
+
 private:
     //そのマス目の状態を管理する　ブロックがないならnullptrを入れる
     Block* gridsBlock[MAX_FRAME_HEIGHT][MAX_FRAME_WIDTH];
@@ -128,5 +144,6 @@ private:
 
     std::unique_ptr<Regal::Model::StaticModel> frameModel;
 
+    std::vector<std::unique_ptr<ChainAbility>> chainAbilitys;
 };
 

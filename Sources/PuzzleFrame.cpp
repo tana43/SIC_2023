@@ -1,5 +1,6 @@
 #include "PuzzleFrame.h"
 #include "BlockManager.h"
+#include "Easing.h"
 
 void PuzzleFrame::CreateResource()
 {
@@ -32,7 +33,38 @@ void PuzzleFrame::Initialize()
 
 void PuzzleFrame::Update(float elapsedTime)
 {
-    
+    //ブロックどっかから順にくるくるさせようぜ
+    static float timer = 0;
+
+    for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
+    {
+        float time = timer + y * 0.1f;
+        for (int x = 0; x < MAX_FRAME_WIDTH; x++)
+        {
+            if (gridsBlock[y][x] == nullptr)continue;
+
+            if (time > 3.0f && time < 4.0f)
+            {
+                gridsBlock[y][x]->GetTransform()->SetRotationY(
+                    Easing::InOutCubic(time - 3.0f, 1.0f/*演出時間*/, DirectX::XM_PIDIV2 + DirectX::XM_PI, DirectX::XM_PIDIV2)
+                );
+            }
+            else
+            {
+                gridsBlock[y][x]->GetTransform()->SetRotationY(DirectX::XM_PIDIV2);
+            }
+        }
+
+        if (y == 0)
+        {
+            if (timer > 5.0f)
+            {
+                timer = 0;
+            }
+        }
+    }
+
+    timer += elapsedTime;
 }
 
 void PuzzleFrame::Render()
@@ -66,6 +98,73 @@ void PuzzleFrame::CheckBlocks()
         if (!block->GetIsPlaced())continue;
 
         SetBlockOnGrid(block);
+    }
+}
+
+void PuzzleFrame::CheckChainBlock(Block* block)
+{
+    //隣接しているブロックを全て調べる
+    Block* blocks[8];
+    blocks[0] = gridsBlock[block->GetGridPos().x + 1][block->GetGridPos().y + 1];//上
+    blocks[2] = gridsBlock[block->GetGridPos().x + 1][block->GetGridPos().y];//右上
+    blocks[1] = gridsBlock[block->GetGridPos().x][block->GetGridPos().y + 1];//左上
+    blocks[3] = gridsBlock[block->GetGridPos().x - 1][block->GetGridPos().y + 1];//右
+    blocks[4] = gridsBlock[block->GetGridPos().x + 1][block->GetGridPos().y - 1];//左
+    blocks[5] = gridsBlock[block->GetGridPos().x][block->GetGridPos().y - 1];//右下
+    blocks[6] = gridsBlock[block->GetGridPos().x - 1][block->GetGridPos().y];//左下
+    blocks[7] = gridsBlock[block->GetGridPos().x - 1][block->GetGridPos().y - 1];//下
+
+    //再帰後、連鎖するブロックを検索している場合は処理を変える
+    if (block->GetAbility())//すでにアビリティが付与されている場合
+    {
+        for (auto& b : blocks)
+        {
+            if (block->GetType() != b->GetType())continue;
+            if (block->GetAbility() == b->GetAbility())continue;
+
+            if (b->GetAbility()) 
+            {
+                //アドレスが異なるアビリティを持っているので、どちらかに統合する
+                auto saBlocks{ BlockManager::Instance().GetSameAbilityBlocks(b->GetAbility()) };
+
+                for (auto& saBlock : saBlocks)
+                {
+                    //アビリティ統合
+                    saBlock.SetAbility(block->GetAbility());
+                }
+            }
+        }
+
+        return;
+    }
+
+    //一度も再帰していない
+    for (auto& b : blocks)
+    {
+        //タイプが同じではないならcontinue
+        if (b->GetType() != block->GetType())continue;
+
+        //隣接しているブロックがすでにチェインしている場合はそれに追加する
+        if (b->GetAbility())
+        {
+            auto cAbility{ b->GetAbility() };
+            block->SetAbility(cAbility);
+        }
+        else//隣接しているブロックがチェインしていない
+        {
+            auto cAbility{std::make_unique<ChainAbility>()};
+            cAbility->type = block->GetType();
+
+            block->SetAbility(cAbility.get());
+            b->SetAbility(cAbility.get());
+            chainAbilitys.emplace_back(cAbility);
+
+            //チェイン数は同アドレスのアビリティを持ったブロックの個数で算出する！！
+            //cAbility->chain = 2;
+
+            //再帰
+            CheckChainBlock(b);
+        }
     }
 }
 

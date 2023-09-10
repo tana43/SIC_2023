@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Block.h"
+#include "PuzzleFrame.h"
 
 class BlockManager
 {
@@ -30,6 +31,9 @@ public:
     void Remove(Block* block);
 
     std::vector<Block*>& GetBlocks() { return blocks; }
+
+    //引数と同じアビリティを持ったブロックの配列を作成し、返す
+    std::vector<Block> GetSameAbilityBlocks(PuzzleFrame::ChainAbility* cAbility);
 
 private:
     std::vector<Block*> blocks;

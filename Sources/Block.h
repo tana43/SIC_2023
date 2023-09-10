@@ -42,10 +42,14 @@ public:
     bool CanMoveDown(int moveDistance);
     bool CanMoveRight(int moveDistance);
     bool CanMoveLeft(int moveDistance);
+    bool CanMoveBottomRight(int moveDistance);
+    bool CanMoveBottomLeft(int moveDistance);
     //下方向に移動
     void MoveDown(int moveDistance);
     void MoveRight(int moveDistance);
     void MoveLeft(int moveDistance);
+    void MoveBottomRight(int moveDistance);
+    void MoveBottomLeft(int moveDistance);
 
     Regal::Game::Transform* GetTransform() const { return model->GetTransform(); }
 
@@ -64,6 +68,9 @@ public:
 
     void SetOnGrid(const bool og) { onGrid = og; }
     
+    void SetAbility(PuzzleFrame::ChainAbility* ca) { ability = ca; }
+    PuzzleFrame::ChainAbility* GetAbility() { return ability; }
+
 private:
     std::unique_ptr<Regal::Model::StaticModel> model;
 
@@ -84,5 +91,8 @@ private:
 
     //マス目上にそって動くかどうかのフラグ
     bool onGrid;
+
+    //ブロックが所属するチェイン効果のアドレス（役が揃ってるとかチェインしてるとか）
+    PuzzleFrame::ChainAbility* ability;
 };
 

@@ -95,7 +95,7 @@ void BlockGroup::DrawDebug()
 
 bool BlockGroup::MoveDown(int moveDistance)
 {
-	//ブロックが下に動いても枠の外に出ないかチェック
+	//ブロックが動いても枠の外に出ないかチェック
 	for (auto& block : blocks)
 	{
 		if (!block->CanMoveDown(moveDistance))return false;
@@ -120,7 +120,7 @@ bool BlockGroup::MoveDown(int moveDistance)
 
 void BlockGroup::MoveRight(int moveDistance)
 {
-	//ブロックが下に動いても枠の外に出ないかチェック
+	//ブロックが動いても枠の外に出ないかチェック
 	for (auto& block : blocks)
 	{
 		if (!block->CanMoveRight(moveDistance))return;
@@ -143,7 +143,7 @@ void BlockGroup::MoveRight(int moveDistance)
 
 void BlockGroup::MoveLeft(int moveDistance)
 {
-	//ブロックが下に動いても枠の外に出ないかチェック
+	//ブロックが動いても枠の外に出ないかチェック
 	for (auto& block : blocks)
 	{
 		if (!block->CanMoveLeft(moveDistance))return;
@@ -162,6 +162,56 @@ void BlockGroup::MoveLeft(int moveDistance)
 	{
 		block->MoveLeft(moveDistance);
 	}
+}
+
+bool BlockGroup::MoveBottomRight(int moveDistance)
+{
+	//ブロックが動いても枠の外に出ないかチェック
+	for (auto& block : blocks)
+	{
+		if (!block->CanMoveBottomRight(moveDistance))return false;
+	}
+
+	Block::GridPosition moveGridPos{
+		gridPos.x,
+		gridPos.y - moveDistance
+	};
+	moveGridPos.x = std::clamp(moveGridPos.x, 0, PuzzleFrame::MAX_FRAME_WIDTH);
+	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
+
+	gridPos = moveGridPos;
+
+	for (auto& block : blocks)
+	{
+		block->MoveBottomRight(moveDistance);
+	}
+
+	return true;
+}
+
+bool BlockGroup::MoveBottomLeft(int moveDistance)
+{
+	//ブロックが動いても枠の外に出ないかチェック
+	for (auto& block : blocks)
+	{
+		if (!block->CanMoveBottomLeft(moveDistance))return false;
+	}
+
+	Block::GridPosition moveGridPos{
+		gridPos.x - moveDistance,
+		gridPos.y
+	};
+	moveGridPos.x = std::clamp(moveGridPos.x, 0, PuzzleFrame::MAX_FRAME_WIDTH);
+	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
+
+	gridPos = moveGridPos;
+
+	for (auto& block : blocks)
+	{
+		block->MoveBottomLeft(moveDistance);
+	}
+
+	return true;
 }
 
 void BlockGroup::RotRight()
@@ -184,7 +234,7 @@ void BlockGroup::RotLeft()
 	blocks[3] = temp;
 }
 
-bool BlockGroup::IsButtom()
+bool BlockGroup::IsBottom()
 {
 	char checkStates[5]{
 		PuzzleFrame::Instance().GetGridState(blocks[0]->GetGridPos().x - 1, blocks[0]->GetGridPos().y - 1),

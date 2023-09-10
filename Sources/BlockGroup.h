@@ -11,7 +11,7 @@ public:
 
     BlockGroup(bool onGrid = true);
     ~BlockGroup() {}
-
+    
     void CreateResource()override;
     void Initialize()override;
     void Update(float elapsedTime)override;
@@ -21,6 +21,8 @@ public:
     bool MoveDown(int moveDistance);
     void MoveRight(int moveDistance);
     void MoveLeft(int moveDistance);
+    bool MoveBottomRight(int moveDistance);
+    bool MoveBottomLeft(int moveDistance);
 
     void RotRight();
     void RotLeft();
@@ -38,7 +40,7 @@ public:
     }
 
     //設置されたブロックか底についているか
-    bool IsButtom();
+    bool IsBottom();
 
     //ブロックを枠内に設置、固定
     void PutOnGrid();

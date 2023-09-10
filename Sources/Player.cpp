@@ -58,6 +58,28 @@ void Player::UseBlocksMove()
     {
         useBlockGroup->MoveLeft(1);
     }
+    else if (MoveBottomRightButton())
+    {
+        if (useBlockGroup->MoveBottomRight(1))
+        {
+            //自動落下時間リセット
+            autoFallTimer = 0;
+
+            //自動設置時間リセット
+            autoSetTimer = 0;
+        }
+    }
+    else if (MoveBottomLeftButton())
+    {
+        if (useBlockGroup->MoveBottomLeft(1))
+        {
+            //自動落下時間リセット
+            autoFallTimer = 0;
+
+            //自動設置時間リセット
+            autoSetTimer = 0;
+        }
+    }
 
     //ブロック回転
     if (RotRightButton())
@@ -84,7 +106,7 @@ void Player::AutoFallBlock(float elapsedTime)
 void Player::AutoSetBlock(float elapsedTime)
 {
     //接地している
-    if (useBlockGroup->IsButtom() && !useBlockGroup->CanMoveDown())
+    if (useBlockGroup->IsBottom() && !useBlockGroup->CanMoveDown())
     {
         autoSetTimer += elapsedTime;
         autoFallTimer = 0;

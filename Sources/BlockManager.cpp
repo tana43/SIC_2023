@@ -94,3 +94,15 @@ void BlockManager::Remove(Block* block)
 {
 	removes.emplace_back(block);
 }
+
+std::vector<Block> BlockManager::GetSameAbilityBlocks(PuzzleFrame::ChainAbility* cAbility)
+{
+	std::vector<Block> saBlocks;
+
+	for (Block* block : blocks)
+	{
+		if (block->GetAbility() == cAbility)saBlocks.emplace_back(block);
+	}
+
+	return saBlocks;
+}

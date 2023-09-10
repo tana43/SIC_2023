@@ -115,6 +115,24 @@ bool Block::CanMoveLeft(int moveDistance)
 	return false;
 }
 
+bool Block::CanMoveBottomRight(int moveDistance)
+{
+	GridPosition moveGridPos{ gridPos.x,gridPos.y - moveDistance };
+
+	if (PuzzleFrame::Instance().MoveBlockDetection(moveGridPos.x, moveGridPos.y))return true;
+
+	return false;
+}
+
+bool Block::CanMoveBottomLeft(int moveDistance)
+{
+	GridPosition moveGridPos{ gridPos.x - moveDistance,gridPos.y};
+
+	if (PuzzleFrame::Instance().MoveBlockDetection(moveGridPos.x, moveGridPos.y))return true;
+
+	return false;
+}
+
 void Block::MoveDown(int moveDistance)
 {
 	GridPosition moveGridPos{
@@ -144,6 +162,30 @@ void Block::MoveLeft(int moveDistance)
 	GridPosition moveGridPos{
 		gridPos.x - moveDistance,
 		gridPos.y + moveDistance
+	};
+	moveGridPos.x = std::clamp(moveGridPos.x, 0, PuzzleFrame::MAX_FRAME_WIDTH);
+	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
+
+	gridPos = moveGridPos;
+}
+
+void Block::MoveBottomRight(int moveDistance)
+{
+	GridPosition moveGridPos{
+		gridPos.x,
+		gridPos.y - moveDistance
+	};
+	moveGridPos.x = std::clamp(moveGridPos.x, 0, PuzzleFrame::MAX_FRAME_WIDTH);
+	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
+
+	gridPos = moveGridPos;
+}
+
+void Block::MoveBottomLeft(int moveDistance)
+{
+	GridPosition moveGridPos{
+		gridPos.x - moveDistance,
+		gridPos.y
 	};
 	moveGridPos.x = std::clamp(moveGridPos.x, 0, PuzzleFrame::MAX_FRAME_WIDTH);
 	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
