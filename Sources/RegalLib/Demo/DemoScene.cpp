@@ -20,7 +20,7 @@ namespace Regal::Demo
 
 		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
 		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
-		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/Stage02.fbx");
+		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/EnemyType01.fbx");
 
 		/*for (size_t i = 0; i < 500; i++)
 		{

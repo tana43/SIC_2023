@@ -474,6 +474,11 @@ namespace Regal::Graphics
 		immediateContext->OMSetBlendState(blendStates[blendState].Get(), nullptr, 0xFFFFFFFF);
 	}
 
+	void Graphics::SetRSState(int rasterizerState)
+	{
+		immediateContext->RSSetState(rasterizerStates[rasterizerState].Get());
+	}
+
 	void Graphics::Set2DStates()
 	{
 		immediateContext->OMSetDepthStencilState(setting2DDepthStencilState, 1);

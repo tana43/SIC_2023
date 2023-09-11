@@ -90,7 +90,7 @@ void BlockGroupManager::Register(BlockGroup* BlockGroup)
 	BlockGroup->Initialize();
 }
 
-void BlockGroupManager::Remove(BlockGroup* BlockGroup)
+void BlockGroupManager::Destroy(BlockGroup* BlockGroup)
 {
 	removes.emplace_back(BlockGroup);
 }

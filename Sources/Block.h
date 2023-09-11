@@ -72,6 +72,11 @@ public:
     void SetAbility(PuzzleFrame::ChainAbility* ca) { ability = ca; }
     PuzzleFrame::ChainAbility* GetAbility() { return ability; }
 
+    void Spin() { isSpin = true; }
+
+private:
+    void SpinUpdate(float elapsedTime);
+
 private:
     std::unique_ptr<Regal::Model::StaticModel> model;
 
@@ -95,5 +100,9 @@ private:
 
     //ブロックが所属するチェイン効果のアドレス（役が揃ってるとかチェインしてるとか）
     PuzzleFrame::ChainAbility* ability;
+
+    //見た目だけ回転させる用フラグ
+    bool isSpin;
+    float spinTimer;
 };
 

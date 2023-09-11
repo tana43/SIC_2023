@@ -27,7 +27,7 @@ public:
     //¶¬‚µ‚½ƒuƒƒbƒN‚Ì“o˜^
     void Register(Block* block);
 
-    void Remove(Block* block);
+    void Destroy(Block* block);
 
     std::vector<Block*>& GetBlocks() { return blocks; }
 

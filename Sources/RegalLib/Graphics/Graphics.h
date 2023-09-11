@@ -60,7 +60,9 @@ namespace Regal::Graphics
 		void CreateStates();
 
 		//各種ステートをセット
-		void SetStates(int depthStencilState, int rastarizeState, int blendState);
+		void SetStates(int depthStencilState, int rastarizerState, int blendState);
+
+		void SetRSState(int rasterizerState);
 
 		//2D用のステートをセット
 		void Set2DStates();

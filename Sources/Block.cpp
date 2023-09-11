@@ -1,5 +1,6 @@
 #include "Block.h"
 #include "PuzzleFrame.h"
+#include "Easing.h"
 
 DirectX::XMFLOAT2 Block::STARTING_POS = DirectX::XMFLOAT2(5.0f, 2.0f);
 
@@ -19,6 +20,8 @@ void Block::Initialize()
 	model->GetTransform()->SetRotationX(DirectX::XMConvertToRadians(45));
 	model->GetTransform()->SetRotationY(DirectX::XMConvertToRadians(90));
 	model->GetTransform()->SetScale(DirectX::XMFLOAT3(0.8f,1,1));
+
+	model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f);
 
 	switch (type)
 	{
@@ -41,13 +44,19 @@ void Block::Update(float elapsedTime)
 {
 	if (isPlaced)//接地している場合
 	{
-		
+		//チェイン発動中なら発光を強くする
+		if (ability)
+		{
+			if (ability->chain >= 4)
+			{
+				model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f + ability->chain * 0.2f);
+			}
+		}
 	}
-	else
-	{
-		
-	}
+	
 	if(onGrid)ConvertToWorldPos();
+
+	SpinUpdate(elapsedTime);
 }
 
 void Block::Render()
@@ -191,4 +200,23 @@ void Block::MoveBottomLeft(int moveDistance)
 	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
 
 	gridPos = moveGridPos;
+}
+
+void Block::SpinUpdate(float elapsedTime)
+{
+	if (isSpin)
+	{
+		GetTransform()->SetRotationY(
+			Easing::InOutCubic(spinTimer, 0.6f, DirectX::XM_PIDIV2 + DirectX::XM_PI * 2, DirectX::XM_PIDIV2)
+		);
+
+		if (spinTimer > 0.6f)
+		{
+			GetTransform()->SetRotationY(DirectX::XM_PIDIV2);
+			isSpin = false;
+			spinTimer = 0;
+		}
+
+		spinTimer += elapsedTime;
+	}
 }

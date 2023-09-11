@@ -25,8 +25,8 @@ void PuzzleFrame::Initialize()
 
         DirectX::XMFLOAT3 eyePos;
         eyePos = transform->GetPosition();
-        eyePos.y += 30.0f;
-        eyePos.z -= 70.0f;
+        eyePos.y += 43.0f;
+        eyePos.z -= 88.0f;
         cTransform->SetPosition(eyePos);
     }
 }
@@ -34,34 +34,32 @@ void PuzzleFrame::Initialize()
 void PuzzleFrame::Update(float elapsedTime)
 {
     //ブロックどっかから順にくるくるさせようぜ
-    static float timer = 0;
+
+    static float timer;
 
     for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
     {
-        float time = timer + y * 0.1f;
+        float time = timer - 0.15f * y;
         for (int x = 0; x < MAX_FRAME_WIDTH; x++)
         {
-            if (gridsBlock[y][x] == nullptr)continue;
+            auto block = GetGridBlock(x,y);
+            if (block == nullptr)continue;
 
-            if (time > 3.0f && time < 4.0f)
+            if (time > 5.0f && time < 5.5f)
             {
-                gridsBlock[y][x]->GetTransform()->SetRotationY(
-                    Easing::InOutCubic(time - 3.0f, 1.0f/*演出時間*/, DirectX::XM_PIDIV2 + DirectX::XM_PI, DirectX::XM_PIDIV2)
-                );
+                block->Spin();
             }
-            else
+
+            if (time > 10.0f && time < 10.5f)
             {
-                gridsBlock[y][x]->GetTransform()->SetRotationY(DirectX::XM_PIDIV2);
+                block->Spin();
             }
         }
+    }
 
-        if (y == 0)
-        {
-            if (timer > 5.0f)
-            {
-                timer = 0;
-            }
-        }
+    if (timer > 14.0f)
+    {
+        timer = 0;
     }
 
     timer += elapsedTime;
@@ -86,6 +84,11 @@ void PuzzleFrame::DrawDebug()
     }
 }
 
+void PuzzleFrame::ChainAbilityUpdate(float elapsedTime)
+{
+    
+}
+
 void PuzzleFrame::CheckBlocks()
 {
     //一度枠の情報を全てリセット
@@ -105,20 +108,21 @@ void PuzzleFrame::CheckChainBlock(Block* block)
 {
     //隣接しているブロックを全て調べる
     Block* blocks[8];
-    blocks[0] = gridsBlock[block->GetGridPos().x + 1][block->GetGridPos().y + 1];//上
-    blocks[2] = gridsBlock[block->GetGridPos().x + 1][block->GetGridPos().y];//右上
-    blocks[1] = gridsBlock[block->GetGridPos().x][block->GetGridPos().y + 1];//左上
-    blocks[3] = gridsBlock[block->GetGridPos().x - 1][block->GetGridPos().y + 1];//右
-    blocks[4] = gridsBlock[block->GetGridPos().x + 1][block->GetGridPos().y - 1];//左
-    blocks[5] = gridsBlock[block->GetGridPos().x][block->GetGridPos().y - 1];//右下
-    blocks[6] = gridsBlock[block->GetGridPos().x - 1][block->GetGridPos().y];//左下
-    blocks[7] = gridsBlock[block->GetGridPos().x - 1][block->GetGridPos().y - 1];//下
+    blocks[0] = GetGridBlock(block->GetGridPos().x + 1,block->GetGridPos().y + 1);  //上
+    blocks[2] = GetGridBlock(block->GetGridPos().x + 1,block->GetGridPos().y);      //右上
+    blocks[1] = GetGridBlock(block->GetGridPos().x,block->GetGridPos().y + 1);      //左上
+    blocks[3] = GetGridBlock(block->GetGridPos().x - 1,block->GetGridPos().y + 1);   //右
+    blocks[4] = GetGridBlock(block->GetGridPos().x + 1,block->GetGridPos().y - 1);  //左
+    blocks[5] = GetGridBlock(block->GetGridPos().x,block->GetGridPos().y - 1);      //右下
+    blocks[6] = GetGridBlock(block->GetGridPos().x - 1,block->GetGridPos().y);      //左下
+    blocks[7] = GetGridBlock(block->GetGridPos().x - 1,block->GetGridPos().y - 1);  //下
 
     //再帰後、連鎖するブロックを検索している場合は処理を変える
     if (block->GetAbility())//すでにアビリティが付与されている場合
     {
         for (auto& b : blocks)
         {
+            if (b == nullptr)continue;
             if (block->GetType() != b->GetType())continue;
             if (block->GetAbility() == b->GetAbility())continue;
 
@@ -139,9 +143,11 @@ void PuzzleFrame::CheckChainBlock(Block* block)
         return;
     }
 
-    //一度も再帰していない
+    //一度も再帰していLない
     for (auto& b : blocks)
     {
+        if (b == nullptr)continue;
+
         //タイプが同じではないならcontinue
         if (b->GetType() != block->GetType())continue;
 
@@ -160,12 +166,17 @@ void PuzzleFrame::CheckChainBlock(Block* block)
             b->SetAbility(cAbility);
             chainAbilitys.emplace_back(cAbility);
 
-            //チェイン数は同アドレスのアビリティを持ったブロックの個数で算出する！！
-            //cAbility->chain = 2;
-
             //再帰
             CheckChainBlock(b);
         }
+    }
+
+    //各アビリティのチェイン数を同アドレスを持ったブロック数で算出
+    for (auto& cAbility : chainAbilitys)
+    {   
+        std::vector<Block*> blocks;
+        BlockManager::Instance().FindSameAbilityBlocks(cAbility.get(), blocks);
+        cAbility->chain = static_cast<int>(blocks.size());
     }
 }
 
@@ -227,6 +238,16 @@ bool PuzzleFrame::MoveBlockDetection(int gridX, int gridY)
     if (gridsState[gridY][gridX] == NONE || gridsState[gridY][gridX] == LIMIT) return true;
 
     return false;
+}
+
+Block* PuzzleFrame::GetGridBlock(int gridX, int gridY)
+{
+    if (gridX < 0 || gridX >= MAX_FRAME_WIDTH)return nullptr;
+    if (gridY < 0 || gridY >= MAX_FRAME_HEIGHT)return nullptr;
+
+    if (gridsState[gridY][gridX] != ON_BLOCK) return nullptr;
+
+    return gridsBlock[gridY][gridX];
 }
 
 //bool PuzzleFrame::IsBlockOnButtom(int gridX, int gridY)

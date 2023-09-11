@@ -193,12 +193,16 @@
     <ClCompile Include="Sources\BlockGroup.cpp">
       <Filter>Game\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Player.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\BlockGroupManager.cpp">
       <Filter>Game\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\EnemyManager.cpp">
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Player.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Enemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -342,15 +346,19 @@
     <ClInclude Include="Sources\BlockGroup.h">
       <Filter>Game\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Player.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\BlockGroupManager.h">
       <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Easing.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\EnemyManager.h">
+      <Filter>Game\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Player.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Enemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">

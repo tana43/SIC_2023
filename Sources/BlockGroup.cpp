@@ -258,6 +258,12 @@ void BlockGroup::PutOnGrid()
 		PuzzleFrame::Instance().SetBlockOnGrid(block);
 		block->PutOnGrid();
 	}
+
+	for (auto& block : blocks)
+	{
+		//連結しているブロックがないかチェック
+		PuzzleFrame::Instance().CheckChainBlock(block);
+	}
 }
 
 const bool BlockGroup::CanMoveDown()

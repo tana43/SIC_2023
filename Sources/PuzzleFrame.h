@@ -93,10 +93,12 @@ public:
     void Render()override;
     void DrawDebug()override;
 
+    void ChainAbilityUpdate(float elapsedTime);
+
     //設置されている各ブロックと内部的なデータの同期
     void CheckBlocks();
 
-    //対象のブロックからチェインしているブロックがあるならアビリティ生成
+    //対象のブロックからチェインしているブロックがあるならアビリティ生成 ブロック設置時に呼ぶ
     void CheckChainBlock(Block* block);
 
     //ブロックを設置
@@ -119,6 +121,8 @@ public:
         if (gridY < 0 || gridY >= MAX_FRAME_WIDTH)return OUT_RANGE;
         return gridsState[gridY][gridX]; 
     }
+
+    Block* GetGridBlock(int gridX, int gridY);
 
     //引数のマス目が設置されたブロックも含めた枠の底についているかを返す
     //bool IsBlockOnButtom(int gridX,int gridY);

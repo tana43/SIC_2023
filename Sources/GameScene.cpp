@@ -4,6 +4,7 @@
 #include "BlockManager.h"
 #include "BlockGroupManager.h"
 #include "GameManager.h"
+#include "EnemyManager.h"
 
 #define ENABLE_PARTICLE 1
 
@@ -31,6 +32,7 @@ void GameScene::CreateResource()
 	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
 #endif // ENABLE_PARTICLE
 
+	GameManager::Instance().CreateResource();
 }
 
 void GameScene::Initialize()
@@ -48,7 +50,11 @@ void GameScene::Initialize()
 	{
 		BlockManager::Instance().Register(new Block);
 	}*/
+
+	EnemyManager::Instance().Initialize();
+
 	GameManager::Instance().Initialize();
+
 	
 #if ENABLE_PARTICLE
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
@@ -80,6 +86,9 @@ void GameScene::Update(const float& elapsedTime)
 	//blockGroup.Update(elapsedTime);
 
 	GameManager::Instance().Update(elapsedTime);
+
+	EnemyManager::Instance().Update(elapsedTime);
+
 #if ENABLE_PARTICLE
 	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
 #endif // ENABLE_PARTICLE
@@ -125,10 +134,11 @@ void GameScene::Render(const float& elapsedTime)
 
 		BlockManager::Instance().Render();
 
-
 		PuzzleFrame::Instance().Render();
 
 		GameManager::Instance().Render();
+
+		EnemyManager::Instance().Render();
 	}
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffer->Deactivate(immediateContext);
@@ -169,7 +179,11 @@ void GameScene::DrawDebug()
 
 	GameManager::Instance().DrawDebug();
 
+#if ENABLE_PARTICLE
 	BGParticles->DrawDebug();
+#endif // ENABLE_PARTICLE
+
+	EnemyManager::Instance().DrawDebug();
 }
 
 void GameScene::PostEffectDrawDebug()

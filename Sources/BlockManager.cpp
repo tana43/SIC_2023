@@ -90,7 +90,7 @@ void BlockManager::Register(Block* block)
 	block->Initialize();
 }
 
-void BlockManager::Remove(Block* block)
+void BlockManager::Destroy(Block* block)
 {
 	removes.emplace_back(block);
 }

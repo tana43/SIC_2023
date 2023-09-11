@@ -8,10 +8,10 @@ public:
     Player() : GameObject("Player") {}
     ~Player() {}
 
-    void CreateResource()override {}
+    void CreateResource()override;
     void Initialize()override;
     void Update(float elapsedTime)override;
-    void Render()override {}
+    void Render()override;
     void DrawDebug()override;
 
     void UseBlocksMove();
@@ -21,6 +21,8 @@ public:
 
     //使用ブロックを切り替えるときに呼ぶ
     void ChangeUseBG();
+
+    Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
 
     //----------------------------INPUT-------------------------------------
     
@@ -86,6 +88,9 @@ public:
 private:
     BlockGroup* useBlockGroup;
 
+    //自分が攻撃を喰らったときはカメラを振動
+    //敵に攻撃を与えたときは敵自体を振動させる
+
     int hp;
     int power;//攻撃力
 
@@ -96,5 +101,7 @@ private:
     //ブロック強制設置時間
     float autoSetTime;
     float autoSetTimer;
+
+    std::unique_ptr<Regal::Model::StaticModel> model;
 };
 

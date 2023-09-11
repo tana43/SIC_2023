@@ -1,11 +1,12 @@
 #include "GameManager.h"
 #include "BlockGroupManager.h"
+#include "EnemyManager.h"
 
 //スコアの管理、ゲームの進行を担うクラス
 
 void GameManager::CreateResource()
 {
-
+    player->CreateResource();
 }
 
 void GameManager::Initialize()
@@ -20,6 +21,8 @@ void GameManager::Initialize()
 
     //プレイヤーに使用ブロックセット
     NextBlockUse();
+
+    EnemyManager::Instance().Register(new Enemy);
 }
 
 void GameManager::Update(float elapsedTime)
@@ -64,6 +67,7 @@ void GameManager::DrawDebug()
 
 void GameManager::Render()
 {
+    player->Render();
 }
 
 void GameManager::NextBlockUse()
@@ -79,6 +83,14 @@ void GameManager::NextBlockUse()
     nextBlockGroups[3] = new BlockGroup(false);
     BlockGroupManager::Instance().Register(nextBlockGroups[3]);
 
+    //生成位置に描画されてしまうのを防止
+    for (int i = 0; i < 4; ++i)
+    {
+        nextBlockGroups[i]->SetPosition(DirectX::XMFLOAT3(
+            nBlockPos.x, nBlockPos.y - nBlockInterval * i, nBlockPos.z
+        ));
+        nextBlockGroups[i]->Update(0);
+    }
     //ブロックがなめらかに動いてるように見せたいだけ
     //nBlockInterval = OFFSET_Y;
 }

@@ -2,6 +2,11 @@
 #include "PuzzleFrame.h"
 #include "GameManager.h"
 
+void Player::CreateResource()
+{
+    model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+}
+
 void Player::Initialize()
 {
     hp = 10;
@@ -10,11 +15,18 @@ void Player::Initialize()
     autoFallTimer = 0;
     autoSetTime = 0.5f;
     autoSetTimer = 0;
+
+    model->GetTransform()->SetPositionX(-45.0f);
+    model->GetTransform()->SetPositionY(72.0f);
+    model->GetTransform()->SetScaleFactor(2.3f);
 }
 
 void Player::Update(float elapsedTime)
 {
     //useBlockGroup->Update(elapsedTime);
+
+    model->GetTransform()->AddRotationY(-0.1f * elapsedTime);
+    model->GetTransform()->AddRotationX(0.1f * elapsedTime);
 
     UseBlocksMove();
 
@@ -23,9 +35,16 @@ void Player::Update(float elapsedTime)
     AutoSetBlock(elapsedTime);
 }
 
+void Player::Render()
+{
+    model->Render();
+}
+
 void Player::DrawDebug()
 {
     ImGui::Begin(name.c_str());
+
+    model->DrawDebug();
     
     if (useBlockGroup)
     {
@@ -121,6 +140,8 @@ void Player::AutoSetBlock(float elapsedTime)
     {
         useBlockGroup->PutOnGrid();
         autoSetTimer = 0;
+
+        
 
         ChangeUseBG();
     }
