@@ -325,10 +325,13 @@ void PuzzleFrame::Clear()
     {
         for (int x = 0; x < MAX_FRAME_WIDTH; x++)
         {
-            gridsBlock[y][x]->Destroy();
+            if (gridsBlock[y][x])
+            {
+                gridsBlock[y][x]->Destroy();
 
-            //ブロック情報リセット
-            gridsBlock[y][x] = nullptr;
+                //ブロック情報リセット
+                gridsBlock[y][x] = nullptr;
+            }
 
             //ステート情報リセット
             gridsState[y][x] = INIT_GRID_STATES[y][x];
@@ -355,6 +358,7 @@ void PuzzleFrame::ActiveFrameAttack()
     {
         for (int x = 0; x < MAX_FRAME_WIDTH; x++)
         {
+            if (!gridsBlock[y][x])continue;
             if (gridsBlock[y][x]->GetAbility())continue;
             if (gridsBlock[y][x]->GetAbility()->chain < 4)continue;
 

@@ -14,6 +14,7 @@ void Block::CreateResource()
 {
     //model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
 	model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+	popEffect = std::make_unique<PopEffect>(100);
 }
 
 void Block::Initialize()
@@ -39,30 +40,46 @@ void Block::Initialize()
 		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f));
 		break;
 	}
+
+	popEffect->SetColor(model->GetSkinnedMesh()->GetEmissiveColor());
 }
 
 void Block::Update(float elapsedTime)
 {
-	if (isPlaced)//接地している場合
+	if (!isDestroy)
 	{
-		//チェイン発動中なら発光を強くする
-		if (ability)
+		if (isPlaced)//接地している場合
 		{
-			if (ability->chain >= 4)
+			//チェイン発動中なら発光を強くする
+			if (ability)
 			{
-				model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f + ability->chain * 0.2f);
+				if (ability->chain >= 4)
+				{
+					model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f + ability->chain * 0.2f);
+				}
 			}
 		}
-	}
-	
-	if(onGrid)ConvertToWorldPos();
+		if(onGrid)ConvertToWorldPos();
 
-	SpinUpdate(elapsedTime);
+		SpinUpdate(elapsedTime);
+	}
+	else
+	{
+		if(!popEffect->GetIsPlay())BlockManager::Instance().Remove(this);
+	}
+
+
+	popEffect->Update(elapsedTime);
 }
 
 void Block::Render()
 {
-	model->Render();
+	if (!isDestroy)
+	{
+		model->Render();
+	}
+
+	popEffect->Render();
 }
 
 void Block::DrawDebug()
@@ -74,6 +91,8 @@ void Block::DrawDebug()
 
 	ImGui::DragFloat("STARTING_POS_X", &STARTING_POS.x,0.1f);
 	ImGui::DragFloat("STARTING_POS_Y", &STARTING_POS.y,0.1f);
+
+	popEffect->DrawDebug();
 
 	ImGui::SetNextItemOpen(true, ImGuiCond_FirstUseEver);
 	model->DrawDebug();
@@ -205,7 +224,9 @@ void Block::MoveBottomLeft(int moveDistance)
 
 void Block::Destroy()
 {
-	BlockManager::Instance().Remove(this);
+	//BlockManager::Instance().Remove(this);
+	isDestroy = true;
+	popEffect->Play(GetTransform()->GetPosition());
 }
 
 void Block::SpinUpdate(float elapsedTime)

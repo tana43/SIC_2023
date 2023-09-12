@@ -2,6 +2,7 @@ cbuffer PARTICLE_CONSTANTS : register(b9)
 {
     float3 emitterPosition;
     float particleSize;
+    float4 color;
     float time;
     float deltaTime;
 };

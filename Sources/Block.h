@@ -1,6 +1,7 @@
 #pragma once
 #include "RegalLib/Regal.h"
 #include "PuzzleFrame.h"
+#include "PopEffect.h"
 
 class Block : public Regal::Game::GameObject
 {
@@ -108,5 +109,10 @@ private:
     //見た目だけ回転させる用フラグ
     bool isSpin;
     float spinTimer;
+
+    std::unique_ptr<PopEffect> popEffect;
+
+    //エフェクト再生終了まで破棄を待機するためのフラグ
+    bool isDestroy{ false };
 };
 

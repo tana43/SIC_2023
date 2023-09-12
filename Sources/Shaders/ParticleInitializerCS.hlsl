@@ -8,7 +8,7 @@ float rand(float n)
 }
 
 [numthreads(NUMTHREADS_X, 1, 1)]
-void main( uint3 dtid : SV_DISPATCHTHREADID)
+void main(uint3 dtid : SV_DISPATCHTHREADID)
 {
     uint id = dtid.x;
     
@@ -30,9 +30,9 @@ void main( uint3 dtid : SV_DISPATCHTHREADID)
     
     p.velocity.y = 2.0 * f1;
     
-    p.color.z = 1.0;
-    p.color.y = f0 * 0.5;
-    p.color.x = f0 * 0.05;
+    p.color.z = f0 * color.z;
+    p.color.y = f0 * color.y;
+    p.color.x = f0 * color.x;
     p.color.xyz *= 3.0;
     p.color.w = 1.0f;
     
@@ -41,3 +41,4 @@ void main( uint3 dtid : SV_DISPATCHTHREADID)
 
     particleBuffer[id] = p;
 }
+

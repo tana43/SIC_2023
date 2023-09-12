@@ -18,16 +18,20 @@ namespace Regal::Graphics
         float age{};
         int state{};
     };
-    struct Particles
+
+    class Particles
     {
+    public:
         const size_t maxParticleCount;
         struct  ParticleConstants
         {
             DirectX::XMFLOAT3 emitterPosition{};
             float particleSize{ 0.08f };
+            DirectX::XMFLOAT4 color;
             float time{};
             float deltaTime{};
             float something[2];
+
         };
         ParticleConstants particleData;
 
@@ -53,8 +57,20 @@ namespace Regal::Graphics
         //çXêVèàóù
         void Integrate(ID3D11DeviceContext* immediateContext, float deltaTime);
 
+        virtual void SetComputeShader(ID3D11Device* device);
+
         void Initialize(ID3D11DeviceContext* immediateContext, float deltaTime);
         void Render(ID3D11DeviceContext* immediateContext);
         void DrawDebug();
+
+        DirectX::XMFLOAT4 color{1.0f,1.0f,1.0f,1.0f};
+    };
+
+    class PopParticles : public Particles
+    {
+    public:
+        PopParticles(ID3D11Device* device, size_t particleCount) : Particles(device, particleCount) {}
+
+        void SetComputeShader(ID3D11Device* device) override;
     };
 }

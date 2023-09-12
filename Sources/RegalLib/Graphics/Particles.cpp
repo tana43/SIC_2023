@@ -51,8 +51,9 @@ namespace Regal::Graphics
         Shader::CreateVSFromCso(device, "./Resources/Shader/ParticleVS.cso", particleVS.ReleaseAndGetAddressOf(), NULL, NULL, 0);
         Shader::CreatePSFromCso(device, "./Resources/Shader/ParticlePS.cso", particlePS.ReleaseAndGetAddressOf());
         Shader::CreateGSFromCso(device, "./Resources/Shader/ParticleGS.cso", particleGS.ReleaseAndGetAddressOf());
-        Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
-        Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
+        //Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
+        //Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
+        SetComputeShader(device);
     }
 
     UINT Align(UINT num, UINT alignment)
@@ -78,12 +79,19 @@ namespace Regal::Graphics
         immediateContext->CSSetUnorderedAccessViews(0, 1, &nullUnorederedAccessView, NULL);
     }
 
+    void Particles::SetComputeShader(ID3D11Device* device)
+    {
+        Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
+        Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
+    }
+
     void Particles::Initialize(ID3D11DeviceContext* immediateContext, float deltaTime)
     {
         immediateContext->CSSetUnorderedAccessViews(0, 1, particleBufferUav.GetAddressOf(), NULL);
 
         particleData.time += deltaTime;
         particleData.deltaTime = deltaTime;
+        particleData.color = color;
         immediateContext->UpdateSubresource(constantBuffer.Get(), 0, 0, &particleData, 0, 0);
         immediateContext->CSSetConstantBuffers(9, 1, constantBuffer.GetAddressOf());
 
@@ -128,8 +136,14 @@ namespace Regal::Graphics
             ImGui::SliderFloat("Particle Size", &particleData.particleSize, 0.0f, 0.1f);
             ImGui::DragFloat3("Emitter Position", &particleData.emitterPosition.x, 0.1f);
             //ImGui::SliderFloat("Effect Time", &particleData.time,0.0f, 20.0f);
-
+            ImGui::ColorEdit4("Color",&color.x);
             ImGui::EndMenu();
         }
+    }
+
+    void PopParticles::SetComputeShader(ID3D11Device* device)
+    {
+        Shader::CreateCSFromCso(device, "./Resources/Shader/PopParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
+        Shader::CreateCSFromCso(device, "./Resources/Shader/PopParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
     }
 }
