@@ -31,10 +31,17 @@ public:
 
     Enemy* GetEnemy() { return curEnemy; }
 
+    void SetSpriteColor(const DirectX::XMFLOAT4 color) { hpGauge->SetColor(color.x, color.y, color.z, color.w); }
+
+    void Change();
+
 private:
     Enemy* curEnemy;
 
     std::vector<Enemy*> enemys;
     std::vector<Enemy*> removes;
+
+    std::unique_ptr<Regal::Resource::Sprite> hpGauge;
+    DirectX::XMFLOAT2 spritePos{150,40};
 };
 

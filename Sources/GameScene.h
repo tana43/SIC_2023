@@ -34,6 +34,9 @@ private:
     std::unique_ptr<Regal::Resource::Sprite> sprite;
 #endif // _DEBUG
 
+    std::unique_ptr<Regal::Resource::Sprite> sHealth;
+    std::unique_ptr<Regal::Resource::Sprite> sEnemy;
+
     BlockGroup blockGroup;
 
     //Hexagon hexagon;

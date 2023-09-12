@@ -9,8 +9,10 @@ void Player::CreateResource()
     for (auto& effect : projectilePopEffects)
     {
         effect = std::make_unique<PopEffect>(10);
-
     }
+
+    hpGauge = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
+        L"./Resources/Images/PlayerHpGauge.png");
 }
 
 void Player::Initialize()
@@ -135,6 +137,16 @@ void Player::Render()
         effect->Render();
     }
 
+    auto& graphics{ Regal::Graphics::Graphics::Instance() };
+
+    float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
+    graphics.Set2DStates();
+    hpGauge->_Render(graphics.GetDeviceContext(),
+        spritePos.x, spritePos.y,
+        300.0f * (static_cast<float>(hp) / static_cast<float>(maxHp)) * screenCorrection, 
+        10.0f * screenCorrection, 0, 0,
+        300.0f, 10, 0);
+    graphics.Set3DStates();
 }
 
 void Player::DrawDebug()
@@ -149,6 +161,8 @@ void Player::DrawDebug()
     }
 
     ImGui::SliderInt("HP", &hp, 0, maxHp);
+
+    ImGui::DragFloat2("Sprite Pos", &spritePos.x);
 
     ImGui::End();
     

@@ -13,6 +13,7 @@ public:
         PURPLE,
         RED,
         YELLOW,
+        END,
     };
 
     enum State
@@ -72,15 +73,27 @@ public:
     void OnDamaged();
     void OnDead();
 
+    int GetHp() { return hp; }
+    int GetMaxHp() { return maxHp; }
+
     PopEffect* GetPopEffect() { return projectilePopEffect.get(); }
 
     Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
 
+    const int GetType() const { return type; }
+
 private:
     int hp;
+    int maxHp;
     int power;
     float attackTimer;
     float attackCoolTime;
+
+    float deadTimer;
+
+    float eIntensity{1.5f};
+
+    float timer;
 
     int type;
     int state;

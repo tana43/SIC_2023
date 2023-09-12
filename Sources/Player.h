@@ -165,5 +165,8 @@ private:
     std::vector<Projectile*> removes;
 
     std::unique_ptr<PopEffect> projectilePopEffects[Block::BlockType::END];
+
+    std::unique_ptr<Regal::Resource::Sprite> hpGauge;
+    DirectX::XMFLOAT2 spritePos{34,670};
 };
 

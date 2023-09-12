@@ -36,13 +36,14 @@ void Enemy::Initialize()
         break;
     }
     hp = 1000;
+    maxHp = 1000;
     power = 3;
     attackTimer = 0;
 
     attackCoolTime = 8.0f;
 
     model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0, 0, 0, 1));
-    model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f);
+    model->GetSkinnedMesh()->SetEmissiveIntensity(0);
 
     model->GetTransform()->SetScaleFactor(8.0f);
     model->GetTransform()->SetPositionX(51.0f);
@@ -52,11 +53,18 @@ void Enemy::Initialize()
 
     projectilePopEffect->SetColor(DirectX::XMFLOAT4(1, 0.3f, 0.3f, 0.5f));
     projectilePopEffect->SetScale(1.5f);
+
+    EnemyManager::Instance().SetSpriteColor(model->GetSkinnedMesh()->GetEmissiveColor());
 }
 
 void Enemy::Update(float elapsedTime)
 {
     model->GetTransform()->AddRotationY(0.1f * elapsedTime);
+
+    if (timer < 2.0f)
+    {
+        model->GetSkinnedMesh()->SetEmissiveIntensity(timer * eIntensity);
+    }
 
     switch (state)
     {
@@ -76,6 +84,17 @@ void Enemy::Update(float elapsedTime)
         state = IDLE;
         break;
     case DIE:
+
+        model->GetSkinnedMesh()->SetEmissiveIntensity(eIntensity * (deadTimer - 1.0f));
+
+        if (deadTimer > 1.0f)
+        {
+            //エネミーを交代
+            EnemyManager::Instance().Change();
+            return;
+        }
+
+        deadTimer += elapsedTime;
         break;
     }
 
@@ -100,6 +119,8 @@ void Enemy::Update(float elapsedTime)
         delete projectile;
     }
     removes.clear();
+
+    timer += elapsedTime;
 }
 
 void Enemy::Render()
@@ -122,6 +143,8 @@ void Enemy::DrawDebug()
     {
         Shot();
     }
+
+    ImGui::SliderInt("HP", &hp, 0, 1000);
 
     model->DrawDebug();
 

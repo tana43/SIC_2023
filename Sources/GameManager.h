@@ -28,6 +28,7 @@ public:
 
     static Player& GetPlayer() { return *Instance().player; }
    
+    void AddStageLevel() { stageLevel++; }
 
     void NextBlockUse();
 

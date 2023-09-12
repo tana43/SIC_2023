@@ -25,6 +25,8 @@ void GameScene::CreateResource()
 #if _DEBUG
 	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game.png");
 #endif // _DEBUG
+	sHealth = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Health.png");
+	sEnemy = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Enemy.png");
 
 	PuzzleFrame::Instance().CreateResource();
 
@@ -38,7 +40,8 @@ void GameScene::CreateResource()
 void GameScene::Initialize()
 {
 #if _DEBUG
-	sprite->SetColor(1, 1, 1, 0.3f);
+	//sprite->SetColor(1, 1, 1, 0.3f);
+	sprite->SetColor(1, 1, 1, 0.0f);
 #endif // _DEBUG
 
 	PuzzleFrame::Instance().Initialize();
@@ -121,6 +124,12 @@ void GameScene::Render(const float& elapsedTime)
 		sprite->Render(graphics.GetDeviceContext(), 0, 0,
 			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 #endif // _DEBUG
+
+		sHealth->Render(graphics.GetDeviceContext(), 0, 0,
+			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+
+		sEnemy->Render(graphics.GetDeviceContext(), 0, 0,
+			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 	}
 
 #if ENABLE_PARTICLE
