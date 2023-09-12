@@ -225,6 +225,7 @@
     <ClCompile Include="Sources\GameScene.cpp" />
     <ClCompile Include="Sources\Block.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\Number.cpp" />
     <ClCompile Include="Sources\Player.cpp" />
     <ClCompile Include="Sources\PuzzleFrame.cpp" />
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="Sources\GameScene.h" />
     <ClInclude Include="Sources\Block.h" />
     <ClInclude Include="Sources\HighResolutionTimer.h" />
+    <ClInclude Include="Sources\Number.h" />
     <ClInclude Include="Sources\Player.h" />
     <ClInclude Include="Sources\PuzzleFrame.h" />
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h" />

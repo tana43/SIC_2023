@@ -22,6 +22,11 @@ public:
     //使用ブロックを切り替えるときに呼ぶ
     void ChangeUseBG();
 
+    bool ApplyDamage(int damage);
+
+    void OnDamaged();
+    void OnDead();
+
     Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
 
     //----------------------------INPUT-------------------------------------
@@ -92,6 +97,7 @@ private:
     //敵に攻撃を与えたときは敵自体を振動させる
 
     int hp;
+    int maxHp{100};
     int power;//攻撃力
 
     //ブロックの自動落下
@@ -103,5 +109,8 @@ private:
     float autoSetTimer;
 
     std::unique_ptr<Regal::Model::StaticModel> model;
+
+    float blinkTimer;
+    float blinkIntensity;
 };
 

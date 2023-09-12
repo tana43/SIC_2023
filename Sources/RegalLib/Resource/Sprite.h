@@ -15,6 +15,9 @@ namespace Regal::Resource
         void Render(ID3D11DeviceContext* immediateContext,
             float dx, float dy, float dw, float dh, float angle);
 
+        void _Render(ID3D11DeviceContext* immediateContext,
+            float dx, float dy, float dw, float dh,float sx,float sy,float sw,float sh, float angle);
+
         void Render(ID3D11DeviceContext* immediateContext,
             float dx, float dy, float dw, float dh,
             float r, float g, float b, float a,
@@ -36,7 +39,7 @@ namespace Regal::Resource
 
         void DrawDebug();
 
-        void SetEmissiveColor(float r,float g,float b,float a) { color[0] = r;color[1] = g;color[2] = b;color[3] = a; }
+        void SetColor(float r,float g,float b,float a) { color[0] = r;color[1] = g;color[2] = b;color[3] = a; }
 
         //シェーダーリソースビュー取得
         const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return shaderResourceView; }

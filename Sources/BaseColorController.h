@@ -2,6 +2,8 @@
 
 class BaseColorController
 {
-
+private:
+    BaseColorController() {}
+    ~BaseColorController() {}
 };
 

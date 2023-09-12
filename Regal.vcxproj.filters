@@ -202,7 +202,12 @@
     <ClCompile Include="Sources\Player.cpp">
       <Filter>Game\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Enemy.cpp" />
+    <ClCompile Include="Sources\Enemy.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Number.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -358,7 +363,12 @@
     <ClInclude Include="Sources\Player.h">
       <Filter>Game\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Enemy.h" />
+    <ClInclude Include="Sources\Enemy.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Number.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">

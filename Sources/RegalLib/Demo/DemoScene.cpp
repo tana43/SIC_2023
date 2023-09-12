@@ -34,7 +34,7 @@ namespace Regal::Demo
     void DemoScene::Initialize()
     {
 		particles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
-		sprite->SetEmissiveColor(1, 1, 1, 0.01f);
+		sprite->SetColor(1, 1, 1, 0.01f);
     }
 
     void DemoScene::Finalize()

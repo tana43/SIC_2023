@@ -38,7 +38,7 @@ void GameScene::CreateResource()
 void GameScene::Initialize()
 {
 #if _DEBUG
-	sprite->SetEmissiveColor(1, 1, 1, 0.3f);
+	sprite->SetColor(1, 1, 1, 0.3f);
 #endif // _DEBUG
 
 	PuzzleFrame::Instance().Initialize();
@@ -77,9 +77,9 @@ void GameScene::Update(const float& elapsedTime)
 		Regal::Scene::SceneManager::Instance().ChangeScene(new TitleScene);
 	}
 
-	BlockManager::Instance().Update(elapsedTime);
-
 	BlockGroupManager::Instance().Update(elapsedTime);
+
+	BlockManager::Instance().Update(elapsedTime);
 
 	PuzzleFrame::Instance().Update(elapsedTime);
 
@@ -93,6 +93,7 @@ void GameScene::Update(const float& elapsedTime)
 	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
 #endif // ENABLE_PARTICLE
 
+	Regal::Game::Camera::Instance().Update(elapsedTime);
 }
 
 void GameScene::End()

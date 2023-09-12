@@ -74,6 +74,10 @@ public:
 
     void Spin() { isSpin = true; }
 
+    void Destroy();
+
+    const std::unique_ptr<Regal::Model::StaticModel>& GetModel() const { return model; }
+
 private:
     void SpinUpdate(float elapsedTime);
 

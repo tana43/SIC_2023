@@ -97,6 +97,13 @@ namespace Regal::Resource
             color[0], color[1], color[2], color[3], angle);
     }
 
+    void Sprite::_Render(ID3D11DeviceContext* immediateContext,
+        float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh, float angle)
+    {
+        Render(immediateContext, dx, dy, dw, dh, 
+            color[0], color[1], color[2], color[3], angle,sx, sy,sw,sh);
+    }
+
     void Sprite::Render(ID3D11DeviceContext* immediateContext,
         float dx, float dy, float dw, float dh,
         float r, float g, float b, float a,

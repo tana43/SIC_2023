@@ -1,10 +1,12 @@
 #include "PuzzleFrame.h"
 #include "Easing.h"
 #include "BlockManager.h"
+#include "Block.h"
 
 void PuzzleFrame::CreateResource()
 {
     frameModel = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/PazzleFrame03.fbx");
+    keepOutBarModel = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
 }
 
 void PuzzleFrame::Initialize()
@@ -29,6 +31,11 @@ void PuzzleFrame::Initialize()
         eyePos.z -= 88.0f;
         cTransform->SetPosition(eyePos);
     }
+
+    //侵入禁止エリアバー
+    keepOutBarModel->GetTransform()->SetPosition(DirectX::XMFLOAT3(2.2f,46,3));
+    keepOutBarModel->GetTransform()->SetScale(DirectX::XMFLOAT3(22.0f,1,1));
+    keepOutBarModel->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1, 0, 0, 1));
 }
 
 void PuzzleFrame::Update(float elapsedTime)
@@ -63,11 +70,53 @@ void PuzzleFrame::Update(float elapsedTime)
     }
 
     timer += elapsedTime;
+
+
+    //アビリティのチェイン数に合わせた数字表示
+    for (auto& cAbility : chainAbilitys)
+    {
+        cAbility->numbers.SetNumbers(cAbility->chain);
+    }
 }
 
 void PuzzleFrame::Render()
 {
     frameModel->Render();
+    keepOutBarModel->Render();
+    
+
+    //その属性の最大チェイン数のアビリティのみ表示する
+    ChainAbility* chains[4];
+    for (char type = 0; type < Block::BlockType::END; type++)
+    {
+        chains[type] = nullptr;
+        int chain{};
+        for (auto& cAbility : chainAbilitys)
+        {
+            if (cAbility->type != type)continue;
+            if (!chain)
+            {
+                chain = cAbility->chain;
+                chains[type] = cAbility.get();
+            }
+
+            if (chains[type]->chain < cAbility->chain)
+            {
+                chain = chain = cAbility->chain;
+                chains[type] = cAbility.get();
+            }
+        }
+    }
+
+    Regal::Graphics::Graphics::Instance().Set2DStates();
+    int i{};
+    for (int i = 0;i < 4;++i)
+    {
+        if (chains[i] == nullptr)continue;
+        if (chains[i]->chain < 4)continue;
+        chains[i]->Render(DirectX::XMFLOAT2(200, 250 + 50.0f * i));
+    }
+    Regal::Graphics::Graphics::Instance().Set3DStates();
 }
 
 void PuzzleFrame::DrawDebug()
@@ -77,6 +126,12 @@ void PuzzleFrame::DrawDebug()
         ImGui::Begin(name.c_str());
 
         frameModel->DrawDebug();
+
+        if(ImGui::TreeNode("Keep Out"))
+        {
+            keepOutBarModel->DrawDebug();
+            ImGui::TreePop();
+        }
 
         ImGui::End();
 
@@ -189,8 +244,10 @@ bool PuzzleFrame::SetBlockOnGrid(Block* block)
     {
         return false;
     }*/
-
-    gridsState[gridPos.y][gridPos.x] = 1;
+    if (gridsState[gridPos.y][gridPos.x] != LIMIT)
+    {
+        gridsState[gridPos.y][gridPos.x] = ON_BLOCK;
+    }
     gridsBlock[gridPos.y][gridPos.x] = block;
 
     return true;
@@ -268,6 +325,8 @@ void PuzzleFrame::Clear()
     {
         for (int x = 0; x < MAX_FRAME_WIDTH; x++)
         {
+            gridsBlock[y][x]->Destroy();
+
             //ブロック情報リセット
             gridsBlock[y][x] = nullptr;
 
@@ -278,4 +337,70 @@ void PuzzleFrame::Clear()
 
     //アビリティ配列リセット
     chainAbilitys.clear();
+}
+
+void PuzzleFrame::FrameAttackUpdate(float elapsedTime)
+{
+    if (!isFrameAttack)return;
+
+    
+}
+
+void PuzzleFrame::ActiveFrameAttack()
+{
+    isFrameAttack = true;
+
+    //発動しているアビリティを持っていないブロックを全てけす
+    for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
+    {
+        for (int x = 0; x < MAX_FRAME_WIDTH; x++)
+        {
+            if (gridsBlock[y][x]->GetAbility())continue;
+            if (gridsBlock[y][x]->GetAbility()->chain < 4)continue;
+
+            gridsBlock[y][x]->Destroy();
+
+            //ブロック情報リセット
+            gridsBlock[y][x] = nullptr;
+
+        }
+    }
+
+}
+
+PuzzleFrame::ChainAbility::ChainAbility()
+{
+    chainSprite = std::make_unique<Regal::Resource::Sprite>(
+        Regal::Graphics::Graphics::Instance().GetDevice(),
+        L"./Resources/Images/chain.png");
+}
+
+void PuzzleFrame::ChainAbility::Render(DirectX::XMFLOAT2 pos)
+{
+    switch (type)
+    {
+    case Block::BlockType::RED:
+        chainSprite->SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+        break;
+    case Block::BlockType::CYAN:
+        chainSprite->SetColor(0.0f, 1.0f, 1.0f, 1.0f);
+        break;
+    case Block::BlockType::GREEN:
+        chainSprite->SetColor(00.4f, 1.0f, 0.0f, 1.0f);
+        break;
+    case Block::BlockType::PURPLE:
+        chainSprite->SetColor(1.0f, 0.0f, 1.0f, 1.0f);
+        break;
+    }
+
+    auto& graphics{ Regal::Graphics::Graphics::Instance() };
+    DirectX::XMFLOAT2 screenCorrection{graphics.GetScreenWidth() / 1280.0f, graphics.GetScreenHeight() / 720.0f};
+    chainSprite->Render(Regal::Graphics::Graphics::Instance().GetDeviceContext(),
+        pos.x * screenCorrection.x,pos.y * screenCorrection.y,
+        220.0f * screenCorrection.x * 0.5f,95.0f * screenCorrection.y * 0.5f,0.0f);
+
+    pos.x -= 30;
+    numbers.SetPosition(pos);
+    numbers.SetNumbers(chain);
+    numbers.Render();
 }

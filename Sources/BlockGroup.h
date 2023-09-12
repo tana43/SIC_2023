@@ -47,6 +47,9 @@ public:
 
     const bool CanMoveDown();
 
+    //ã‚Ì§ŒÀƒ‰ƒCƒ“‚ğ‰z‚¦‚½‚Æ‚«‚Ìˆ—
+    void OutFrame();
+
 private:
     Block* blocks[4];
 

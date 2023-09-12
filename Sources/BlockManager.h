@@ -1,8 +1,9 @@
 #pragma once
 #include "RegalLib/Game/GameObject.h"
 #include <vector>
+#include "PuzzleFrame.h"
 
-#include "Block.h"
+class Block;
 
 class BlockManager
 {
@@ -27,7 +28,7 @@ public:
     //ê∂ê¨ÇµÇΩÉuÉçÉbÉNÇÃìoò^
     void Register(Block* block);
 
-    void Destroy(Block* block);
+    void Remove(Block* block);
 
     std::vector<Block*>& GetBlocks() { return blocks; }
 

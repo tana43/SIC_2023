@@ -1,6 +1,7 @@
 #include "Block.h"
 #include "PuzzleFrame.h"
 #include "Easing.h"
+#include "BlockManager.h"
 
 DirectX::XMFLOAT2 Block::STARTING_POS = DirectX::XMFLOAT2(5.0f, 2.0f);
 
@@ -12,7 +13,7 @@ Block::Block(bool onGrid,int type) : GameObject("GameObject"),onGrid(onGrid), ty
 void Block::CreateResource()
 {
     //model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
-    model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+	model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
 }
 
 void Block::Initialize()
@@ -200,6 +201,11 @@ void Block::MoveBottomLeft(int moveDistance)
 	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
 
 	gridPos = moveGridPos;
+}
+
+void Block::Destroy()
+{
+	BlockManager::Instance().Remove(this);
 }
 
 void Block::SpinUpdate(float elapsedTime)

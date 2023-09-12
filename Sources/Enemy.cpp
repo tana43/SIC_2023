@@ -2,6 +2,11 @@
 #include "EnemyManager.h"
 #include "GameManager.h"
 
+Enemy::~Enemy()
+{
+    ProjectilesClear();
+}
+
 void Enemy::CreateResource()
 {
     model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/EnemyType01.fbx");
@@ -9,6 +14,8 @@ void Enemy::CreateResource()
 
 void Enemy::Initialize()
 {
+    ProjectilesClear();
+
     switch (type)
     {
     case BLUE:
@@ -30,12 +37,17 @@ void Enemy::Initialize()
     hp = 1000;
     power = 3;
     attackTimer = 0;
+
+    attackCoolTime = 8.0f;
+
     model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0, 0, 0, 1));
     model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f);
 
     model->GetTransform()->SetScaleFactor(8.0f);
     model->GetTransform()->SetPositionX(51.0f);
     model->GetTransform()->SetPositionY(73.0f);
+
+    state = IDLE;
 }
 
 void Enemy::Update(float elapsedTime)
@@ -45,8 +57,19 @@ void Enemy::Update(float elapsedTime)
     switch (state)
     {
     case IDLE:
+
+        if (attackTimer > attackCoolTime)
+        {
+            state = ATTACK;
+        }
+
+        attackTimer += elapsedTime;
         break;
     case ATTACK:
+
+        Shot();
+        attackTimer = 0;
+        state = IDLE;
         break;
     case DIE:
         break;
@@ -116,9 +139,48 @@ void Enemy::Shot()
     projectiles.emplace_back(p);
 }
 
-void Enemy::Destroy()
+void Enemy::Remove()
 {
-    EnemyManager::Instance().Destroy(this);
+    EnemyManager::Instance().Remove(this);
+}
+
+void Enemy::ProjectilesClear()
+{
+    for (auto& projectile : projectiles)
+    {
+        delete projectile;
+    }
+    projectiles.clear();
+}
+
+bool Enemy::ApplyDamage(int damage)
+{
+    //ダメージが０の場合は健康状態を変更する必要がない
+    if (damage == 0)return false;
+
+    //死亡している場合は健康状態を変更しない
+    if (hp <= 0)return false;
+
+    hp -= damage;
+
+    if (hp <= 0)
+    {
+        OnDead();
+    }
+    else
+    {
+        OnDamaged();
+    }
+
+    return true;
+}
+
+void Enemy::OnDamaged()
+{
+}
+
+void Enemy::OnDead()
+{
 }
 
 void Enemy::Projectile::CreateResource()
@@ -129,8 +191,9 @@ void Enemy::Projectile::CreateResource()
 void Enemy::Projectile::Initialize()
 {
     auto pos = owner->model->GetTransform()->GetPosition();
-    pos.x -= 10;
+    pos.x -= 13;
     model->GetTransform()->SetPosition(pos);
+    model->GetTransform()->SetScaleFactor(0);
 
     chargeTimer = 0;
 
@@ -148,7 +211,7 @@ void Enemy::Projectile::Update(float elapsedTime)
     }
     else
     {
-        scaleFactor = (chargeTimer / chargeTime) * 3.0f;
+        scaleFactor = (chargeTimer / chargeTime) * 2.0f;
 
         spinSpeed = (chargeTimer / chargeTime) * 3.0f;
 
@@ -185,10 +248,12 @@ void Enemy::Projectile::DrawDebug()
 
 void Enemy::Projectile::Hit()
 {    
-    Destroy(this);
+    GameManager::GetPlayer().ApplyDamage(power);
+
+    Remove(this);
 }
 
-void Enemy::Projectile::Destroy(Projectile* projectile)
+void Enemy::Projectile::Remove(Projectile* projectile)
 {
     owner->GetRemoves().emplace_back(projectile);
 }

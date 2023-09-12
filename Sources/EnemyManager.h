@@ -27,7 +27,7 @@ public:
     //生成したエネミーの登録
     void Register(Enemy* Enemy);
 
-    void Destroy(Enemy* Enemy);
+    void Remove(Enemy* Enemy);
 
     Enemy* GetEnemy() { return enemys.at(0); }
 

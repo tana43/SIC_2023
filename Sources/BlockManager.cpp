@@ -1,5 +1,6 @@
 #include "BlockManager.h"
 #include <set>
+#include "Block.h"
 
 BlockManager::~BlockManager()
 {
@@ -90,7 +91,7 @@ void BlockManager::Register(Block* block)
 	block->Initialize();
 }
 
-void BlockManager::Destroy(Block* block)
+void BlockManager::Remove(Block* block)
 {
 	removes.emplace_back(block);
 }

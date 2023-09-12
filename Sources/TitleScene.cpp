@@ -15,12 +15,14 @@ void TitleScene::CreateResource()
 	bloomer = std::make_unique<Regal::Graphics::Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
 	Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
-	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Title.png");
+	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
 }
 
 void TitleScene::Initialize()
 {
-	sprite->SetEmissiveColor(1, 1, 1, 0.3f);
+	sprite->SetColor(0, 1, 0.5f, 1);
+	bloomer->bloomExtractionThreshold = 0;
+	bloomer->bloomIntensity = 0.5f;
 }
 
 void TitleScene::Finalize()
@@ -33,6 +35,8 @@ void TitleScene::Begin()
 
 void TitleScene::Update(const float& elapsedTime)
 {
+	
+
 	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
 	{
 		Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);

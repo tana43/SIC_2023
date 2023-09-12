@@ -30,7 +30,7 @@ namespace Regal::Game
 
         void Initialize();
 
-        void Update();
+        void Update(float elapsedTime);
         void UpdateViewProjectionMatrix();
 
         DirectX::XMMATRIX CalcViewMatrix() const;
@@ -47,10 +47,20 @@ namespace Regal::Game
 
         void DrawDebug();
 
+        //‰æ–ÊU“®
+        void ScreenVibrate(float volume/*U“®—Ê*/, float effectTime/*U“®ŠÔ*/);
+        void ScreenVibrationUpdate(float elapsedTime);
+
     private:
         DirectX::XMMATRIX ViewProjection{};
 
         TransformEuler transform;
         Parameters parameters;
+
+        //‰æ–ÊU“®
+        DirectX::XMFLOAT3 screenVibrationOffset{};//U“®•\Œ»—p‚ÌÀ•W
+        float vibrationVolume;//U“®—Ê
+        float vibrationTime;//U“®ŠÔ
+        float vibrationTimer;//U“®ŠÔ‚ğ‘ª‚é‚½‚ß‚Ìƒ^ƒCƒ}[
     };
 }

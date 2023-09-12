@@ -33,21 +33,23 @@ public:
         void DrawDebug();
         void Hit();
 
-        void Destroy(Projectile* projectile);
+        void Remove(Projectile* projectile);
 
         float chargeTime{ 5.0f };
         float chargeTimer;
 
-        float scaleFactor{ 0.01f };
+        float scaleFactor{ 0 };
         float spinSpeed{0.1f};
 
         bool completeCharge{false};
+
+        int power{3};
 
         Enemy* owner;
     };
 
     Enemy(int type = 0) :GameObject("Enemy"),type(type) {}
-    ~Enemy() {}
+    ~Enemy();
 
     void CreateResource()override;
     void Initialize()override;
@@ -57,10 +59,17 @@ public:
 
     void Shot();
 
-    void Destroy();
+    void Remove();
+
+    void ProjectilesClear();
 
     std::vector<Projectile*>& GetProjectiles() { return projectiles; }
     std::vector<Projectile*>& GetRemoves() { return removes; }
+
+    bool ApplyDamage(int damage);
+
+    void OnDamaged();
+    void OnDead();
 
 private:
     int hp;

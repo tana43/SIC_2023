@@ -9,7 +9,7 @@ void Player::CreateResource()
 
 void Player::Initialize()
 {
-    hp = 10;
+    hp = maxHp;
     power = 0;
     autoFallTime = 1.5f;
     autoFallTimer = 0;
@@ -33,6 +33,19 @@ void Player::Update(float elapsedTime)
     AutoFallBlock(elapsedTime);
 
     AutoSetBlock(elapsedTime);
+
+    //hpに連動して点滅させる
+    if (hp > 0)
+    {
+        float intensity{ sinf(blinkTimer) * (static_cast<float>(hp) / static_cast<float>(maxHp)) * 2.5f };
+        if (intensity < 0)intensity = -intensity;
+        model->GetSkinnedMesh()->SetEmissiveIntensity(intensity);
+        blinkTimer += elapsedTime;
+    }
+    else
+    {
+        model->GetSkinnedMesh()->SetEmissiveIntensity(0);
+    }
 }
 
 void Player::Render()
@@ -51,6 +64,8 @@ void Player::DrawDebug()
         useBlockGroup->DrawDebug();
     }
 
+    ImGui::SliderInt("HP", &hp, 0, maxHp);
+
     ImGui::End();
     
 }
@@ -59,6 +74,13 @@ void Player::UseBlocksMove()
 {
     //操作対象のブロックがなければ処理しない
     if (!useBlockGroup)return;
+
+    //上入力で底に最速ブロック配置
+    if (MoveUpButton())
+    {
+        while (useBlockGroup->MoveDown(1));
+        autoSetTimer = autoSetTime;
+    }
 
     //上方向以外への移動
     if (MoveDownButton())
@@ -139,17 +161,48 @@ void Player::AutoSetBlock(float elapsedTime)
     if (autoSetTimer > autoSetTime)
     {
         useBlockGroup->PutOnGrid();
+        auto* bg{ useBlockGroup };
         autoSetTimer = 0;
 
-        
-
         ChangeUseBG();
+
+        //ブロックが制限ラインに達しているなら盤面を全てリセット
+        bg->OutFrame();
     }
 }
 
 void Player::ChangeUseBG()
 {
     GameManager::Instance().NextBlockUse();
+}
 
+bool Player::ApplyDamage(int damage)
+{
+    //ダメージが０の場合は健康状態を変更する必要がない
+    if (damage == 0)return false;
 
+    //死亡している場合は健康状態を変更しない
+    if (hp <= 0)return false;
+
+    hp -= damage;
+
+    if (hp <= 0)
+    {
+        OnDead();
+    }
+    else
+    {
+        OnDamaged();
+    }
+
+    return true;
+}
+
+void Player::OnDamaged()
+{
+    Regal::Game::Camera::Instance().ScreenVibrate(0.08f,0.7f);
+}
+
+void Player::OnDead()
+{
 }

@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include <d3d11.h>
 #include "../Graphics/Graphics.h"
+#include "../../Easing.h"
 
 #include "../../../External/imgui/imgui.h"
 
@@ -12,9 +13,9 @@ namespace Regal::Game
 		//transform.SetRotationY(DirectX::XMConvertToRadians(180));
     }
 
-    void Camera::Update()
+    void Camera::Update(float elapsedTime)
     {
-		
+		ScreenVibrationUpdate(elapsedTime);
     }
 
 	void Camera::UpdateViewProjectionMatrix()
@@ -64,6 +65,11 @@ namespace Regal::Game
 			eye.z + forward.z * 10.0f,
 			1.0f
 		};
+
+		//画面振動
+		focus.x += screenVibrationOffset.x;
+		focus.y += screenVibrationOffset.y;
+		focus.z += screenVibrationOffset.z;
 		
 		Focus = DirectX::XMLoadFloat4(&focus);
 		/*-----------------------------------------------------------------------*/
@@ -103,7 +109,56 @@ namespace Regal::Game
 			ImGui::InputFloat("Height",&parameters.height);
 			ImGui::InputFloat("AspectRatio",&parameters.aspectRatio);
 
+			static float vibVolume;
+			static float vibTime;
+			if (ImGui::TreeNode("Vibration"))
+			{
+				ImGui::SliderFloat("VibrationVolume", &vibVolume, 0.0f, 1.0f);
+				ImGui::SliderFloat("VibrationTime", &vibTime, 0.0f, 5.0f);
+				if (ImGui::Button("Vibrate"))
+				{
+					ScreenVibrate(vibVolume, vibTime);
+				}
+				ImGui::TreePop();
+			}
+
 			ImGui::EndMenu();
 		}
+	}
+
+	void Camera::ScreenVibrate(float volume, float effectTime)
+	{
+		vibrationVolume = volume;
+		vibrationTimer = effectTime;
+		vibrationTime = effectTime;
+	}
+
+	void Camera::ScreenVibrationUpdate(float elapsedTime)
+	{
+		screenVibrationOffset = {};
+		if (vibrationTimer <= 0)return;
+
+		//振動方向の指定(乱数)
+		DirectX::XMFLOAT3 vibVec;
+		auto right = GetTransform()->CalcRight();
+		auto up = GetTransform()->CalcUp();
+
+		right = right * (rand() % 100 - 50.0f);
+		up = up *(rand() % 100 - 50.0f);
+
+		vibVec = {
+			right.x + up.x,
+			right.y + up.y,
+			0.0f
+		};
+		vibVec = Normalize(vibVec);
+
+		//イージングを使い経過時間で振動量を調整する
+		float vibrationVolume = Easing::InSine(vibrationTimer, vibrationTime, this->vibrationVolume, 0.0f);
+
+		//振動値を入れる
+		screenVibrationOffset = vibVec * vibrationVolume;
+
+		vibrationTimer -= elapsedTime;
 	}
 }

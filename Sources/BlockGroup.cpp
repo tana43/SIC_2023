@@ -1,6 +1,7 @@
 #include "BlockGroup.h"
 #include "BlockManager.h"
 #include "PuzzleFrame.h"
+#include "BlockGroupManager.h"
 
 BlockGroup::BlockGroup(bool onGrid) : GameObject("BlocksGroup"),onGrid(onGrid)
 {
@@ -51,6 +52,7 @@ void BlockGroup::Update(float elapsedTime)
 	}
 	else
 	{
+
 		static float root2 = sqrtf(2.0f);
 		auto blockPos = position;
 		blocks[0]->GetTransform()->SetPosition(blockPos);
@@ -264,6 +266,8 @@ void BlockGroup::PutOnGrid()
 		//連結しているブロックがないかチェック
 		PuzzleFrame::Instance().CheckChainBlock(block);
 	}
+
+	BlockGroupManager::Instance().Remove(this);
 }
 
 const bool BlockGroup::CanMoveDown()
@@ -274,4 +278,16 @@ const bool BlockGroup::CanMoveDown()
 		if (!block->CanMoveDown(1))return false;
 	}
 	return true;
+}
+
+void BlockGroup::OutFrame()
+{
+	for (auto& block : blocks)
+	{
+		//範囲外にブロックが出てしまった場合クリア
+		if (PuzzleFrame::Instance().GetGridState(block->GetGridPos().x, block->GetGridPos().y) == PuzzleFrame::LIMIT)
+		{
+			PuzzleFrame::Instance().Clear();
+		}
+	}
 }

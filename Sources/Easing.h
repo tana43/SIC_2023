@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 
 // イージング関数
 struct Easing

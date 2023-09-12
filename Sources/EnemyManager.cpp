@@ -88,7 +88,7 @@ void EnemyManager::Register(Enemy* enemy)
 	enemy->Initialize();
 }
 
-void EnemyManager::Destroy(Enemy* enemy)
+void EnemyManager::Remove(Enemy* enemy)
 {
 	removes.emplace_back(enemy);
 }
