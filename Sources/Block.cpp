@@ -2,6 +2,8 @@
 #include "PuzzleFrame.h"
 #include "Easing.h"
 #include "BlockManager.h"
+#include "EnemyManager.h"
+#include "GameManager.h"
 
 DirectX::XMFLOAT2 Block::STARTING_POS = DirectX::XMFLOAT2(5.0f, 2.0f);
 
@@ -14,7 +16,7 @@ void Block::CreateResource()
 {
     //model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
 	model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
-	popEffect = std::make_unique<PopEffect>(100);
+	projectilePopEffect = std::make_unique<PopEffect>(100);
 }
 
 void Block::Initialize()
@@ -41,12 +43,12 @@ void Block::Initialize()
 		break;
 	}
 
-	popEffect->SetColor(model->GetSkinnedMesh()->GetEmissiveColor());
+	projectilePopEffect->SetColor(model->GetSkinnedMesh()->GetEmissiveColor());
 }
 
 void Block::Update(float elapsedTime)
 {
-	if (!isDestroy)
+	if (!isDestroy && !isAssault)
 	{
 		if (isPlaced)//ê⁄ínÇµÇƒÇ¢ÇÈèÍçá
 		{
@@ -63,13 +65,44 @@ void Block::Update(float elapsedTime)
 
 		SpinUpdate(elapsedTime);
 	}
-	else
+	
+	if(isDestroy)
 	{
-		if(!popEffect->GetIsPlay())BlockManager::Instance().Remove(this);
+		if(!projectilePopEffect->GetIsPlay())BlockManager::Instance().Remove(this);
 	}
 
+	//ìÀåÇ
+	if (isAssault)
+	{
+		float spinSpeed{ elapsedTime * 15 };
+		model->GetTransform()->AddRotation(DirectX::XMFLOAT3(spinSpeed,spinSpeed,0));
 
-	popEffect->Update(elapsedTime);
+		auto* target{ EnemyManager::Instance().GetEnemy() };
+		auto myPos{ model->GetTransform()->GetPosition() };
+		auto targetPos{ target->GetTransform()->GetPosition()};
+		DirectX::XMFLOAT3 vec;
+		DirectX::XMVECTOR Vec = {
+			DirectX::XMVectorSubtract(
+			DirectX::XMLoadFloat3(&targetPos),DirectX::XMLoadFloat3(&myPos))
+		};
+		DirectX::XMVECTOR VecNormal{DirectX::XMVector3Normalize(Vec)};
+		DirectX::XMFLOAT3 velocity;
+		DirectX::XMStoreFloat3(&velocity,DirectX::XMVectorScale(VecNormal, 50.0f * elapsedTime));
+
+		model->GetTransform()->AddPosition(velocity);
+
+		//îªíËèàóù
+		float length{ DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec)) };
+		
+		if (length < 10.0f)
+		{
+			target->ApplyDamage(GameManager::GetPlayer().GetPower(type));
+			isAssault = false;
+			Destroy();
+		}
+	}
+
+	projectilePopEffect->Update(elapsedTime);
 }
 
 void Block::Render()
@@ -79,7 +112,7 @@ void Block::Render()
 		model->Render();
 	}
 
-	popEffect->Render();
+	projectilePopEffect->Render();
 }
 
 void Block::DrawDebug()
@@ -92,7 +125,7 @@ void Block::DrawDebug()
 	ImGui::DragFloat("STARTING_POS_X", &STARTING_POS.x,0.1f);
 	ImGui::DragFloat("STARTING_POS_Y", &STARTING_POS.y,0.1f);
 
-	popEffect->DrawDebug();
+	projectilePopEffect->DrawDebug();
 
 	ImGui::SetNextItemOpen(true, ImGuiCond_FirstUseEver);
 	model->DrawDebug();
@@ -226,7 +259,13 @@ void Block::Destroy()
 {
 	//BlockManager::Instance().Remove(this);
 	isDestroy = true;
-	popEffect->Play(GetTransform()->GetPosition());
+	projectilePopEffect->Play(GetTransform()->GetPosition());
+	if(isPlaced)PuzzleFrame::Instance().SetBlockOnGrid(nullptr, gridPos.x, gridPos.y);
+}
+
+void Block::Assault()
+{
+	isAssault = true;
 }
 
 void Block::SpinUpdate(float elapsedTime)

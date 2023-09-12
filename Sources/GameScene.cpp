@@ -57,6 +57,7 @@ void GameScene::Initialize()
 
 	
 #if ENABLE_PARTICLE
+	BGParticles->color = DirectX::XMFLOAT4(0, 0.3f, 1.0f, 1);
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
 #endif // ENABLE_PARTICLE
 

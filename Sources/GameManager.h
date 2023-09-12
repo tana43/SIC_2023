@@ -27,7 +27,7 @@ public:
     void Render()override;
 
     static Player& GetPlayer() { return *Instance().player; }
-    
+   
 
     void NextBlockUse();
 

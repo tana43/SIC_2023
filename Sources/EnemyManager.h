@@ -29,9 +29,11 @@ public:
 
     void Remove(Enemy* Enemy);
 
-    Enemy* GetEnemy() { return enemys.at(0); }
+    Enemy* GetEnemy() { return curEnemy; }
 
 private:
+    Enemy* curEnemy;
+
     std::vector<Enemy*> enemys;
     std::vector<Enemy*> removes;
 };

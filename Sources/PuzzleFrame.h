@@ -112,6 +112,9 @@ public:
     //ブロックを設置
     bool SetBlockOnGrid(Block* block);
 
+    //ブロックを設置
+    bool SetBlockOnGrid(Block* block,int x,int y);
+
     //ブロックが枠を越えた場所に設置されているかの判定 範囲越えならtrue
     bool IsOverToleranceLimit();
     //とそのときの処理
@@ -151,6 +154,8 @@ public:
     void FrameAttackUpdate(float elapsedTime);
     void ActiveFrameAttack();
 
+    const bool GetIsFrameAttack() const { return isFrameAttack; }
+
     std::vector<std::unique_ptr<ChainAbility>>& GetChainAbilitys() { return chainAbilitys; }
 
 private:
@@ -167,5 +172,8 @@ private:
 
     //全ブロックを消して攻撃をするか
     bool isFrameAttack;
+
+    float frameAttackTimer{};
+    float frameAttackTime{0.05f};
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RegalLib/Regal.h"
+#include "PopEffect.h"
 
 class Enemy : public Regal::Game::GameObject
 {
@@ -71,6 +72,10 @@ public:
     void OnDamaged();
     void OnDead();
 
+    PopEffect* GetPopEffect() { return projectilePopEffect.get(); }
+
+    Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
+
 private:
     int hp;
     int power;
@@ -84,5 +89,7 @@ private:
 
     std::vector<Projectile*> projectiles;
     std::vector<Projectile*> removes;
+
+    std::unique_ptr<PopEffect> projectilePopEffect;
 };
 

@@ -86,6 +86,8 @@ void EnemyManager::Register(Enemy* enemy)
 	enemys.emplace_back(enemy);
 	enemy->CreateResource();
 	enemy->Initialize();
+
+	curEnemy = enemy;
 }
 
 void EnemyManager::Remove(Enemy* enemy)

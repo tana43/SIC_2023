@@ -1,16 +1,25 @@
 #include "Player.h"
 #include "PuzzleFrame.h"
 #include "GameManager.h"
+#include "EnemyManager.h"
 
 void Player::CreateResource()
 {
     model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+    for (auto& effect : projectilePopEffects)
+    {
+        effect = std::make_unique<PopEffect>(10);
+
+    }
 }
 
 void Player::Initialize()
 {
     hp = maxHp;
-    power = 0;
+    for (int i = 0; i < Block::END; i++)
+    {
+        power[i] = 0;
+    }
     autoFallTime = 1.5f;
     autoFallTimer = 0;
     autoSetTime = 0.5f;
@@ -19,6 +28,27 @@ void Player::Initialize()
     model->GetTransform()->SetPositionX(-45.0f);
     model->GetTransform()->SetPositionY(72.0f);
     model->GetTransform()->SetScaleFactor(2.3f);
+
+
+    for (int i = 0;i < Block::END;++i)
+    {
+        switch (i)
+        {
+        case Block::RED:
+            projectilePopEffects[i]->SetColor(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+            break;
+        case Block::CYAN:
+            projectilePopEffects[i]->SetColor(DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f));
+            break;
+        case Block::GREEN:
+            projectilePopEffects[i]->SetColor(DirectX::XMFLOAT4(0.4f, 1.0f, 0.0f, 1.0f));
+            break;
+        case Block::PURPLE:
+            projectilePopEffects[i]->SetColor(DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
+            break;
+        }
+    }
+    
 }
 
 void Player::Update(float elapsedTime)
@@ -28,11 +58,15 @@ void Player::Update(float elapsedTime)
     model->GetTransform()->AddRotationY(-0.1f * elapsedTime);
     model->GetTransform()->AddRotationX(0.1f * elapsedTime);
 
-    UseBlocksMove();
+    //全攻撃中は処理を止める
+    if (!PuzzleFrame::Instance().GetIsFrameAttack())
+    {
+        UseBlocksMove();
 
-    AutoFallBlock(elapsedTime);
+        AutoFallBlock(elapsedTime);
 
-    AutoSetBlock(elapsedTime);
+        AutoSetBlock(elapsedTime);
+    }
 
     //hpに連動して点滅させる
     if (hp > 0)
@@ -46,11 +80,61 @@ void Player::Update(float elapsedTime)
     {
         model->GetSkinnedMesh()->SetEmissiveIntensity(0);
     }
+
+    //クールダウンと攻撃
+    for (int i = 0; i < Block::END; i++)
+    {
+        if (power[i] <= 0)continue;
+
+        if (attackTimer[i] > attackTime)
+        {
+            Shot(i);
+            attackTimer[i] = 0;
+        }
+
+        attackTimer[i] += elapsedTime;
+    }
+
+    for (auto& projectile : projectiles)
+    {
+        projectile->Update(elapsedTime);
+    }
+
+    for (auto& effect : projectilePopEffects)
+    {
+        effect->Update(elapsedTime);
+    }
+
+
+    for (auto& projectile : removes)
+    {
+        //イテレーターからじゃないと破棄できない
+        std::vector<Projectile*>::iterator it =
+            std::find(projectiles.begin(), projectiles.end(), projectile);
+
+        if (it != projectiles.end())
+        {
+            projectiles.erase(it);
+        }
+
+        delete projectile;
+    }
+    removes.clear();
 }
 
 void Player::Render()
 {
     model->Render();
+    for (auto& projectile : projectiles)
+    {
+        projectile->Render();
+    }
+
+    for (auto& effect : projectilePopEffects)
+    {
+        effect->Render();
+    }
+
 }
 
 void Player::DrawDebug()
@@ -205,4 +289,116 @@ void Player::OnDamaged()
 
 void Player::OnDead()
 {
+}
+
+void Player::Shot(int type)
+{
+    auto p = new Projectile;
+    p->owner = this;
+    p->type = type;
+    p->power = power[type];
+    p->CreateResource();
+    p->Initialize();
+    projectiles.emplace_back(p);
+}
+
+void Player::ProjectilesClear()
+{
+    for (auto& projectile : projectiles)
+    {
+        delete projectile;
+    }
+    projectiles.clear();
+}
+
+void Player::Projectile::CreateResource()
+{
+    model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
+}
+
+void Player::Projectile::Initialize()
+{
+    auto pos = owner->model->GetTransform()->GetPosition();
+    pos.x += 8;
+    model->GetTransform()->SetPosition(pos);
+    model->GetTransform()->SetScaleFactor(0);
+
+    chargeTimer = 0;
+
+    switch (type)
+    {
+    case Block::RED:
+        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+        break;
+    case Block::CYAN:
+        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f));
+        break;
+    case Block::GREEN:
+        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.4f, 1.0f, 0.0f, 1.0f));
+        break;
+    case Block::PURPLE:
+        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
+        break;
+    }
+}
+
+void Player::Projectile::Update(float elapsedTime)
+{
+    model->GetTransform()->AddRotation(DirectX::XMFLOAT3(
+        spinSpeed * elapsedTime, spinSpeed * elapsedTime, 0));
+
+    if (completeCharge)
+    {
+        model->GetTransform()->AddPosition(DirectX::XMFLOAT3(speed * elapsedTime, 0, 0));
+    }
+    else
+    {
+        scale = (chargeTimer / chargeTime) * (1.0f + power * 0.05f);
+
+        spinSpeed = (chargeTimer / chargeTime) * 3.0f;
+
+        if (chargeTimer > chargeTime)
+        {
+            completeCharge = true;
+            chargeTimer = 0;
+        }
+
+        model->GetTransform()->SetScaleFactor(scale);
+        chargeTimer += elapsedTime;
+    }
+
+    //判定処理
+    auto enemyPosX{ EnemyManager::Instance().GetEnemy()->GetTransform()->GetPosition().x };
+    if (model->GetTransform()->GetPosition().x > enemyPosX - 9.0f)
+    {
+        Hit();
+    }
+}
+
+void Player::Projectile::Render()
+{
+    //弾丸にはカリングオフのwireframeを表示させる
+    Regal::Graphics::Graphics::Instance().SetRSState(Regal::Graphics::WIREFRAME_CULL_NONE);
+    model->Render();
+    Regal::Graphics::Graphics::Instance().Set3DStates();
+}
+
+void Player::Projectile::DrawDebug()
+{
+    model->DrawDebug();
+}
+
+void Player::Projectile::Hit()
+{
+    EnemyManager::Instance().GetEnemy()->ApplyDamage(power);
+
+    owner->GetProjectilePopEffect(type)->SetScale(1.2f + power * 0.03f);
+    owner->GetProjectilePopEffect(type)->Play(model->GetTransform()->GetPosition());
+
+    Remove();
+}
+
+void Player::Projectile::Remove()
+{
+    owner->GetRemoves().emplace_back(this);
 }

@@ -47,7 +47,9 @@ namespace Regal::Graphics
         Microsoft::WRL::ComPtr<ID3D11ComputeShader> particleInitializerCS;
         Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
-        Particles(ID3D11Device* device, size_t particleCount);
+        Particles(ID3D11Device* device, size_t particleCount,
+            const char* cs = "./Resources/Shader/ParticleCS.cso",
+            const char* initializeCs = "./Resources/Shader/ParticleInitializerCS.cso");
         Particles(const Particles&) = delete;
         Particles& operator=(const Particles&) = delete;
         Particles(Particles&&) noexcept = delete;
@@ -57,20 +59,23 @@ namespace Regal::Graphics
         //çXêVèàóù
         void Integrate(ID3D11DeviceContext* immediateContext, float deltaTime);
 
-        virtual void SetComputeShader(ID3D11Device* device);
 
         void Initialize(ID3D11DeviceContext* immediateContext, float deltaTime);
         void Render(ID3D11DeviceContext* immediateContext);
         void DrawDebug();
 
         DirectX::XMFLOAT4 color{1.0f,1.0f,1.0f,1.0f};
+
+    protected:
+        virtual void SetComputeShader(ID3D11Device* device,const char* cs,const char* initializeCs);
     };
 
     class PopParticles : public Particles
     {
     public:
-        PopParticles(ID3D11Device* device, size_t particleCount) : Particles(device, particleCount) {}
-
-        void SetComputeShader(ID3D11Device* device) override;
+        PopParticles(ID3D11Device* device, size_t particleCount) : 
+            Particles(device, particleCount,
+                "./Resources/Shader/PopParticleCS.cso",
+                "./Resources/Shader/PopParticleInitializerCS.cso") {}
     };
 }

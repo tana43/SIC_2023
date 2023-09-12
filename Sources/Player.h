@@ -5,6 +5,34 @@
 class Player : public Regal::Game::GameObject
 {
 public:
+    //プレイヤー専用の弾丸
+    struct Projectile
+    {
+        void CreateResource();
+        void Initialize();
+        void Update(float elapsedTime);
+        void Render();
+        void DrawDebug();
+
+        void Hit();
+
+        void Remove();
+
+        float speed{40.0f};
+        int power;
+        int type;
+        float chargeTimer;
+        float chargeTime{5.0f};
+        float spinSpeed{0.2f};
+        bool completeCharge{false};
+
+        float scale{0};
+
+        std::unique_ptr<Regal::Model::StaticModel> model;
+        
+        Player* owner;
+    };
+
     Player() : GameObject("Player") {}
     ~Player() {}
 
@@ -28,6 +56,14 @@ public:
     void OnDead();
 
     Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
+
+    void SetColor(const DirectX::XMFLOAT4 color) { model->GetSkinnedMesh()->SetEmissiveColor(color); }
+
+    void Shot(int type);
+
+    void ProjectilesClear();
+
+
 
     //----------------------------INPUT-------------------------------------
     
@@ -90,6 +126,15 @@ public:
     }
     BlockGroup* GetUseBlockGroup() { return useBlockGroup; }
 
+    Regal::Model::StaticModel* GetModel() { return model.get(); }
+
+    PopEffect* GetProjectilePopEffect(int type) { return projectilePopEffects[type].get(); }
+
+    void SetPower(const int power,const char t) { this->power[t] = power; }
+    const int GetPower(const char type) const { return power[type]; }
+
+    std::vector<Projectile*>& GetRemoves() { return removes; }
+
 private:
     BlockGroup* useBlockGroup;
 
@@ -98,7 +143,10 @@ private:
 
     int hp;
     int maxHp{100};
-    int power;//攻撃力
+    int power[Block::END];//各属性の攻撃力
+
+    float attackTimer[Block::END];
+    float attackTime{6.0f};
 
     //ブロックの自動落下
     float autoFallTime;
@@ -112,5 +160,10 @@ private:
 
     float blinkTimer;
     float blinkIntensity;
+
+    std::vector<Projectile*> projectiles;
+    std::vector<Projectile*> removes;
+
+    std::unique_ptr<PopEffect> projectilePopEffects[Block::BlockType::END];
 };
 

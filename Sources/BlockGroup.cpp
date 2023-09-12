@@ -36,6 +36,9 @@ void BlockGroup::Initialize()
 
 void BlockGroup::Update(float elapsedTime)
 {
+	//全攻撃中は処理しない
+	if (PuzzleFrame::Instance().GetIsFrameAttack())return;
+
 	if (onGrid)
 	{
 		auto blockGridPos = gridPos;
@@ -287,7 +290,10 @@ void BlockGroup::OutFrame()
 		//範囲外にブロックが出てしまった場合クリア
 		if (PuzzleFrame::Instance().GetGridState(block->GetGridPos().x, block->GetGridPos().y) == PuzzleFrame::LIMIT)
 		{
-			PuzzleFrame::Instance().Clear();
+			PuzzleFrame::Instance().ActiveFrameAttack();
+			return;
+			//動作確認できたからとりあえず今はくりあにしとく
+			//PuzzleFrame::Instance().Clear();
 		}
 	}
 }

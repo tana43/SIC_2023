@@ -9,7 +9,7 @@ using namespace Regal::Resource;
 
 namespace Regal::Graphics
 {
-    Particles::Particles(ID3D11Device* device, size_t particleCount) : maxParticleCount(particleCount)
+    Particles::Particles(ID3D11Device* device, size_t particleCount,const char* cs,const char* initializeCs) : maxParticleCount(particleCount)
     {
         HRESULT hr{ S_OK };
         D3D11_BUFFER_DESC bufferDesc{};
@@ -53,7 +53,7 @@ namespace Regal::Graphics
         Shader::CreateGSFromCso(device, "./Resources/Shader/ParticleGS.cso", particleGS.ReleaseAndGetAddressOf());
         //Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
         //Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
-        SetComputeShader(device);
+        SetComputeShader(device, cs,initializeCs);
     }
 
     UINT Align(UINT num, UINT alignment)
@@ -79,10 +79,10 @@ namespace Regal::Graphics
         immediateContext->CSSetUnorderedAccessViews(0, 1, &nullUnorederedAccessView, NULL);
     }
 
-    void Particles::SetComputeShader(ID3D11Device* device)
+    void Particles::SetComputeShader(ID3D11Device* device, const char* cs, const char* initializeCs)
     {
-        Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
-        Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
+        Shader::CreateCSFromCso(device, cs, particleCS.ReleaseAndGetAddressOf());
+        Shader::CreateCSFromCso(device, initializeCs, particleInitializerCS.ReleaseAndGetAddressOf());
     }
 
     void Particles::Initialize(ID3D11DeviceContext* immediateContext, float deltaTime)
@@ -139,11 +139,5 @@ namespace Regal::Graphics
             ImGui::ColorEdit4("Color",&color.x);
             ImGui::EndMenu();
         }
-    }
-
-    void PopParticles::SetComputeShader(ID3D11Device* device)
-    {
-        Shader::CreateCSFromCso(device, "./Resources/Shader/PopParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
-        Shader::CreateCSFromCso(device, "./Resources/Shader/PopParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
     }
 }

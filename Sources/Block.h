@@ -79,9 +79,17 @@ public:
 
     const std::unique_ptr<Regal::Model::StaticModel>& GetModel() const { return model; }
 
+    void SetEffectColor(const DirectX::XMFLOAT4 color) { projectilePopEffect->SetColor(color); }
+
+    //突撃
+    void Assault();
+
+    const bool GetIsAssault() const { return isAssault; }
+
 private:
     void SpinUpdate(float elapsedTime);
 
+    void AssaultUpdate(float elapsedTime);
 private:
     std::unique_ptr<Regal::Model::StaticModel> model;
 
@@ -110,9 +118,11 @@ private:
     bool isSpin;
     float spinTimer;
 
-    std::unique_ptr<PopEffect> popEffect;
+    std::unique_ptr<PopEffect> projectilePopEffect;
 
     //エフェクト再生終了まで破棄を待機するためのフラグ
     bool isDestroy{ false };
+
+    bool isAssault{ false };
 };
 

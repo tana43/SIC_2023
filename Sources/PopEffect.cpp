@@ -13,7 +13,7 @@ void PopEffect::Update(float elapsedTime)
     {
         if (timer > effectTime)isPlay = false;
 
-        popParticle->particleData.particleSize = ((effectTime - timer) / effectTime) * 0.1f;
+        popParticle->particleData.particleSize = ((effectTime - timer) / effectTime) * scale;
 
         popParticle->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
 

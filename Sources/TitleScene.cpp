@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include "GameScene.h"
+#include "BaseColorController.h"
 
 void TitleScene::CreateResource()
 {
@@ -16,13 +17,23 @@ void TitleScene::CreateResource()
 	Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
 	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
+
+	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
 }
 
 void TitleScene::Initialize()
 {
-	sprite->SetColor(0, 1, 0.5f, 1);
+	//sprite->SetColor(0, 1, 0.5f, 1);
+	auto color = BaseColorController::RundomBrightColor();
+	sprite->SetColor(color.x,color.y,color.z,color.w);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;
+
+	BGParticles->color = color;
+	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
+
+	Regal::Game::Camera::Instance().GetTransform()->SetPosition(DirectX::XMFLOAT3(2, 44, -88));
+	//2 44 -88
 }
 
 void TitleScene::Finalize()
@@ -35,7 +46,7 @@ void TitleScene::Begin()
 
 void TitleScene::Update(const float& elapsedTime)
 {
-	
+	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
 
 	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
 	{
@@ -70,6 +81,7 @@ void TitleScene::Render(const float& elapsedTime)
 	//パーティクル
 	graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
 	immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
+	BGParticles->Render(graphics.GetDeviceContext());
 
 	//3D
 	{
@@ -109,4 +121,6 @@ void TitleScene::DrawDebug()
 void TitleScene::PostEffectDrawDebug()
 {
 	bloomer->DrawDebug();
+
+	BGParticles->DrawDebug();
 }

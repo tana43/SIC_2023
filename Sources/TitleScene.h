@@ -29,5 +29,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> LEPixelShader;
 
     std::unique_ptr<Regal::Resource::Sprite> sprite;
+
+    std::unique_ptr<Regal::Graphics::Particles> BGParticles;
 };
 

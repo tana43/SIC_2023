@@ -10,6 +10,7 @@ Enemy::~Enemy()
 void Enemy::CreateResource()
 {
     model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/EnemyType01.fbx");
+    projectilePopEffect = std::make_unique<PopEffect>(10);
 }
 
 void Enemy::Initialize()
@@ -48,6 +49,9 @@ void Enemy::Initialize()
     model->GetTransform()->SetPositionY(73.0f);
 
     state = IDLE;
+
+    projectilePopEffect->SetColor(DirectX::XMFLOAT4(1, 0.3f, 0.3f, 0.5f));
+    projectilePopEffect->SetScale(1.5f);
 }
 
 void Enemy::Update(float elapsedTime)
@@ -80,6 +84,8 @@ void Enemy::Update(float elapsedTime)
         projectile->Update(elapsedTime);
     }
 
+    projectilePopEffect->Update(elapsedTime);
+
     for (auto& projectile : removes)
     {
         //イテレーターからじゃないと破棄できない
@@ -99,6 +105,8 @@ void Enemy::Update(float elapsedTime)
 void Enemy::Render()
 {
     model->Render();
+
+    projectilePopEffect->Render();
 
     for (auto& projectile : projectiles)
     {
@@ -177,10 +185,13 @@ bool Enemy::ApplyDamage(int damage)
 
 void Enemy::OnDamaged()
 {
+    Regal::Game::Camera::Instance().ScreenVibrate(0.08f, 0.7f);
 }
 
 void Enemy::OnDead()
 {
+    Regal::Game::Camera::Instance().ScreenVibrate(0.3f, 5.0f);
+    state = DIE;
 }
 
 void Enemy::Projectile::CreateResource()
@@ -249,6 +260,9 @@ void Enemy::Projectile::DrawDebug()
 void Enemy::Projectile::Hit()
 {    
     GameManager::GetPlayer().ApplyDamage(power);
+    GameManager::GetPlayer().GetModel()->GetSkinnedMesh()->SetEmissiveIntensity(10.0f);
+
+    owner->GetPopEffect()->Play(model->GetTransform()->GetPosition());
 
     Remove(this);
 }

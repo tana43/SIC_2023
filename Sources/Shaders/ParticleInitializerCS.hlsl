@@ -25,7 +25,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
     //p.velocity.y = 2.0 * f1;
     //p.velocity.z = 1.0 * cos(2 * 3.14 * f0);
     
-    p.position.x += (f0 * 120) - f1 * 90;
+    p.position.x += (f0 * 150) - f1 * 150;
     p.position.y += f2 * 100;
     
     p.velocity.y = 2.0 * f1;

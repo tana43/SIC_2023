@@ -2,6 +2,7 @@
 #include "Easing.h"
 #include "BlockManager.h"
 #include "Block.h"
+#include "GameManager.h"
 
 void PuzzleFrame::CreateResource()
 {
@@ -43,23 +44,25 @@ void PuzzleFrame::Update(float elapsedTime)
     //ブロックどっかから順にくるくるさせようぜ
 
     static float timer;
-
-    for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
+    if (!isFrameAttack)
     {
-        float time = timer - 0.15f * y;
-        for (int x = 0; x < MAX_FRAME_WIDTH; x++)
+        for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
         {
-            auto block = GetGridBlock(x,y);
-            if (block == nullptr)continue;
-
-            if (time > 5.0f && time < 5.5f)
+            float time = timer - 0.15f * y;
+            for (int x = 0; x < MAX_FRAME_WIDTH; x++)
             {
-                block->Spin();
-            }
+                auto block = GetGridBlock(x, y);
+                if (block == nullptr)continue;
 
-            if (time > 10.0f && time < 10.5f)
-            {
-                block->Spin();
+                if (time > 5.0f && time < 5.5f)
+                {
+                    block->Spin();
+                }
+
+                if (time > 10.0f && time < 10.5f)
+                {
+                    block->Spin();
+                }
             }
         }
     }
@@ -68,8 +71,10 @@ void PuzzleFrame::Update(float elapsedTime)
     {
         timer = 0;
     }
-
     timer += elapsedTime;
+
+    FrameAttackUpdate(elapsedTime);
+
 
 
     //アビリティのチェイン数に合わせた数字表示
@@ -106,6 +111,15 @@ void PuzzleFrame::Render()
                 chains[type] = cAbility.get();
             }
         }
+        if (chain > 3)
+        {
+            GameManager::GetPlayer().SetPower(chain,type);
+        }
+        else
+        {
+            GameManager::GetPlayer().SetPower(0, type);
+        }
+        
     }
 
     Regal::Graphics::Graphics::Instance().Set2DStates();
@@ -114,7 +128,7 @@ void PuzzleFrame::Render()
     {
         if (chains[i] == nullptr)continue;
         if (chains[i]->chain < 4)continue;
-        chains[i]->Render(DirectX::XMFLOAT2(200, 250 + 50.0f * i));
+        chains[i]->Render(DirectX::XMFLOAT2(200, 400 + 50.0f * i));
     }
     Regal::Graphics::Graphics::Instance().Set3DStates();
 }
@@ -253,6 +267,13 @@ bool PuzzleFrame::SetBlockOnGrid(Block* block)
     return true;
 }
 
+bool PuzzleFrame::SetBlockOnGrid(Block* block, int x, int y)
+{
+    gridsBlock[y][x] = block;
+
+    return true;
+}
+
 bool PuzzleFrame::IsOverToleranceLimit()
 {
     for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
@@ -346,7 +367,36 @@ void PuzzleFrame::FrameAttackUpdate(float elapsedTime)
 {
     if (!isFrameAttack)return;
 
-    
+    if (frameAttackTimer > frameAttackTime)
+    {
+        for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
+        {
+            for (int x = 0; x < MAX_FRAME_WIDTH; x++)
+            {
+                auto* gridBlock{ gridsBlock[y][x] };
+                if (gridBlock == nullptr)continue;
+                if (gridBlock->GetIsAssault())continue;
+                gridBlock->Assault();
+                frameAttackTimer = 0;
+                goto loopEnd;
+            }
+        }
+
+        for (int y = 0; y < MAX_FRAME_HEIGHT; y++)
+        {
+            for (int x = 0; x < MAX_FRAME_WIDTH; x++)
+            {
+                auto* gridBlock{ gridsBlock[y][x] };
+                if (gridBlock)goto loopEnd;
+            }
+        }
+        isFrameAttack = false;
+        Clear();
+        return;
+    }
+    loopEnd:
+
+    frameAttackTimer += elapsedTime;
 }
 
 void PuzzleFrame::ActiveFrameAttack()
@@ -358,11 +408,15 @@ void PuzzleFrame::ActiveFrameAttack()
     {
         for (int x = 0; x < MAX_FRAME_WIDTH; x++)
         {
-            if (!gridsBlock[y][x])continue;
-            if (gridsBlock[y][x]->GetAbility())continue;
-            if (gridsBlock[y][x]->GetAbility()->chain < 4)continue;
+            auto* gridBlock{ gridsBlock[y][x] };
+            if (!gridBlock)continue;
+            if (gridBlock->GetAbility())
+            {
+                if (gridBlock->GetAbility()->chain > 3)continue;
+            }
 
-            gridsBlock[y][x]->Destroy();
+            gridBlock->SetEffectColor(DirectX::XMFLOAT4(1,1,1,1));
+            gridBlock->Destroy();
 
             //ブロック情報リセット
             gridsBlock[y][x] = nullptr;
