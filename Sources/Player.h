@@ -55,6 +55,8 @@ public:
     void OnDamaged();
     void OnDead();
 
+    void Heal(int value);
+
     Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
 
     void SetColor(const DirectX::XMFLOAT4 color) { model->GetSkinnedMesh()->SetEmissiveColor(color); }

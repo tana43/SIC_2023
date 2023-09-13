@@ -44,5 +44,7 @@ private:
     //背景用パーティクル
     std::unique_ptr<Regal::Graphics::Particles> BGParticles;
 
+
+    float particleTimer{ 0 };
 };
 

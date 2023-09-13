@@ -64,6 +64,8 @@ namespace Regal::Graphics
         void Render(ID3D11DeviceContext* immediateContext);
         void DrawDebug();
 
+        void SetColor(DirectX::XMFLOAT4 col);
+
         DirectX::XMFLOAT4 color{1.0f,1.0f,1.0f,1.0f};
 
     protected:

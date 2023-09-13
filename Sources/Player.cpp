@@ -303,6 +303,14 @@ void Player::OnDamaged()
 
 void Player::OnDead()
 {
+    Regal::Game::Camera::Instance().ScreenVibrate(0.2f,3.0f);
+    GameManager::Instance().GameClear();
+}
+
+void Player::Heal(int value)
+{
+    if (hp <= 0)return;
+    hp += value;
 }
 
 void Player::Shot(int type)

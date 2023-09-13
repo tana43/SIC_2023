@@ -74,31 +74,64 @@ void Block::Update(float elapsedTime)
 	//“ËŒ‚
 	if (isAssault)
 	{
-		float spinSpeed{ elapsedTime * 15 };
-		model->GetTransform()->AddRotation(DirectX::XMFLOAT3(spinSpeed,spinSpeed,0));
 
-		auto* target{ EnemyManager::Instance().GetEnemy() };
-		auto myPos{ model->GetTransform()->GetPosition() };
-		auto targetPos{ target->GetTransform()->GetPosition()};
-		DirectX::XMFLOAT3 vec;
-		DirectX::XMVECTOR Vec = {
-			DirectX::XMVectorSubtract(
-			DirectX::XMLoadFloat3(&targetPos),DirectX::XMLoadFloat3(&myPos))
-		};
-		DirectX::XMVECTOR VecNormal{DirectX::XMVector3Normalize(Vec)};
-		DirectX::XMFLOAT3 velocity;
-		DirectX::XMStoreFloat3(&velocity,DirectX::XMVectorScale(VecNormal, 50.0f * elapsedTime));
-
-		model->GetTransform()->AddPosition(velocity);
-
-		//”»’èˆ—
-		float length{ DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec)) };
-		
-		if (length < 10.0f)
+		if (type == GREEN)
 		{
-			target->ApplyDamage(GameManager::GetPlayer().GetPower(type));
-			isAssault = false;
-			Destroy();
+			float spinSpeed{ elapsedTime * 15 };
+			model->GetTransform()->AddRotation(DirectX::XMFLOAT3(spinSpeed, spinSpeed, 0));
+
+			auto& target{ GameManager::GetPlayer() };
+			auto myPos{ model->GetTransform()->GetPosition() };
+			auto targetPos{ target.GetTransform()->GetPosition() };
+			DirectX::XMFLOAT3 vec;
+			DirectX::XMVECTOR Vec = {
+				DirectX::XMVectorSubtract(
+				DirectX::XMLoadFloat3(&targetPos),DirectX::XMLoadFloat3(&myPos))
+			};
+			DirectX::XMVECTOR VecNormal{DirectX::XMVector3Normalize(Vec)};
+			DirectX::XMFLOAT3 velocity;
+			DirectX::XMStoreFloat3(&velocity, DirectX::XMVectorScale(VecNormal, 50.0f * elapsedTime));
+
+			model->GetTransform()->AddPosition(velocity);
+
+			//”»’èˆ—
+			float length{ DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec)) };
+
+			if (length < 6.0f)
+			{
+				target.Heal(1);
+				isAssault = false;
+				Destroy();
+			}
+		}
+		else
+		{
+			float spinSpeed{ elapsedTime * 15 };
+			model->GetTransform()->AddRotation(DirectX::XMFLOAT3(spinSpeed, spinSpeed, 0));
+
+			auto* target{ EnemyManager::Instance().GetEnemy() };
+			auto myPos{ model->GetTransform()->GetPosition() };
+			auto targetPos{ target->GetTransform()->GetPosition() };
+			DirectX::XMFLOAT3 vec;
+			DirectX::XMVECTOR Vec = {
+				DirectX::XMVectorSubtract(
+				DirectX::XMLoadFloat3(&targetPos),DirectX::XMLoadFloat3(&myPos))
+			};
+			DirectX::XMVECTOR VecNormal{DirectX::XMVector3Normalize(Vec)};
+			DirectX::XMFLOAT3 velocity;
+			DirectX::XMStoreFloat3(&velocity, DirectX::XMVectorScale(VecNormal, 50.0f * elapsedTime));
+
+			model->GetTransform()->AddPosition(velocity);
+
+			//”»’èˆ—
+			float length{ DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec)) };
+
+			if (length < 10.0f)
+			{
+				target->ApplyDamage(GameManager::GetPlayer().GetPower(type));
+				isAssault = false;
+				Destroy();
+			}
 		}
 	}
 

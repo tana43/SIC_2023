@@ -1,6 +1,8 @@
 #include "GameManager.h"
 #include "BlockGroupManager.h"
 #include "EnemyManager.h"
+#include "BaseColorController.h"
+#include "TitleScene.h"
 
 //スコアの管理、ゲームの進行を担うクラス
 
@@ -9,7 +11,8 @@ void GameManager::CreateResource()
     player->CreateResource();
     sStageLevel = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
         L"./Resources/Images/StageLevel.png");
-
+    sGameClear = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
+        L"./Resources/Images/GameClear.png");
     number = std::make_unique<Numbers>();
 }
 
@@ -33,21 +36,48 @@ void GameManager::Initialize()
     number->SetPosition(DirectX::XMFLOAT2(1215, 633));
     number->SetScale(0.9f);
     number->SetBetweenNum(32);
+
+    sAlpha = 0;
+
+    gameClear = false;
 }
 
 void GameManager::Update(float elapsedTime)
 {
+    if (!gameClear)
+    {
+
     player->Update(elapsedTime);
 
-    for (int i = 0;i < 4;++i)
-    {
-        nextBlockGroups[i]->SetPosition(DirectX::XMFLOAT3(
+        for (int i = 0;i < 4;++i)
+        {
+            nextBlockGroups[i]->SetPosition(DirectX::XMFLOAT3(
             nBlockPos.x, nBlockPos.y - nBlockInterval * i,nBlockPos.z
-        ));
+            ));
 
-        //nextBlockGroups[i]->Update(elapsedTime);
+            //nextBlockGroups[i]->Update(elapsedTime);
+        }
+
     }
-
+    else
+    {
+        if (sAlpha < 1)
+        {
+            sAlpha += elapsedTime * 0.3f;
+        }
+        else
+        {
+            if (Player::SelectButton())
+            {
+                Regal::Scene::SceneManager::Instance().ChangeScene(new TitleScene);
+            }
+        }
+        sGameClear->SetColor(rundomColor.x, rundomColor.y, rundomColor.z, sAlpha);
+        number->SetAlpha(sAlpha);
+        number->SetPosition(DirectX::XMFLOAT2(552.0f, 179.0f));
+        number->SetScale(1.53f);
+        
+    }
     number->SetNumbers(stageLevel);
 }
 
@@ -83,15 +113,29 @@ void GameManager::Render()
 {
     player->Render();
 
-    auto& graphics{ Regal::Graphics::Graphics::Instance() };
-    float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
-    graphics.Set2DStates();
-    sStageLevel->Render(graphics.GetDeviceContext(), 0, 0,
-        graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+    if (!gameClear)
+    {
+        auto& graphics{ Regal::Graphics::Graphics::Instance() };
+        float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
+        graphics.Set2DStates();
+        sStageLevel->Render(graphics.GetDeviceContext(), 0, 0,
+            graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 
-    number->Render();
+        number->Render();
+        graphics.Set3DStates();
+    }
+}
 
-    graphics.Set3DStates();
+void GameManager::GameClearRender()
+{
+    if (gameClear)
+    {
+        auto& graphics{ Regal::Graphics::Graphics::Instance() };
+        sGameClear->Render(graphics.GetDeviceContext(), 0, 0,
+            graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+
+        number->Render();
+    }
 }
 
 void GameManager::NextBlockUse()
@@ -117,4 +161,10 @@ void GameManager::NextBlockUse()
     }
     //ブロックがなめらかに動いてるように見せたいだけ
     //nBlockInterval = OFFSET_Y;
+}
+
+void GameManager::GameClear()
+{
+    gameClear = true;
+    rundomColor = BaseColorController::RundomBrightColor();
 }

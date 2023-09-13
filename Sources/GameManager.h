@@ -26,6 +26,8 @@ public:
     void DrawDebug()override;
     void Render()override;
 
+    void GameClearRender();
+
     static Player& GetPlayer() { return *Instance().player; }
    
     void AddStageLevel() { stageLevel++; }
@@ -33,6 +35,8 @@ public:
     void NextBlockUse();
 
     const int GetStageLevel() const { return stageLevel; }
+
+    void GameClear();
 
 private:
     int score;
@@ -50,6 +54,13 @@ private:
     DirectX::XMFLOAT3 nBlockPos{38,50,0};
 
     std::unique_ptr<Regal::Resource::Sprite> sStageLevel;
+    std::unique_ptr<Regal::Resource::Sprite> sGameClear;
+    float sAlpha{0};
     std::unique_ptr<Numbers> number;
+
+    DirectX::XMFLOAT4 rundomColor;
+
+    bool gameClear = false;
+
 };
 

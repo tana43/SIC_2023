@@ -1,6 +1,7 @@
 #include "Particles.h"
 
 #include "../Resource/Shader.h"
+#include "../Graphics/Graphics.h"
 #include "../Other/Misc.h"
 
 #include "../../../External/imgui/imgui.h"
@@ -139,5 +140,10 @@ namespace Regal::Graphics
             ImGui::ColorEdit4("Color",&color.x);
             ImGui::EndMenu();
         }
+    }
+    void Particles::SetColor(DirectX::XMFLOAT4 col)
+    {
+        color = col;
+        Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0.016f);
     }
 }

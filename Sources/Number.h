@@ -43,6 +43,14 @@ public:
     void SetScale(const float sca) { scale = sca; }
     void SetBetweenNum(const float bet) { betweenNumbers = bet; }
 
+    void SetAlpha(float alpha) 
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            num[i].SetColor(DirectX::XMFLOAT4(1,1,1,alpha));
+        }
+    }
+
 private:
 
     DirectX::XMFLOAT2 pos;

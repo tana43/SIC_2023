@@ -100,6 +100,26 @@ void GameScene::Update(const float& elapsedTime)
 #endif // ENABLE_PARTICLE
 
 	Regal::Game::Camera::Instance().Update(elapsedTime);
+
+
+	if (particleTimer > 10.0f)
+	{
+		float& particleSize = BGParticles->particleData.particleSize;
+		if (particleSize > 0)
+		{
+			BGParticles->particleData.particleSize -= elapsedTime * 0.3f;
+			if (particleSize > 0)BGParticles->SetColor(EnemyManager::Instance().GetEnemy()->GetModel()->GetSkinnedMesh()->GetEmissiveColor());
+		}
+		else
+		{
+			particleSize += elapsedTime * 0.3f;
+			if (0.08f > particleSize)
+			{
+				particleTimer = 0;
+			}
+		}
+	}
+	particleTimer += elapsedTime;
 }
 
 void GameScene::End()
@@ -154,6 +174,8 @@ void GameScene::Render(const float& elapsedTime)
 			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 
 		//Fade::Instance().Render(immediateContext);
+
+		GameManager::Instance().GameClearRender();
 	}
 
 #ifndef DISABLE_OFFSCREENRENDERING

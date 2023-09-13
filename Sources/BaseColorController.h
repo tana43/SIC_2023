@@ -15,5 +15,7 @@ public:
     }
 
     static DirectX::XMFLOAT4 RundomBrightColor();
+
+    DirectX::XMFLOAT4 baseColor;
 };
 
