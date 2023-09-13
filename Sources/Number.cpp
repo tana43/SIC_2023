@@ -1,5 +1,12 @@
 #include "Number.h"
 
+Number::Number()
+{
+    sprite = std::make_unique<Regal::Resource::Sprite>(
+        Regal::Graphics::Graphics::Instance().GetDevice()
+        , L"./Resources/Images/numbers.png");
+}
+
 void Number::Render()
 {
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
@@ -16,11 +23,25 @@ void Number::SetNumber(int n)
     trimmingPos.x = n * iWidth;
 }
 
+Numbers::Numbers(int n) :myNum(n)
+{
+    int num{ myNum };
+    int d{};
+    while (num != 0)
+    {
+        num /= 10;
+
+        ++d;
+    }
+    digit = d;
+}
+
 void Numbers::Render()
 {
     for (int i = 0; i < digit; i++)
     {
         num[i].pos = { pos.x - betweenNumbers * i,pos.y };
+        num[i].scale = { scale,scale };
         num[i].Render();
     }
 }
@@ -36,6 +57,7 @@ void Numbers::SetNumbers(int n)
         ++d;
     }
     digit = d;
+    if (digit == 0)digit = 1;
 
     for (int i = 0; i < digit; i++)
     {
@@ -54,6 +76,10 @@ void Numbers::DrawDebug()
         {
             SetNumbers(i);
         }
+        ImGui::DragFloat2("Pos", &pos.x);
+
+        ImGui::DragFloat("Scale", &scale,0.01f);
+
         ImGui::EndMenu();
     }
 }

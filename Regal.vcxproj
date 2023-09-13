@@ -220,6 +220,7 @@
     <ClCompile Include="Sources\BlockGroup.cpp" />
     <ClCompile Include="Sources\EnemyManager.cpp" />
     <ClCompile Include="Sources\Enemy.cpp" />
+    <ClCompile Include="Sources\Fade.cpp" />
     <ClCompile Include="Sources\Framework.cpp" />
     <ClCompile Include="Sources\GameManager.cpp" />
     <ClCompile Include="Sources\GameScene.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="Sources\Easing.h" />
     <ClInclude Include="Sources\EnemyManager.h" />
     <ClInclude Include="Sources\Enemy.h" />
+    <ClInclude Include="Sources\Fade.h" />
     <ClInclude Include="Sources\Framework.h" />
     <ClInclude Include="Sources\GameManager.h" />
     <ClInclude Include="Sources\GameScene.h" />

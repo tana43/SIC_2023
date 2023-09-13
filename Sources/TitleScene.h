@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./RegalLib/Regal.h"
+#include "PopEffect.h"
 
 class TitleScene final : public Regal::Scene::BaseScene
 {
@@ -19,6 +20,13 @@ public:
     void DrawDebug()override;
     void PostEffectDrawDebug()override;
 
+    enum SelectMenu
+    {
+        PLAY,
+        TUTORIAL,
+        EXIT,
+    };
+
 private:
     float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
     std::unique_ptr<Regal::Graphics::Framebuffer> framebuffer;
@@ -29,7 +37,18 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> LEPixelShader;
 
     std::unique_ptr<Regal::Resource::Sprite> sprite;
+    std::unique_ptr<Regal::Resource::Sprite> sCursor;
+    std::unique_ptr<Regal::Resource::Sprite> sTutrial;
+    DirectX::XMFLOAT2 sCursorPos{512, 405};
+    //DirectX::XMFLOAT2 sPos;
+
+    int cursorState{PLAY};
 
     std::unique_ptr<Regal::Graphics::Particles> BGParticles;
+    std::unique_ptr<PopEffect> popEffect;
+
+    bool isDecide{false};
+    bool once{false};
+    bool openTutrial{ false };
 };
 

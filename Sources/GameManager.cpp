@@ -7,6 +7,10 @@
 void GameManager::CreateResource()
 {
     player->CreateResource();
+    sStageLevel = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
+        L"./Resources/Images/StageLevel.png");
+
+    number = std::make_unique<Numbers>();
 }
 
 void GameManager::Initialize()
@@ -23,6 +27,12 @@ void GameManager::Initialize()
     NextBlockUse();
 
     EnemyManager::Instance().Register(new Enemy);
+
+    stageLevel = 0;
+    number->SetNumbers(stageLevel);
+    number->SetPosition(DirectX::XMFLOAT2(1215, 633));
+    number->SetScale(0.9f);
+    number->SetBetweenNum(32);
 }
 
 void GameManager::Update(float elapsedTime)
@@ -37,6 +47,8 @@ void GameManager::Update(float elapsedTime)
 
         //nextBlockGroups[i]->Update(elapsedTime);
     }
+
+    number->SetNumbers(stageLevel);
 }
 
 void GameManager::DrawDebug()
@@ -47,6 +59,8 @@ void GameManager::DrawDebug()
 
         ImGui::DragFloat("nBlock Interval", &nBlockInterval, 0.1f);
         ImGui::DragFloat3("nBlock Positoin", &nBlockPos.x, 0.1f);
+
+        number->DrawDebug();
 
         //スクロール可能なリスト
         ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);
@@ -68,6 +82,16 @@ void GameManager::DrawDebug()
 void GameManager::Render()
 {
     player->Render();
+
+    auto& graphics{ Regal::Graphics::Graphics::Instance() };
+    float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
+    graphics.Set2DStates();
+    sStageLevel->Render(graphics.GetDeviceContext(), 0, 0,
+        graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+
+    number->Render();
+
+    graphics.Set3DStates();
 }
 
 void GameManager::NextBlockUse()

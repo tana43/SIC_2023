@@ -4,12 +4,7 @@
 class Number
 {
 public:
-    Number() 
-    {
-        sprite = std::make_unique<Regal::Resource::Sprite>(
-            Regal::Graphics::Graphics::Instance().GetDevice()
-            , L"./Resources/Images/numbers.png");
-    }
+    Number();
     ~Number() {}
 
     void Render();
@@ -34,18 +29,7 @@ public:
 class Numbers
 {
 public:
-    Numbers(int n = 0):myNum(n) 
-    {
-        int num{ myNum };
-        int d{};
-        while (num != 0)
-        {
-            num /= 10;
-
-            ++d;
-        }
-        digit = d;
-    }
+    Numbers(int n = 0);
     ~Numbers() {}
 
     void Render();
@@ -55,6 +39,9 @@ public:
     void DrawDebug();
 
     void SetPosition(const DirectX::XMFLOAT2 pos) { this->pos = pos; }
+
+    void SetScale(const float sca) { scale = sca; }
+    void SetBetweenNum(const float bet) { betweenNumbers = bet; }
 
 private:
 
@@ -70,4 +57,6 @@ private:
 
     //”š‚Æ”š‚ÌŠÔŠu
     float betweenNumbers{25};
+
+    float scale{0.5f};
 };

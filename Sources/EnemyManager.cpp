@@ -11,7 +11,7 @@ void EnemyManager::Initialize()
 {
 	hpGauge = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
 		L"./Resources/Images/HpGauge.png");
-
+	popEffect = std::make_unique<PopEffect>(300);
 	Clear();
 }
 
@@ -21,6 +21,8 @@ void EnemyManager::Update(float elapsedTime)
 	{
 		enemy->Update(elapsedTime);
 	}
+
+	popEffect->Update(elapsedTime);
 
 	//破棄処理
 	//範囲ベースfor文の中で破棄すると不具合が起こる
@@ -47,6 +49,8 @@ void EnemyManager::Render()
 	{
 		enemy->Render();
 	}
+
+	popEffect->Render();
 
 	auto& graphics{ Regal::Graphics::Graphics::Instance() };
 	float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
@@ -123,4 +127,10 @@ void EnemyManager::Change()
 	Register(p);
 
 	GameManager::Instance().AddStageLevel();
+}
+
+void EnemyManager::EffectPlay(Enemy* enemy)
+{
+	popEffect->SetColor(enemy->GetModel()->GetSkinnedMesh()->GetEmissiveColor());
+	popEffect->Play(enemy->GetTransform()->GetPosition());
 }

@@ -211,6 +211,9 @@
     <ClCompile Include="Sources\PopEffect.cpp">
       <Filter>Game\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Fade.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -374,6 +377,9 @@
     </ClInclude>
     <ClInclude Include="Sources\PopEffect.h">
       <Filter>Game\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Fade.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

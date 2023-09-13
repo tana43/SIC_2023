@@ -35,6 +35,8 @@ public:
 
     void Change();
 
+    void EffectPlay(Enemy* enemy);
+
 private:
     Enemy* curEnemy;
 
@@ -43,5 +45,7 @@ private:
 
     std::unique_ptr<Regal::Resource::Sprite> hpGauge;
     DirectX::XMFLOAT2 spritePos{150,40};
+
+    std::unique_ptr<PopEffect> popEffect;
 };
 

@@ -54,8 +54,8 @@ namespace Regal::Resource
             DirectX::XMFLOAT2 texcoord;
         };
 
-    private:
         float color[4] = {1,1,1,1};
+    private:
 
         Microsoft::WRL::ComPtr<ID3D11VertexShader>  vertexShader;
         Microsoft::WRL::ComPtr<ID3D11PixelShader>   pixelShader;

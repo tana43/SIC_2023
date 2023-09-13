@@ -5,6 +5,7 @@
 #include "BlockGroupManager.h"
 #include "GameManager.h"
 #include "EnemyManager.h"
+#include "Fade.h"
 
 #define ENABLE_PARTICLE 1
 
@@ -64,6 +65,7 @@ void GameScene::Initialize()
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
 #endif // ENABLE_PARTICLE
 
+
 }
 
 void GameScene::Finalize()
@@ -116,22 +118,6 @@ void GameScene::Render(const float& elapsedTime)
 	framebuffer->Activate(immediateContext);
 #endif // !ENABLE_OFFSCREENRENDERING
 
-	//2D
-	{
-		graphics.Set2DStates();
-
-#if _DEBUG
-		sprite->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
-#endif // _DEBUG
-
-		sHealth->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
-
-		sEnemy->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
-	}
-
 #if ENABLE_PARTICLE
 	//パーティクル
 	graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
@@ -151,6 +137,25 @@ void GameScene::Render(const float& elapsedTime)
 
 		EnemyManager::Instance().Render();
 	}
+
+	//2D
+	{
+		graphics.Set2DStates();
+
+#if _DEBUG
+		sprite->Render(graphics.GetDeviceContext(), 0, 0,
+			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+#endif // _DEBUG
+
+		sHealth->Render(graphics.GetDeviceContext(), 0, 0,
+			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+
+		sEnemy->Render(graphics.GetDeviceContext(), 0, 0,
+			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+
+		//Fade::Instance().Render(immediateContext);
+	}
+
 #ifndef DISABLE_OFFSCREENRENDERING
 	framebuffer->Deactivate(immediateContext);
 #endif // !DISABLE_OFFSCREENRENDERING

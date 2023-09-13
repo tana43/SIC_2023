@@ -1,6 +1,8 @@
 #include "TitleScene.h"
 #include "GameScene.h"
 #include "BaseColorController.h"
+#include "Fade.h"
+#include "Player.h"
 
 void TitleScene::CreateResource()
 {
@@ -17,8 +19,12 @@ void TitleScene::CreateResource()
 	Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
 	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
+	sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
+	sTutrial = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial.png");
 
 	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
+	popEffect = std::make_unique<PopEffect>(200);
+	//Fade::Instance().Initialize();
 }
 
 void TitleScene::Initialize()
@@ -31,9 +37,15 @@ void TitleScene::Initialize()
 
 	BGParticles->color = color;
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
+	sCursor->color[0] = color.x;
+	sCursor->color[1] = color.y;
+	sCursor->color[2] = color.z;
+
+	popEffect->SetColor(color);
 
 	Regal::Game::Camera::Instance().GetTransform()->SetPosition(DirectX::XMFLOAT3(2, 44, -88));
 	//2 44 -88
+
 }
 
 void TitleScene::Finalize()
@@ -46,7 +58,87 @@ void TitleScene::Begin()
 
 void TitleScene::Update(const float& elapsedTime)
 {
+	/*if (!once)
+	{
+		goto skip;
+		once = true;
+	}
+	Fade::Instance().Initialize();
+	skip : */
+
 	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
+
+	popEffect->Update(elapsedTime);
+
+	if (!isDecide)
+	{
+		switch (cursorState)
+		{
+		case PLAY:
+			if (Player::MoveDownButton())
+			{
+				cursorState++;
+			}
+			break;
+		case TUTORIAL:
+			if (Player::MoveDownButton())
+			{
+				cursorState++;
+			}
+			if (Player::MoveUpButton())
+			{
+				cursorState--;
+			}
+			break;
+		case EXIT:
+			if (Player::MoveUpButton())
+			{
+				cursorState--;
+			}
+			break;
+		}
+
+		if (Player::SelectButton())
+		{
+			isDecide = true;
+			switch (cursorState)
+			{
+			case PLAY:
+				popEffect->Play(DirectX::XMFLOAT3(-12.3f, 33.4f, 0));
+				break;
+			case TUTORIAL:
+				//27.7 20.6
+				popEffect->Play(DirectX::XMFLOAT3(-27.7f, 20.6f, 0));
+				break;
+			}
+		}
+	}
+	else
+	{
+		//何かが選択された
+		switch (cursorState)
+		{
+		case PLAY:
+			Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
+			//-12.3 33.4
+			break;
+		case TUTORIAL:
+			openTutrial = true;
+			if (Player::SelectButton())
+			{
+				openTutrial = false;
+				isDecide = false;
+			}
+			//27.7 20.6
+			break;
+		case EXIT:
+			exit(0);
+			//-12.3 7.5
+			break;
+		}
+	}
+	
+	//Fade::Instance().Update(elapsedTime);
 
 	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
 	{
@@ -76,12 +168,36 @@ void TitleScene::Render(const float& elapsedTime)
 
 		sprite->Render(graphics.GetDeviceContext(),0,0,
 			graphics.GetScreenWidth(),graphics.GetScreenHeight(),0);
+
+		DirectX::XMFLOAT2 sPos;
+		switch (cursorState)
+		{
+		case PLAY:sPos = {512,405}; break;
+		case TUTORIAL:sPos = { 400,492 };break;
+		case EXIT:sPos = { 512,585 };break;
+		}
+		sCursorPos = sPos;
+
+		sCursor->_Render(graphics.GetDeviceContext(), sCursorPos.x, sCursorPos.y,	
+			64.0f, 64.0f, 
+			0.0f, 0.0f, 128.0f, 128.0f, 0);
+
+		if (openTutrial)
+		{
+			sTutrial->Render(graphics.GetDeviceContext(), 0, 0,
+				graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+		}
+		//Fade::Instance().Render(immediateContext);
+
 	}
 
 	//パーティクル
 	graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
 	immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
 	BGParticles->Render(graphics.GetDeviceContext());
+
+	popEffect->Render();
+
 
 	//3D
 	{
@@ -114,8 +230,11 @@ void TitleScene::DrawDebug()
 		ImGui::EndMenu();
 	}
 
+	popEffect->DrawDebug();
 
 	sprite->DrawDebug();
+
+	ImGui::DragFloat2("Cursor Pos", &sCursorPos.x);
 }
 
 void TitleScene::PostEffectDrawDebug()

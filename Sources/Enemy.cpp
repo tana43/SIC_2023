@@ -35,9 +35,9 @@ void Enemy::Initialize()
         model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1,1,0,1));
         break;
     }
-    hp = 1000;
-    maxHp = 1000;
-    power = 3;
+    hp = 1000 + 500 * GameManager::Instance().GetStageLevel();
+    maxHp = hp;
+    power = 3 + 2 * GameManager::Instance().GetStageLevel();
     attackTimer = 0;
 
     attackCoolTime = 8.0f;
@@ -85,7 +85,7 @@ void Enemy::Update(float elapsedTime)
         break;
     case DIE:
 
-        model->GetSkinnedMesh()->SetEmissiveIntensity(eIntensity * (deadTimer - 1.0f));
+        model->GetSkinnedMesh()->SetEmissiveIntensity(eIntensity * (1.0f - deadTimer));
 
         if (deadTimer > 1.0f)
         {

@@ -82,6 +82,8 @@ public:
 
     const int GetType() const { return type; }
 
+    Regal::Model::StaticModel* GetModel() { return model.get(); }
+
 private:
     int hp;
     int maxHp;

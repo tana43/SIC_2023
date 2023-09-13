@@ -32,6 +32,8 @@ public:
 
     void NextBlockUse();
 
+    const int GetStageLevel() const { return stageLevel; }
+
 private:
     int score;
     int highScore;
@@ -46,5 +48,8 @@ private:
 
     float nBlockInterval{10};
     DirectX::XMFLOAT3 nBlockPos{38,50,0};
+
+    std::unique_ptr<Regal::Resource::Sprite> sStageLevel;
+    std::unique_ptr<Numbers> number;
 };
 
