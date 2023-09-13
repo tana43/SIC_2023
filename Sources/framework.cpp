@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "TitleScene.h"
+#include "AudioManager.h"
 
 using namespace Regal::Resource;
 using namespace Regal::Graphics;
@@ -103,6 +104,9 @@ bool Framework::Initialize()
 	particles->Initialize(graphics.GetDeviceContext(), 0);
 
 #endif // 0
+
+	// XAUDIO2
+	AudioManager::Instance().Initialize();
 	
 #ifdef DEMO_MODE
 	SceneManager::Instance().ChangeScene(new DemoScene);

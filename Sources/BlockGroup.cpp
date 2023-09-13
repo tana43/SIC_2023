@@ -2,6 +2,7 @@
 #include "BlockManager.h"
 #include "PuzzleFrame.h"
 #include "BlockGroupManager.h"
+#include "AudioManager.h"
 
 BlockGroup::BlockGroup(bool onGrid) : GameObject("BlocksGroup"),onGrid(onGrid)
 {
@@ -227,6 +228,8 @@ void BlockGroup::RotRight()
 	blocks[1] = blocks[2];
 	blocks[2] = blocks[3];
 	blocks[3] = temp;
+
+	AudioManager::Instance().Play(AudioManager::ROT_BLOCK);
 }
 
 void BlockGroup::RotLeft()
@@ -237,6 +240,8 @@ void BlockGroup::RotLeft()
 	blocks[1] = blocks[0];
 	blocks[0] = blocks[3];
 	blocks[3] = temp;
+
+	AudioManager::Instance().Play(AudioManager::ROT_BLOCK);
 }
 
 bool BlockGroup::IsBottom()
@@ -271,6 +276,8 @@ void BlockGroup::PutOnGrid()
 	}
 
 	BlockGroupManager::Instance().Remove(this);
+
+	AudioManager::Instance().Play(AudioManager::PUT_BLOCK);
 }
 
 const bool BlockGroup::CanMoveDown()

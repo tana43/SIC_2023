@@ -214,6 +214,12 @@
     <ClCompile Include="Sources\Fade.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\RegalLib\audio.cpp">
+      <Filter>RegalLib</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\AudioManager.cpp">
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -380,6 +386,12 @@
     </ClInclude>
     <ClInclude Include="Sources\Fade.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\audio.h">
+      <Filter>RegalLib</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\AudioManager.h">
+      <Filter>Game\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

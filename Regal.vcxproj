@@ -214,6 +214,7 @@
     <ClCompile Include="External\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="External\imgui\imgui_tables.cpp" />
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Sources\AudioManager.cpp" />
     <ClCompile Include="Sources\BaseColorController.cpp" />
     <ClCompile Include="Sources\BlockGroupManager.cpp" />
     <ClCompile Include="Sources\BlockManager.cpp" />
@@ -230,6 +231,7 @@
     <ClCompile Include="Sources\Player.cpp" />
     <ClCompile Include="Sources\PopEffect.cpp" />
     <ClCompile Include="Sources\PuzzleFrame.cpp" />
+    <ClCompile Include="Sources\RegalLib\audio.cpp" />
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp" />
     <ClCompile Include="Sources\RegalLib\Game\Camera.cpp" />
     <ClCompile Include="Sources\RegalLib\Game\Transform.cpp" />
@@ -264,6 +266,7 @@
     <ClInclude Include="External\imgui\imstb_rectpack.h" />
     <ClInclude Include="External\imgui\imstb_textedit.h" />
     <ClInclude Include="External\imgui\imstb_truetype.h" />
+    <ClInclude Include="Sources\AudioManager.h" />
     <ClInclude Include="Sources\BaseColorController.h" />
     <ClInclude Include="Sources\BlockGroupManager.h" />
     <ClInclude Include="Sources\BlockManager.h" />
@@ -281,6 +284,7 @@
     <ClInclude Include="Sources\Player.h" />
     <ClInclude Include="Sources\PopEffect.h" />
     <ClInclude Include="Sources\PuzzleFrame.h" />
+    <ClInclude Include="Sources\RegalLib\audio.h" />
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h" />
     <ClInclude Include="Sources\RegalLib\Game\Camera.h" />
     <ClInclude Include="Sources\RegalLib\Game\GameObject.h" />

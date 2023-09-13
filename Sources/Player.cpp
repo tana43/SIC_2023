@@ -2,6 +2,7 @@
 #include "PuzzleFrame.h"
 #include "GameManager.h"
 #include "EnemyManager.h"
+#include "AudioManager.h"
 
 void Player::CreateResource()
 {
@@ -298,11 +299,13 @@ bool Player::ApplyDamage(int damage)
 
 void Player::OnDamaged()
 {
+    AudioManager::Instance().Play(AudioManager::DAMAGED);
     Regal::Game::Camera::Instance().ScreenVibrate(0.08f,0.7f);
 }
 
 void Player::OnDead()
 {
+    AudioManager::Instance().Play(AudioManager::LOSE);
     Regal::Game::Camera::Instance().ScreenVibrate(0.2f,3.0f);
     GameManager::Instance().GameClear();
 }
@@ -381,6 +384,7 @@ void Player::Projectile::Update(float elapsedTime)
 
         if (chargeTimer > chargeTime)
         {
+            AudioManager::Instance().Play(AudioManager::SHOT);
             completeCharge = true;
             chargeTimer = 0;
         }
@@ -416,6 +420,8 @@ void Player::Projectile::Hit()
 
     owner->GetProjectilePopEffect(type)->SetScale(1.2f + power * 0.03f);
     owner->GetProjectilePopEffect(type)->Play(model->GetTransform()->GetPosition());
+
+    
 
     Remove();
 }

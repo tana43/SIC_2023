@@ -44,3 +44,5 @@
 #include "Input/Input.h"
 
 #include "Demo/DemoScene.h"
+
+#include "audio.h"

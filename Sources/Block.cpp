@@ -4,6 +4,7 @@
 #include "BlockManager.h"
 #include "EnemyManager.h"
 #include "GameManager.h"
+#include "AudioManager.h"
 
 DirectX::XMFLOAT2 Block::STARTING_POS = DirectX::XMFLOAT2(5.0f, 2.0f);
 
@@ -99,6 +100,7 @@ void Block::Update(float elapsedTime)
 
 			if (length < 6.0f)
 			{
+				AudioManager::Instance().Play(AudioManager::BLOCK_ASSAULT);
 				target.Heal(1);
 				isAssault = false;
 				Destroy();
@@ -129,6 +131,7 @@ void Block::Update(float elapsedTime)
 			if (length < 10.0f)
 			{
 				target->ApplyDamage(GameManager::GetPlayer().GetPower(type));
+				AudioManager::Instance().Play(AudioManager::BLOCK_ASSAULT);
 				isAssault = false;
 				Destroy();
 			}

@@ -3,6 +3,7 @@
 #include "BaseColorController.h"
 #include "Fade.h"
 #include "Player.h"
+#include "AudioManager.h"
 
 void TitleScene::CreateResource()
 {
@@ -77,22 +78,26 @@ void TitleScene::Update(const float& elapsedTime)
 		case PLAY:
 			if (Player::MoveDownButton())
 			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
 				cursorState++;
 			}
 			break;
 		case TUTORIAL:
 			if (Player::MoveDownButton())
 			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
 				cursorState++;
 			}
 			if (Player::MoveUpButton())
 			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
 				cursorState--;
 			}
 			break;
 		case EXIT:
 			if (Player::MoveUpButton())
 			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
 				cursorState--;
 			}
 			break;
@@ -100,6 +105,7 @@ void TitleScene::Update(const float& elapsedTime)
 
 		if (Player::SelectButton())
 		{
+			AudioManager::Instance().Play(AudioManager::DECIDE);
 			isDecide = true;
 			switch (cursorState)
 			{

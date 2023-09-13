@@ -3,6 +3,7 @@
 #include "EnemyManager.h"
 #include "BaseColorController.h"
 #include "TitleScene.h"
+#include "AudioManager.h"
 
 //スコアの管理、ゲームの進行を担うクラス
 
@@ -167,4 +168,5 @@ void GameManager::GameClear()
 {
     gameClear = true;
     rundomColor = BaseColorController::RundomBrightColor();
+    //AudioManager::Instance().GetSE(AudioManager::)->play();
 }

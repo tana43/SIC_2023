@@ -3,6 +3,7 @@
 #include "BlockManager.h"
 #include "Block.h"
 #include "GameManager.h"
+#include "AudioManager.h"
 
 void PuzzleFrame::CreateResource()
 {
@@ -402,6 +403,8 @@ void PuzzleFrame::FrameAttackUpdate(float elapsedTime)
 void PuzzleFrame::ActiveFrameAttack()
 {
     isFrameAttack = true;
+
+    AudioManager::Instance().Play(AudioManager::ALL_BLOCK_ERASE);
 
     //発動しているアビリティを持っていないブロックを全てけす
     for (int y = 0; y < MAX_FRAME_HEIGHT; y++)

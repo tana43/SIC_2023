@@ -214,6 +214,9 @@ private:
 	std::unique_ptr<Regal::Resource::Sprite> skyboxSprite;
 	std::unique_ptr<Regal::Graphics::Particles> particles;*/
 
+	// XAUDIO2
+	Microsoft::WRL::ComPtr<IXAudio2> xaudio2;
+	IXAudio2MasteringVoice* master_voice = nullptr;
 
 	float spriteColors[4] = { 1.0f,1.0f,1.0f,1.0f };
 

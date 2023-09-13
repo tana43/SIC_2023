@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "EnemyManager.h"
 #include "GameManager.h"
+#include "AudioManager.h"
 
 Enemy::~Enemy()
 {
@@ -208,11 +209,13 @@ bool Enemy::ApplyDamage(int damage)
 
 void Enemy::OnDamaged()
 {
+    AudioManager::Instance().Play(AudioManager::DAMAGED);
     Regal::Game::Camera::Instance().ScreenVibrate(0.08f, 0.7f);
 }
 
 void Enemy::OnDead()
 {
+    AudioManager::Instance().Play(AudioManager::ENEMY_DIE);
     Regal::Game::Camera::Instance().ScreenVibrate(0.3f, 5.0f);
     state = DIE;
 }
@@ -251,6 +254,7 @@ void Enemy::Projectile::Update(float elapsedTime)
 
         if (chargeTimer > chargeTime)
         {
+            AudioManager::Instance().Play(AudioManager::SHOT);
             completeCharge = true;
             chargeTimer = 0;
         }

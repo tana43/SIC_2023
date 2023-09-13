@@ -104,8 +104,8 @@ void GameScene::Update(const float& elapsedTime)
 
 	if (particleTimer > 10.0f)
 	{
-		float& particleSize = BGParticles->particleData.particleSize;
-		if (particleSize > 0)
+		BGParticles->SetColor(EnemyManager::Instance().GetEnemy()->GetModel()->GetSkinnedMesh()->GetEmissiveColor());
+		/*if (particleSize > 0)
 		{
 			BGParticles->particleData.particleSize -= elapsedTime * 0.3f;
 			if (particleSize > 0)BGParticles->SetColor(EnemyManager::Instance().GetEnemy()->GetModel()->GetSkinnedMesh()->GetEmissiveColor());
@@ -117,7 +117,8 @@ void GameScene::Update(const float& elapsedTime)
 			{
 				particleTimer = 0;
 			}
-		}
+		}*/
+		particleTimer = 0;
 	}
 	particleTimer += elapsedTime;
 }
@@ -205,7 +206,7 @@ void GameScene::DrawDebug()
 	}
 
 
-	sprite->DrawDebug();
+	//sprite->DrawDebug();
 
 	BlockManager::Instance().DrawDebug();
 
