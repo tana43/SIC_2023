@@ -10,5 +10,6 @@ namespace Regal::Input
     {
         Keyboard::Instance().Update();
         Mouse::Instance().Update();
+        gamePad.Update();
     }
 }

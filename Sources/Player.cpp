@@ -182,23 +182,7 @@ void Player::UseBlocksMove()
     }
 
     //上方向以外への移動
-    if (MoveDownButton())
-    {
-        if (useBlockGroup->MoveDown(1))
-        {
-            //自動落下時間リセット
-            autoFallTimer = 0;
-        }
-    }
-    else if (MoveRightButton())
-    {
-        useBlockGroup->MoveRight(1);
-    }
-    else if (MoveLeftButton())
-    {
-        useBlockGroup->MoveLeft(1);
-    }
-    else if (MoveBottomRightButton())
+    if (MoveBottomRightButton())
     {
         if (useBlockGroup->MoveBottomRight(1))
         {
@@ -220,6 +204,23 @@ void Player::UseBlocksMove()
             autoSetTimer = 0;
         }
     }
+    else if (MoveDownButton())
+    {
+        if (useBlockGroup->MoveDown(1))
+        {
+            //自動落下時間リセット
+            autoFallTimer = 0;
+        }
+    }
+    else if (MoveRightButton())
+    {
+        useBlockGroup->MoveRight(1);
+    }
+    else if (MoveLeftButton())
+    {
+        useBlockGroup->MoveLeft(1);
+    }
+   
 
     //ブロック回転
     if (RotRightButton())

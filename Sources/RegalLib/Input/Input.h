@@ -2,6 +2,7 @@
 
 #include "../Input/Mouse.h"
 #include "../Input/Keyboard.h"
+#include "../Input/GamePad.h"
 
 namespace Regal::Input
 {
@@ -21,6 +22,11 @@ namespace Regal::Input
         }
 
         void Update();
+
+        static GamePad& GetGamePad() { return Instance().gamePad; }
+
+    private:
+        GamePad gamePad;
     };
 }
 
