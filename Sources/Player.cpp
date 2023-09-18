@@ -4,6 +4,8 @@
 #include "EnemyManager.h"
 #include "AudioManager.h"
 
+float Player::inputTimer[] = {0,0,0,0,0};
+
 void Player::CreateResource()
 {
     model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
@@ -31,6 +33,12 @@ void Player::Initialize()
     model->GetTransform()->SetPositionX(-45.0f);
     model->GetTransform()->SetPositionY(72.0f);
     model->GetTransform()->SetScaleFactor(2.3f);
+
+    inputTimer[0] = 0.0f;
+    inputTimer[1] = 0.0f;
+    inputTimer[2] = 0.0f;
+    inputTimer[3] = 0.0f;
+    inputTimer[4] = 0.0f;
 
 
     for (int i = 0;i < Block::END;++i)
@@ -64,7 +72,7 @@ void Player::Update(float elapsedTime)
     //全攻撃中は処理を止める
     if (!PuzzleFrame::Instance().GetIsFrameAttack())
     {
-        UseBlocksMove();
+        UseBlocksMove(elapsedTime);
 
         AutoFallBlock(elapsedTime);
 
@@ -169,7 +177,7 @@ void Player::DrawDebug()
     
 }
 
-void Player::UseBlocksMove()
+void Player::UseBlocksMove(float elapsedTime)
 {
     //操作対象のブロックがなければ処理しない
     if (!useBlockGroup)return;
@@ -182,7 +190,7 @@ void Player::UseBlocksMove()
     }
 
     //上方向以外への移動
-    if (MoveBottomRightButton())
+    if (MoveBottomRightButton() || FastMoveBottomRightButton(elapsedTime))
     {
         if (useBlockGroup->MoveBottomRight(1))
         {
@@ -193,7 +201,7 @@ void Player::UseBlocksMove()
             autoSetTimer = 0;
         }
     }
-    else if (MoveBottomLeftButton())
+    else if (MoveBottomLeftButton() || FastMoveBottomLeftButton(elapsedTime))
     {
         if (useBlockGroup->MoveBottomLeft(1))
         {
@@ -204,7 +212,7 @@ void Player::UseBlocksMove()
             autoSetTimer = 0;
         }
     }
-    else if (MoveDownButton())
+    else if (MoveDownButton() || FastMoveDownButton(elapsedTime))
     {
         if (useBlockGroup->MoveDown(1))
         {
@@ -212,11 +220,11 @@ void Player::UseBlocksMove()
             autoFallTimer = 0;
         }
     }
-    else if (MoveRightButton())
+    else if (MoveRightButton() || FastMoveRightButton(elapsedTime) && !Regal::Input::Keyboard::GetKeyState().LeftShift)
     {
         useBlockGroup->MoveRight(1);
     }
-    else if (MoveLeftButton())
+    else if (MoveLeftButton() || FastMoveLeftButton(elapsedTime) && !Regal::Input::Keyboard::GetKeyState().LeftShift)
     {
         useBlockGroup->MoveLeft(1);
     }

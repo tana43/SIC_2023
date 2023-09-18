@@ -84,7 +84,7 @@ namespace Regal::Graphics
 	public:
 		
 
-		BOOL fullscreenMode{ FALSE };
+		BOOL fullscreenMode;
 		BOOL vsync{ TRUE };//‚’¼“¯Šú
 		BOOL tearingSupported{ FALSE };
 

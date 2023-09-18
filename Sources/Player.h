@@ -42,7 +42,7 @@ public:
     void Render()override;
     void DrawDebug()override;
 
-    void UseBlocksMove();
+    void UseBlocksMove(float elapsedTime);
 
     void AutoFallBlock(float elapsedTime);
     void AutoSetBlock(float elapsedTime);
@@ -98,6 +98,74 @@ public:
             (GamePad::BTN_RIGHT & Regal::Input::Input::GetGamePad().GetButtonDown()));
     }
 
+    //左右上下高速移動
+    static const bool FastMoveLeftButton(float elapsedTime)
+    {
+        if (Regal::Input::Keyboard::GetKeyState().A ||
+            (GamePad::BTN_LEFT & Regal::Input::Input::GetGamePad().GetButton()))
+        {
+            inputTimer[0] += elapsedTime;
+        }
+        else
+        {
+            inputTimer[0] = 0;
+        }
+
+        if (inputTimer[0] > longPressTime)
+        {
+            inputTimer[0] -= longPressInter;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static const bool FastMoveDownButton(float elapsedTime)
+    {
+        if (Regal::Input::Keyboard::GetKeyState().S ||
+            (GamePad::BTN_DOWN & Regal::Input::Input::GetGamePad().GetButton()))
+        {
+            inputTimer[1] += elapsedTime;
+        }
+        else
+        {
+            inputTimer[1] = 0;
+        }
+
+        if (inputTimer[1] > longPressTime)
+        {
+            inputTimer[1] -= longPressInter;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static const bool FastMoveRightButton(float elapsedTime)
+    {
+        if (Regal::Input::Keyboard::GetKeyState().D ||
+            (GamePad::BTN_RIGHT & Regal::Input::Input::GetGamePad().GetButton()))
+        {
+            inputTimer[2] += elapsedTime;
+        }
+        else
+        {
+            inputTimer[2] = 0;
+        }
+
+        if (inputTimer[2] > longPressTime)
+        {
+            inputTimer[2] -= longPressInter;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     //右下、左下移動
     static const bool MoveBottomRightButton()
     {
@@ -108,6 +176,50 @@ public:
     {
         return ((Regal::Input::Keyboard::GetKeyState().LeftShift && MoveLeftButton()) ||
             ((GamePad::BTN_LEFT_SHOULDER & Regal::Input::Input::GetGamePad().GetButtonDown())));
+    }
+    static const bool FastMoveBottomRightButton(float elapsedTime)
+    {
+        if ((Regal::Input::Keyboard::GetKeyState().LeftShift && Regal::Input::Keyboard::GetKeyState().D) ||
+            ((GamePad::BTN_RIGHT_SHOULDER & Regal::Input::Input::GetGamePad().GetButton())))
+        {
+            inputTimer[3] += elapsedTime;
+        }
+        else
+        {
+            inputTimer[3] = 0;
+        }
+
+        if (inputTimer[3] > longPressTime)
+        {
+            inputTimer[3] -= longPressInter;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static const bool FastMoveBottomLeftButton(float elapsedTime)
+    {
+        if ((Regal::Input::Keyboard::GetKeyState().LeftShift && Regal::Input::Keyboard::GetKeyState().A) ||
+            ((GamePad::BTN_LEFT_SHOULDER & Regal::Input::Input::GetGamePad().GetButton())))
+        {
+            inputTimer[4] += elapsedTime;
+        }
+        else
+        {
+            inputTimer[4] = 0;
+        }
+
+        if (inputTimer[4] > longPressTime)
+        {
+            inputTimer[4] -= longPressInter;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     //左右回転
@@ -148,6 +260,11 @@ public:
     std::vector<Projectile*>& GetRemoves() { return removes; }
 
 private:
+
+    static float inputTimer[5];
+    static constexpr float longPressTime = 0.3f;
+    static constexpr float longPressInter = 0.05f;
+
     BlockGroup* useBlockGroup;
 
     //自分が攻撃を喰らったときはカメラを振動

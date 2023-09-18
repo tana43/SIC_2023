@@ -38,7 +38,7 @@ void Enemy::Initialize()
     }
     hp = 1000 + 500 * GameManager::Instance().GetStageLevel();
     maxHp = hp;
-    power = 3 + 2 * GameManager::Instance().GetStageLevel();
+    power = 3 +  GameManager::Instance().GetStageLevel();
     attackTimer = 0;
 
     attackCoolTime = 8.0f;
@@ -286,7 +286,7 @@ void Enemy::Projectile::DrawDebug()
 
 void Enemy::Projectile::Hit()
 {    
-    GameManager::GetPlayer().ApplyDamage(power);
+    GameManager::GetPlayer().ApplyDamage(owner->power);
     GameManager::GetPlayer().GetModel()->GetSkinnedMesh()->SetEmissiveIntensity(10.0f);
 
     owner->GetPopEffect()->Play(model->GetTransform()->GetPosition());

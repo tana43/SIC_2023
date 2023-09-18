@@ -166,7 +166,7 @@ namespace Regal::Graphics
 			swapChainDesk1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 			swapChainDesk1.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 			swapChainDesk1.Flags = tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
-			hr = dxgiFactory6->CreateSwapChainForHwnd(device.Get(), hwnd, &swapChainDesk1, nullptr, nullptr, swapChain.ReleaseAndGetAddressOf());
+			hr = dxgiFactory6->CreateSwapChainForHwnd(device.Get(), hwnd, &swapChainDesk1, nullptr, nullptr, swapChain.GetAddressOf());
 			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 			//標準のフルスクリーン入力 alt+enter を無効にしている

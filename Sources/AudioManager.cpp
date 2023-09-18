@@ -14,6 +14,8 @@ void AudioManager::Initialize()
 
 	bgm = std::make_unique<audio>(xaudio2.Get(), L"./Resources/Audio/Bgm.wav");
 
+	bgm->volume(0);
+
 	for (int i = 0; i < 10; i++)
 	{
 		se[SE::ALL_BLOCK_ERASE][i] = std::make_unique<audio>(xaudio2.Get(), L"./Resources/Audio/AllBlockErase.wav");

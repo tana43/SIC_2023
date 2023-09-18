@@ -75,7 +75,6 @@ void Block::Update(float elapsedTime)
 	//“ËŒ‚
 	if (isAssault)
 	{
-
 		if (type == GREEN)
 		{
 			float spinSpeed{ elapsedTime * 15 };
