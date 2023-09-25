@@ -151,9 +151,9 @@ void Player::Render()
     float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
     graphics.Set2DStates();
     hpGauge->_Render(graphics.GetDeviceContext(),
-        spritePos.x, spritePos.y,
-        300.0f * (static_cast<float>(hp) / static_cast<float>(maxHp)) * screenCorrection, 
-        10.0f * screenCorrection, 0, 0,
+        spritePos.x * screenCorrection, spritePos.y * screenCorrection,
+        300.0f * (static_cast<float>(hp) / static_cast<float>(maxHp)), 
+        10.0f, 0, 0,
         300.0f, 10, 0);
     graphics.Set3DStates();
 }

@@ -143,6 +143,15 @@ void TitleScene::Update(const float& elapsedTime)
 			break;
 		}
 	}
+
+	DirectX::XMFLOAT2 sPos;
+	switch (cursorState)
+	{
+	case PLAY:sPos = { 512,405 }; break;
+	case TUTORIAL:sPos = { 400,492 }; break;
+	case EXIT:sPos = { 512,585 }; break;
+	}
+	sCursorPos = sPos;
 	
 	//Fade::Instance().Update(elapsedTime);
 
@@ -175,16 +184,10 @@ void TitleScene::Render(const float& elapsedTime)
 		sprite->Render(graphics.GetDeviceContext(),0,0,
 			graphics.GetScreenWidth(),graphics.GetScreenHeight(),0);
 
-		DirectX::XMFLOAT2 sPos;
-		switch (cursorState)
-		{
-		case PLAY:sPos = {512,405}; break;
-		case TUTORIAL:sPos = { 400,492 };break;
-		case EXIT:sPos = { 512,585 };break;
-		}
-		sCursorPos = sPos;
-
-		sCursor->_Render(graphics.GetDeviceContext(), sCursorPos.x, sCursorPos.y,	
+		
+		float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
+		sCursor->_Render(graphics.GetDeviceContext(), 
+			sCursorPos.x * screenCorrection, sCursorPos.y * screenCorrection,	
 			64.0f, 64.0f, 
 			0.0f, 0.0f, 128.0f, 128.0f, 0);
 
