@@ -167,6 +167,6 @@ void GameManager::NextBlockUse()
 void GameManager::GameClear()
 {
     gameClear = true;
-    rundomColor = BaseColorController::RundomBrightColor();
+    rundomColor = BaseColorController::GetRundomBrightColor();
     //AudioManager::Instance().GetSE(AudioManager::)->play();
 }

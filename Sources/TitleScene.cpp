@@ -31,7 +31,7 @@ void TitleScene::CreateResource()
 void TitleScene::Initialize()
 {
 	//sprite->SetColor(0, 1, 0.5f, 1);
-	auto color = BaseColorController::RundomBrightColor();
+	auto color = BaseColorController::GetRundomBrightColor();
 	sprite->SetColor(color.x,color.y,color.z,color.w);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;

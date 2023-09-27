@@ -42,7 +42,7 @@ private:
     //Hexagon hexagon;
 
     //背景用パーティクル
-    std::unique_ptr<Regal::Graphics::Particles> BGParticles;
+    //std::unique_ptr<Regal::Graphics::Particles> BGParticles;
 
 
     float particleTimer{ 0 };

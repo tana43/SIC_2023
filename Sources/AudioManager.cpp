@@ -14,7 +14,7 @@ void AudioManager::Initialize()
 
 	bgm = std::make_unique<audio>(xaudio2.Get(), L"./Resources/Audio/Bgm.wav");
 
-	bgm->volume(0);
+	//bgm->volume(0);
 
 	for (int i = 0; i < 10; i++)
 	{

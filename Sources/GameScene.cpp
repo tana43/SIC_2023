@@ -6,8 +6,9 @@
 #include "GameManager.h"
 #include "EnemyManager.h"
 #include "Fade.h"
+#include "BaseColorController.h"
 
-#define ENABLE_PARTICLE 1
+#define ENABLE_PARTICLE 0
 
 void GameScene::CreateResource()
 {
@@ -31,8 +32,9 @@ void GameScene::CreateResource()
 
 	PuzzleFrame::Instance().CreateResource();
 
+
 #if ENABLE_PARTICLE
-	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
+	//BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
 #endif // ENABLE_PARTICLE
 
 	GameManager::Instance().CreateResource();
@@ -59,6 +61,7 @@ void GameScene::Initialize()
 
 	GameManager::Instance().Initialize();
 
+	BaseColorController::Instance().Initialize();
 	
 #if ENABLE_PARTICLE
 	BGParticles->color = DirectX::XMFLOAT4(0, 0.3f, 1.0f, 1);
@@ -95,12 +98,11 @@ void GameScene::Update(const float& elapsedTime)
 
 	EnemyManager::Instance().Update(elapsedTime);
 
+	BaseColorController::Instance().Update(elapsedTime);
+
+
 #if ENABLE_PARTICLE
-	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
-#endif // ENABLE_PARTICLE
-
-	Regal::Game::Camera::Instance().Update(elapsedTime);
-
+	//BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
 
 	if (particleTimer > 10.0f)
 	{
@@ -121,6 +123,9 @@ void GameScene::Update(const float& elapsedTime)
 		particleTimer = 0;
 	}
 	particleTimer += elapsedTime;
+#endif // ENABLE_PARTICLE
+
+	Regal::Game::Camera::Instance().Update(elapsedTime);
 }
 
 void GameScene::End()
@@ -157,6 +162,8 @@ void GameScene::Render(const float& elapsedTime)
 		GameManager::Instance().Render();
 
 		EnemyManager::Instance().Render();
+
+		BaseColorController::Instance().Render();
 	}
 
 	//2D

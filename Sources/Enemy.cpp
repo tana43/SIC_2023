@@ -2,6 +2,7 @@
 #include "EnemyManager.h"
 #include "GameManager.h"
 #include "AudioManager.h"
+#include "BaseColorController.h"
 
 Enemy::~Enemy()
 {
@@ -56,6 +57,8 @@ void Enemy::Initialize()
     projectilePopEffect->SetScale(1.5f);
 
     EnemyManager::Instance().SetSpriteColor(model->GetSkinnedMesh()->GetEmissiveColor());
+
+    BaseColorController::Instance().ChangeColorBGParticle(model->GetSkinnedMesh()->GetEmissiveColor());
 }
 
 void Enemy::Update(float elapsedTime)
