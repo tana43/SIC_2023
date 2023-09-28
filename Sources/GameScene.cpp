@@ -25,7 +25,7 @@ void GameScene::CreateResource()
 	Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
 #if _DEBUG
-	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game.png");
+	sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game.png");
 #endif // _DEBUG
 	sHealth = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Health.png");
 	sEnemy = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Enemy.png");
@@ -44,7 +44,7 @@ void GameScene::Initialize()
 {
 #if _DEBUG
 	//sprite->SetColor(1, 1, 1, 0.3f);
-	sprite->SetColor(1, 1, 1, 0.0f);
+	sTitle_0->SetColor(1, 1, 1, 0.0f);
 #endif // _DEBUG
 
 	PuzzleFrame::Instance().Initialize();
@@ -73,6 +73,10 @@ void GameScene::Initialize()
 
 void GameScene::Finalize()
 {
+	BlockGroupManager::Instance().Clear();
+	BlockManager::Instance().Clear();
+	PuzzleFrame::Instance().Clear();
+	EnemyManager::Instance().Clear();
 }
 
 void GameScene::Begin()
@@ -171,7 +175,7 @@ void GameScene::Render(const float& elapsedTime)
 		graphics.Set2DStates();
 
 #if _DEBUG
-		sprite->Render(graphics.GetDeviceContext(), 0, 0,
+		sTitle_0->Render(graphics.GetDeviceContext(), 0, 0,
 			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 #endif // _DEBUG
 

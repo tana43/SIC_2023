@@ -20,6 +20,15 @@ public:
     void DrawDebug()override;
     void PostEffectDrawDebug()override;
 
+    //タイトル画面とメインメニュー画面の切り替え処理
+    void MenuUpdate(float elapsedTime);
+
+    enum SubScene
+    {
+        TITLE,
+        MAIN_MENU
+    };
+
     enum SelectMenu
     {
         PLAY,
@@ -36,7 +45,8 @@ private:
     //輝度成分抽出用シェーダー
     Microsoft::WRL::ComPtr<ID3D11PixelShader> LEPixelShader;
 
-    std::unique_ptr<Regal::Resource::Sprite> sprite;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_1;
     std::unique_ptr<Regal::Resource::Sprite> sCursor;
     std::unique_ptr<Regal::Resource::Sprite> sTutrial;
     DirectX::XMFLOAT2 sCursorPos{512, 405};
@@ -50,5 +60,7 @@ private:
     bool isDecide{false};
     bool once{false};
     bool openTutrial{ false };
+
+    int state;
 };
 

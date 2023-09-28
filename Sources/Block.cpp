@@ -69,7 +69,11 @@ void Block::Update(float elapsedTime)
 	
 	if(isDestroy)
 	{
-		if(!projectilePopEffect->GetIsPlay())BlockManager::Instance().Remove(this);
+		if (!projectilePopEffect->GetIsPlay())
+		{
+			BlockManager::Instance().Remove(this);
+			return;
+		}
 	}
 
 	//“ËŒ‚

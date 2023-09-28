@@ -89,7 +89,7 @@ public:
 private:
     void SpinUpdate(float elapsedTime);
 
-    void AssaultUpdate(float elapsedTime);
+    //void AssaultUpdate(float elapsedTime);
 private:
     std::unique_ptr<Regal::Model::StaticModel> model;
 

@@ -2,7 +2,7 @@
 
 Number::Number()
 {
-    sprite = std::make_unique<Regal::Resource::Sprite>(
+    sTitle_0 = std::make_unique<Regal::Resource::Sprite>(
         Regal::Graphics::Graphics::Instance().GetDevice()
         , L"./Resources/Images/numbers.png");
 }
@@ -12,7 +12,7 @@ void Number::Render()
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
 
     DirectX::XMFLOAT2 screenCorrection{graphics.GetScreenWidth() / 1280.0f, graphics.GetScreenHeight() / 720.0f};
-    sprite->_Render(graphics.GetDeviceContext(), pos.x * screenCorrection.x, pos.y * screenCorrection.y,
+    sTitle_0->_Render(graphics.GetDeviceContext(), pos.x * screenCorrection.x, pos.y * screenCorrection.y,
         iWidth * screenCorrection.x * scale.x,iHeight * screenCorrection.y * scale.y,
         trimmingPos.x,trimmingPos.y,
         iWidth,iHeight,0);

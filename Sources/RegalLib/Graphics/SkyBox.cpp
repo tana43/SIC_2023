@@ -6,7 +6,7 @@ using namespace Regal::Resource;
 
 namespace Regal::Graphics
 {
-	SkyBox::SkyBox(ID3D11Device* device, Sprite* sprite) : sprite(sprite)
+	SkyBox::SkyBox(ID3D11Device* device, Sprite* sTitle_0) : sTitle_0(sTitle_0)
 	{
 		//入力レイアウト
 		D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
@@ -135,8 +135,8 @@ namespace Regal::Graphics
 
 		UINT stride{ sizeof(Sprite::Vertex) };
 		UINT offset{ 0 };
-		immediateContext->IASetVertexBuffers(0, 1, sprite->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		immediateContext->PSSetShaderResources(0, 1, sprite->GetShaderResourceView().GetAddressOf());
+		immediateContext->IASetVertexBuffers(0, 1, sTitle_0->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		immediateContext->PSSetShaderResources(0, 1, sTitle_0->GetShaderResourceView().GetAddressOf());
 		immediateContext->Draw(4, 0);
 	}
 }

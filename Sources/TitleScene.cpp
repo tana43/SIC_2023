@@ -19,7 +19,9 @@ void TitleScene::CreateResource()
 	bloomer = std::make_unique<Regal::Graphics::Bloom>(graphics.GetDevice(), graphics.GetScreenWidth(), graphics.GetScreenHeight());
 	Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
-	sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
+	//sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
+	sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/title.png");
+	sTitle_1 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_1.png");
 	sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
 	sTutrial = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial.png");
 
@@ -32,7 +34,7 @@ void TitleScene::Initialize()
 {
 	//sprite->SetColor(0, 1, 0.5f, 1);
 	auto color = BaseColorController::GetRundomBrightColor();
-	sprite->SetColor(color.x,color.y,color.z,color.w);
+	sTitle_0->SetColor(color.x,color.y,color.z,color.w);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;
 
@@ -181,8 +183,10 @@ void TitleScene::Render(const float& elapsedTime)
 	{
 		graphics.Set2DStates();
 
-		sprite->Render(graphics.GetDeviceContext(),0,0,
+		sTitle_0->Render(graphics.GetDeviceContext(),0,0,
 			graphics.GetScreenWidth(),graphics.GetScreenHeight(),0);
+		sTitle_1->Render(graphics.GetDeviceContext(), 0, 0,
+			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 
 		
 		float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
@@ -241,7 +245,7 @@ void TitleScene::DrawDebug()
 
 	popEffect->DrawDebug();
 
-	sprite->DrawDebug();
+	sTitle_0->DrawDebug();
 
 	ImGui::DragFloat2("Cursor Pos", &sCursorPos.x);
 }
@@ -251,4 +255,15 @@ void TitleScene::PostEffectDrawDebug()
 	bloomer->DrawDebug();
 
 	BGParticles->DrawDebug();
+}
+
+void TitleScene::MenuUpdate(float elapsedTime)
+{
+	switch (state)
+	{
+	TITLE:
+		break;
+	MAIN_MENU:
+		break;
+	}
 }

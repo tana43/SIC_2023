@@ -2,14 +2,14 @@
 
 void Fade::CreateResource()
 {
-    sprite = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
+    sTitle_0 = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
         L"./Resources/Images/BlackScreen.png");
 }
 
 void Fade::Initialize()
 {
     
-    sprite->SetColor(1, 1, 1, 1);
+    sTitle_0->SetColor(1, 1, 1, 1);
 
     AutoFadeIn();
 }
@@ -22,7 +22,7 @@ void Fade::Update(float elapsedTime)
         {
             //フェードイン
             alpha -= elapsedTime * fadeSpeed;
-            sprite->color[4] = alpha;
+            sTitle_0->color[4] = alpha;
 
             if (alpha <= 0)
             {
@@ -35,7 +35,7 @@ void Fade::Update(float elapsedTime)
         {
             //フェードアウト
             alpha += elapsedTime * fadeSpeed;
-            sprite->color[4] = alpha;
+            sTitle_0->color[4] = alpha;
 
             if (alpha >= 1)
             {
@@ -48,7 +48,7 @@ void Fade::Update(float elapsedTime)
 
 void Fade::Render(ID3D11DeviceContext* immediateContext)
 {
-    sprite->Render(immediateContext, 0, 0,
+    sTitle_0->Render(immediateContext, 0, 0,
         Regal::Graphics::Graphics::Instance().GetScreenWidth(), 
         Regal::Graphics::Graphics::Instance().GetScreenHeight(), 0);
 }
@@ -58,7 +58,7 @@ bool Fade::FadeIn(float elapsedTime)
     if (!hideScereen)return true;
 
     alpha -= elapsedTime * fadeSpeed;
-    sprite->color[4] = alpha;
+    sTitle_0->color[4] = alpha;
 
     if (alpha <= 0)
     {
@@ -74,7 +74,7 @@ bool Fade::FadeOut(float elapsedTime)
     if (hideScereen)return true;
 
     alpha += elapsedTime * fadeSpeed;
-    sprite->color[4] = alpha;
+    sTitle_0->color[4] = alpha;
 
     if (alpha >= 1)
     {

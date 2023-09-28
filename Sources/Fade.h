@@ -35,7 +35,7 @@ public:
     }
 
 private:
-    std::unique_ptr<Regal::Resource::Sprite> sprite;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
     bool hideScereen{true};
     float alpha{1.0f};
     float fadeSpeed{ 0.4f };

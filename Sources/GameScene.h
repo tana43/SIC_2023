@@ -31,7 +31,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> LEPixelShader;
 
 #if _DEBUG
-    std::unique_ptr<Regal::Resource::Sprite> sprite;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
 #endif // _DEBUG
 
     std::unique_ptr<Regal::Resource::Sprite> sHealth;

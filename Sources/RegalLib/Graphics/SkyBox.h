@@ -11,7 +11,7 @@ namespace Regal::Graphics
     class SkyBox
     {
     public:
-        SkyBox(ID3D11Device* device, Regal::Resource::Sprite* sprite);
+        SkyBox(ID3D11Device* device, Regal::Resource::Sprite* sTitle_0);
         ~SkyBox() {}
 
         struct  Vertex
@@ -41,6 +41,6 @@ namespace Regal::Graphics
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState>		depthStencilState;
         Microsoft::WRL::ComPtr<ID3D11SamplerState>			samplerState;
 
-        Regal::Resource::Sprite* sprite;
+        Regal::Resource::Sprite* sTitle_0;
     };
 }

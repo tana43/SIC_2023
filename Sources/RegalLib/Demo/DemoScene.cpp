@@ -19,8 +19,8 @@ namespace Regal::Demo
 		Regal::Resource::Shader::CreatePSFromCso(graphics.GetDevice(), "./Resources/Shader/FinalPassPS.cso", LEPixelShader.ReleaseAndGetAddressOf());
 
 		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousCube04.fbx");
-		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
-		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/EnemyType01.fbx");
+		model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/LuminousHexagon01.fbx");
+		//model = std::make_unique<Regal::Model::StaticModel>("./Resources/Models/TESTidle.fbx");
 
 		/*for (size_t i = 0; i < 500; i++)
 		{
@@ -28,13 +28,13 @@ namespace Regal::Demo
 			hexagons[i]->GetTransform()->SetPositionX(static_cast<float>(i * 2));
 		}*/
 
-		sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Demo.png");
+		sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Demo.png");
     }
 
     void DemoScene::Initialize()
     {
 		particles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
-		sprite->SetColor(1, 1, 1, 0.01f);
+		sTitle_0->SetColor(1, 1, 1, 0.01f);
     }
 
     void DemoScene::Finalize()
@@ -90,7 +90,7 @@ namespace Regal::Demo
 		{
 			graphics.Set2DStates();
 
-			sprite->Render(graphics.GetDeviceContext(), 0, 0,
+			sTitle_0->Render(graphics.GetDeviceContext(), 0, 0,
 				graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
 		}
 
@@ -189,7 +189,7 @@ namespace Regal::Demo
 
 		model->DrawDebug();
 
-		sprite->DrawDebug();
+		sTitle_0->DrawDebug();
     }
 
 	void DemoScene::PostEffectDrawDebug()

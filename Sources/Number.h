@@ -11,12 +11,12 @@ public:
 
     void SetNumber(int n);
 
-    void SetColor(const DirectX::XMFLOAT4 c) { sprite->SetColor(c.x, c.y, c.z, c.w); }
+    void SetColor(const DirectX::XMFLOAT4 c) { sTitle_0->SetColor(c.x, c.y, c.z, c.w); }
 
     void DrawDebug() {}
 
 public:
-    std::unique_ptr<Regal::Resource::Sprite> sprite;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
 
     int iWidth{60};
     int iHeight{100};
