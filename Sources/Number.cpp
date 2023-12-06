@@ -11,11 +11,11 @@ void Number::Render()
 {
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
 
-    DirectX::XMFLOAT2 screenCorrection{graphics.GetScreenWidth() / 1280.0f, graphics.GetScreenHeight() / 720.0f};
-    sTitle_0->_Render(graphics.GetDeviceContext(), pos.x * screenCorrection.x, pos.y * screenCorrection.y,
-        iWidth * screenCorrection.x * scale.x,iHeight * screenCorrection.y * scale.y,
-        trimmingPos.x,trimmingPos.y,
-        iWidth,iHeight,0);
+    sTitle_0->GetSpriteTransform().SetScale(scale);
+    sTitle_0->GetSpriteTransform().SetTexPos(trimmingPos);
+    sTitle_0->GetSpriteTransform().SetTexSize(DirectX::XMFLOAT2(iWidth,iHeight));
+    
+    sTitle_0->Render();
 }
 
 void Number::SetNumber(int n)

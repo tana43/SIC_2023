@@ -53,13 +53,12 @@ void EnemyManager::Render()
 	popEffect->Render();
 
 	auto& graphics{ Regal::Graphics::Graphics::Instance() };
-	float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
+
 	graphics.Set2DStates();
-	hpGauge->_Render(graphics.GetDeviceContext(),
-		spritePos.x, spritePos.y,
-		965.0f * (static_cast<float>(curEnemy->GetHp()) / static_cast<float>(curEnemy->GetMaxHp())) * screenCorrection,
-		40.0f * screenCorrection, 0, 0,
-		965.0f, 40.0f, 0);
+
+	hpGauge->GetSpriteTransform().SetPos(spritePos);
+	hpGauge->GetSpriteTransform().SetScaleX(3.0f * (static_cast<float>(curEnemy->GetHp()) / static_cast<float>(curEnemy->GetMaxHp())));
+	hpGauge->Render();
 	graphics.Set3DStates();
 }
 

@@ -22,6 +22,9 @@ void TitleScene::CreateResource()
 	//sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
 	sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/title.png");
 	sTitle_1 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_1.png");
+	sTitle_play = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_play.png");
+	sTitle_practice = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_practice.png");
+	sTitle_backToTitle = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_backToTitle.png");
 	sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
 	sTutrial = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial.png");
 
@@ -35,19 +38,20 @@ void TitleScene::Initialize()
 	//sprite->SetColor(0, 1, 0.5f, 1);
 	auto color = BaseColorController::GetRundomBrightColor();
 	sTitle_0->SetColor(color.x,color.y,color.z,color.w);
+	sTitle_1->SetColor(color);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;
 
 	BGParticles->color = color;
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
-	sCursor->color[0] = color.x;
-	sCursor->color[1] = color.y;
-	sCursor->color[2] = color.z;
+	sCursor->SetColor(color);
 
 	popEffect->SetColor(color);
 
 	Regal::Game::Camera::Instance().GetTransform()->SetPosition(DirectX::XMFLOAT3(2, 44, -88));
 	//2 44 -88
+
+	state = 0;
 
 }
 
@@ -69,98 +73,15 @@ void TitleScene::Update(const float& elapsedTime)
 	Fade::Instance().Initialize();
 	skip : */
 
+
+	MenuUpdate(elapsedTime);
+
 	BGParticles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(), elapsedTime);
 
 	popEffect->Update(elapsedTime);
 
-	if (!isDecide)
-	{
-		switch (cursorState)
-		{
-		case PLAY:
-			if (Player::MoveDownButton())
-			{
-				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
-				cursorState++;
-			}
-			break;
-		case TUTORIAL:
-			if (Player::MoveDownButton())
-			{
-				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
-				cursorState++;
-			}
-			if (Player::MoveUpButton())
-			{
-				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
-				cursorState--;
-			}
-			break;
-		case EXIT:
-			if (Player::MoveUpButton())
-			{
-				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
-				cursorState--;
-			}
-			break;
-		}
 
-		if (Player::SelectButton())
-		{
-			AudioManager::Instance().Play(AudioManager::DECIDE);
-			isDecide = true;
-			switch (cursorState)
-			{
-			case PLAY:
-				popEffect->Play(DirectX::XMFLOAT3(-12.3f, 33.4f, 0));
-				break;
-			case TUTORIAL:
-				//27.7 20.6
-				popEffect->Play(DirectX::XMFLOAT3(-27.7f, 20.6f, 0));
-				break;
-			}
-		}
-	}
-	else
-	{
-		//何かが選択された
-		switch (cursorState)
-		{
-		case PLAY:
-			Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
-			//-12.3 33.4
-			break;
-		case TUTORIAL:
-			openTutrial = true;
-			if (Player::SelectButton())
-			{
-				openTutrial = false;
-				isDecide = false;
-			}
-			//27.7 20.6
-			break;
-		case EXIT:
-			exit(0);
-			//-12.3 7.5
-			break;
-		}
-	}
-
-	DirectX::XMFLOAT2 sPos;
-	switch (cursorState)
-	{
-	case PLAY:sPos = { 512,405 }; break;
-	case TUTORIAL:sPos = { 400,492 }; break;
-	case EXIT:sPos = { 512,585 }; break;
-	}
-	sCursorPos = sPos;
-	
-	//Fade::Instance().Update(elapsedTime);
-
-	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
-	{
-		Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
-	}
+	timer += elapsedTime;
 }
 
 void TitleScene::End()
@@ -179,37 +100,32 @@ void TitleScene::Render(const float& elapsedTime)
 	framebuffer->Activate(immediateContext);
 #endif // !ENABLE_OFFSCREENRENDERING
 
-	//2D
-	{
-		graphics.Set2DStates();
-
-		sTitle_0->Render(graphics.GetDeviceContext(),0,0,
-			graphics.GetScreenWidth(),graphics.GetScreenHeight(),0);
-		sTitle_1->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
-
-		
-		float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
-		sCursor->_Render(graphics.GetDeviceContext(), 
-			sCursorPos.x * screenCorrection, sCursorPos.y * screenCorrection,	
-			64.0f, 64.0f, 
-			0.0f, 0.0f, 128.0f, 128.0f, 0);
-
-		if (openTutrial)
-		{
-			sTutrial->Render(graphics.GetDeviceContext(), 0, 0,
-				graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
-		}
-		//Fade::Instance().Render(immediateContext);
-
-	}
-
 	//パーティクル
 	graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
 	immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
 	BGParticles->Render(graphics.GetDeviceContext());
 
 	popEffect->Render();
+
+	//2D
+	{
+		graphics.Set2DStates();
+
+		sTitle_0->Render();
+		sTitle_1->Render();
+
+		sCursor->GetSpriteTransform().SetScale(1.0f);
+		sCursor->Render();
+
+		if (openTutrial)
+		{
+			sTutrial->Render();
+		}
+		//Fade::Instance().Render(immediateContext);
+
+	}
+
+	
 
 
 	//3D
@@ -261,9 +177,111 @@ void TitleScene::MenuUpdate(float elapsedTime)
 {
 	switch (state)
 	{
-	TITLE:
+	case static_cast<int>(SubScene::TITLE):
+	{
+		if (Player::SelectButton())
+		{
+			popEffect->Play(DirectX::XMFLOAT3(2.4f,20,-7.3f));
+		}
+		float alpha = std::fabsf(cosf(timer) * 0.7f) + 0.3f;
+		sTitle_1->SetAlpha(alpha);
+
 		break;
-	MAIN_MENU:
+	}
+	case static_cast<int>(SubScene::MAIN_MENU):
+		MainMenuUpdate(elapsedTime);
 		break;
+	}
+}
+
+void TitleScene::MainMenuUpdate(float elapsedTime)
+{
+	if (!isDecide)
+	{
+		switch (cursorState)
+		{
+		case static_cast<int>(SelectMenu::PLAY):
+			if (Player::MoveDownButton())
+			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				cursorState++;
+			}
+			break;
+		case static_cast<int>(SelectMenu::PRACTICE):
+			if (Player::MoveDownButton())
+			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				cursorState++;
+			}
+			if (Player::MoveUpButton())
+			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				cursorState--;
+			}
+			break;
+		case static_cast<int>(SelectMenu::EXIT):
+			if (Player::MoveUpButton())
+			{
+				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				cursorState--;
+			}
+			break;
+		}
+
+		if (Player::SelectButton())
+		{
+			AudioManager::Instance().Play(AudioManager::DECIDE);
+			isDecide = true;
+			switch (cursorState)
+			{
+			case static_cast<int>(SelectMenu::PLAY):
+				popEffect->Play(DirectX::XMFLOAT3(-12.3f, 33.4f, 0));
+				break;
+			case static_cast<int>(SelectMenu::PRACTICE):
+				//27.7 20.6
+				popEffect->Play(DirectX::XMFLOAT3(-27.7f, 20.6f, 0));
+				break;
+			}
+		}
+	}
+	else
+	{
+		//何かが選択された
+		switch (cursorState)
+		{
+		case static_cast<int>(SelectMenu::PLAY):
+			Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
+			//-12.3 33.4
+			break;
+		case static_cast<int>(SelectMenu::PRACTICE):
+			openTutrial = true;
+			if (Player::SelectButton())
+			{
+				openTutrial = false;
+				isDecide = false;
+			}
+			//27.7 20.6
+			break;
+		case static_cast<int>(SelectMenu::EXIT):
+			exit(0);
+			//-12.3 7.5
+			break;
+		}
+	}
+
+	DirectX::XMFLOAT2 sPos;
+	switch (cursorState)
+	{
+	case static_cast<int>(SelectMenu::PLAY):sPos = { 512,405 }; break;
+	case static_cast<int>(SelectMenu::PRACTICE):sPos = { 400,492 }; break;
+	case static_cast<int>(SelectMenu::EXIT):sPos = { 512,585 }; break;
+	}
+	sCursorPos = sPos;
+
+	//Fade::Instance().Update(elapsedTime);
+
+	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
+	{
+		Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
 	}
 }

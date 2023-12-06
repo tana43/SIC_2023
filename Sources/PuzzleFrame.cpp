@@ -455,10 +455,9 @@ void PuzzleFrame::ChainAbility::Render(DirectX::XMFLOAT2 pos)
     }
 
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
-    DirectX::XMFLOAT2 screenCorrection{graphics.GetScreenWidth() / 1280.0f, graphics.GetScreenHeight() / 720.0f};
-    chainSprite->Render(Regal::Graphics::Graphics::Instance().GetDeviceContext(),
-        pos.x * screenCorrection.x,pos.y * screenCorrection.y,
-        220.0f * screenCorrection.x * 0.5f,95.0f * screenCorrection.y * 0.5f,0.0f);
+    chainSprite->GetSpriteTransform().SetPos(pos);
+    chainSprite->GetSpriteTransform().SetScale(0.5f);
+    chainSprite->Render();
 
     pos.x -= 30;
     numbers.SetPosition(pos);

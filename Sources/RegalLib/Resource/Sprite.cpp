@@ -1,7 +1,9 @@
 #include "Sprite.h"
 #include "Texture.h"
 #include "../Other/Misc.h"
+#include "../Graphics/Graphics.h"
 #include <WICTextureLoader.h>
+#include "../Game/Camera.h"
 
 #ifdef  USE_IMGUI
 #include "../../../External/imgui/imgui.h"
@@ -10,8 +12,11 @@
 
 namespace Regal::Resource
 {
-    Sprite::Sprite(ID3D11Device* device, const wchar_t* filename)
+    int Sprite::num{};
+
+    Sprite::Sprite(ID3D11Device* device, const wchar_t* filename, std::string name) : name(name), myNum(num++)
     {
+
         Vertex vertices[]
         {
             {{-1.0,+1.0,0}, {1,1,1,1},{0,0}},
@@ -85,133 +90,204 @@ namespace Regal::Resource
 
         hr = LoadTextureFromFile(device, filename, shaderResourceView.GetAddressOf(), &texture2dDesc);
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+        // 画像サイズを設定
+        spriteTransform.SetTexSize(DirectX::XMFLOAT2(texture2dDesc.Width, texture2dDesc.Height));
     }
 
     Sprite::~Sprite()
     {
     }
 
-    void Sprite::Render(ID3D11DeviceContext* immediateContext, float dx, float dy, float dw, float dh, float angle)
+    void Sprite::Render()
     {
-        Render(immediateContext, dx, dy, dw, dh,
-            color[0], color[1], color[2], color[3], angle);
+        using namespace Regal;
+        Graphics::Graphics& graphics = Graphics::Graphics::Instance();
+        Shader* shader = graphics.GetShader();
+
+        //画面サイズを考慮した補正
+        DirectX::XMFLOAT2 scareenSize{graphics.GetScreenWidth(), graphics.GetScreenHeight()};
+        DirectX::XMFLOAT2 size{
+            spriteTransform.GetTexSizeX()* spriteTransform.GetScaleX()* (scareenSize.x / SCREEN_WIDTH),
+                spriteTransform.GetTexSizeY()* spriteTransform.GetScaleY()* (scareenSize.y / SCREEN_HEIGHT)};
+
+
+        // 描画
+        Render(graphics.GetDeviceContext(), spriteTransform.GetPos(), size, color,
+            spriteTransform.GetAngle(), spriteTransform.GetTexPos(), spriteTransform.GetTexSize());
     }
 
-    void Sprite::_Render(ID3D11DeviceContext* immediateContext,
-        float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh, float angle)
+    void Sprite::Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size)
     {
-        Render(immediateContext, dx, dy, dw, dh, 
-            color[0], color[1], color[2], color[3], angle,sx, sy,sw,sh);
+        Render(deviceContext, pos, size, DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f),
+            DirectX::XMFLOAT2(static_cast<float>(texture2dDesc.Width), static_cast<float>(texture2dDesc.Height)));
     }
 
-    void Sprite::Render(ID3D11DeviceContext* immediateContext,
-        float dx, float dy, float dw, float dh,
-        float r, float g, float b, float a,
-        float angle/*degree*/
-    )
+    void Sprite::Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color)
     {
-        Render(immediateContext, dx, dy, dw, dh, r, g, b, a, angle, 0, 0, static_cast<float>(texture2dDesc.Width), static_cast<float>(texture2dDesc.Height));
+        Render(deviceContext, pos, size, color, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f),
+            DirectX::XMFLOAT2(static_cast<float>(texture2dDesc.Width), static_cast<float>(texture2dDesc.Height)));
     }
 
-    inline auto rotate(float& x, float& y, float cx, float cy, float angle)
+    void Sprite::Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle)
     {
-        x -= cx;
-        y -= cy;
+        Render(deviceContext, pos, size, color, angle, DirectX::XMFLOAT2(0.0f, 0.0f),
+            DirectX::XMFLOAT2(static_cast<float>(texture2dDesc.Width), static_cast<float>(texture2dDesc.Height)));
+    }
 
-        float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
-        float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
-        float tx{ x }, ty{ y };
-        x = cos * tx + -sin * ty;
-        y = sin * tx + cos * ty;
-
-        x += cx;
-        y += cy;
-    };
-    void Sprite::Render(ID3D11DeviceContext* immediateContext, float dx, float dy, float dw, float dh, float r, float g, float b, float a, float angle, float sx, float sy, float sw, float sh)
+    void Sprite::Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle, DirectX::XMFLOAT2 texPos, DirectX::XMFLOAT2 texSize)
     {
+        HRESULT hr{ S_OK };
+
+        // スクリーン（ビューポート）のサイズを取得する
         D3D11_VIEWPORT viewport{};
         UINT numViewports{ 1 };
-        immediateContext->RSGetViewports(&numViewports, &viewport);
+        deviceContext->RSGetViewports(&numViewports, &viewport);
 
+        // 短形の角頂点の位置（スクリーン座標系）を計算する
+        // (x0, y0) *----* (x1, y1)
+        //          |   /|
+        //          |  / |
+        //          | /  |
+        //          |/   |
+        // (x2, y2) *----* (x3, y3)
 
+        // left-top
+        float x0{ pos.x };
+        float y0{ pos.y };
+        // right-top
+        float x1{ pos.x + size.x };
+        float y1{ pos.y };
+        // left-bottom
+        float x2{ pos.x };
+        float y2{ pos.y + size.y };
+        // right-bottom
+        float x3{ pos.x + size.x };
+        float y3{ pos.y + size.y };
 
-        // (x0,y0)*-----*(x1,y1)
-        //         |   /|
-        //         |  / |
-        //         | /  |
-        // (x2,y2)*-----*(x3,y3)
-        float x0{ dx };
-        float y0{ dy };
-        float x1{ dx + dw };
-        float y1{ dy };
-        float x2{ dx };
-        float y2{ dy + dh };
-        float x3{ dx + dw };
-        float y3{ dy + dh };
+        // 矩形回転
+        auto rotate = [](float& x, float& y, float cx, float cy, float angle)
+        {
+            x -= cx;
+            y -= cy;
 
+            float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
+            float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
+            float tx{ x }, ty{ y };
+            x = cos * tx + -sin * ty;
+            y = sin * tx + cos * ty;
 
-        //回転の中心を矩形の中心点にした場合
-        float cx = dx + dw * 0.5f;
-        float cy = dy + dh * 0.5f;
+            x += cx;
+            y += cy;
+        };
+        // 回転の中心を短形の中心点にした場合
+        float cx = pos.x + size.x * 0.5f;
+        float cy = pos.y + size.y * 0.5f;
         rotate(x0, y0, cx, cy, angle);
         rotate(x1, y1, cx, cy, angle);
         rotate(x2, y2, cx, cy, angle);
         rotate(x3, y3, cx, cy, angle);
 
-        //スクリーン座標からNDCへ変換
-#define NDC_FROM_SCREEN_X(x) x = 2.0f * x / viewport.Width - 1.0f
-#define NDC_FROM_SCREEN_Y(y) y = 1.0f - 2.0f * y / viewport.Height
-        NDC_FROM_SCREEN_X(x0); NDC_FROM_SCREEN_Y(y0);
-        NDC_FROM_SCREEN_X(x1); NDC_FROM_SCREEN_Y(y1);
-        NDC_FROM_SCREEN_X(x2); NDC_FROM_SCREEN_Y(y2);
-        NDC_FROM_SCREEN_X(x3); NDC_FROM_SCREEN_Y(y3);
+        // スクリーン座標系からNDCへの座標変換をおこなう
+        x0 = 2.0f * x0 / viewport.Width - 1.0f;
+        y0 = 1.0f - 2.0f * y0 / viewport.Height;
+        x1 = 2.0f * x1 / viewport.Width - 1.0f;
+        y1 = 1.0f - 2.0f * y1 / viewport.Height;
+        x2 = 2.0f * x2 / viewport.Width - 1.0f;
+        y2 = 1.0f - 2.0f * y2 / viewport.Height;
+        x3 = 2.0f * x3 / viewport.Width - 1.0f;
+        y3 = 1.0f - 2.0f * y3 / viewport.Height;
 
-        //頂点バッファにテクスチャ座標をセット
-        HRESULT hr{ S_OK };
-        D3D11_MAPPED_SUBRESOURCE mappedSubresource{};
-        hr = immediateContext->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
+        // 計算結果で頂点バッファオブジェクトを更新する
+        D3D11_MAPPED_SUBRESOURCE mapped_subresource{};
+        hr = deviceContext->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_subresource);
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-        Vertex* vertices{ reinterpret_cast<Vertex*>(mappedSubresource.pData) };
+        Vertex* vertices{ reinterpret_cast<Vertex*>(mapped_subresource.pData) };
         if (vertices != nullptr)
         {
-            vertices[0].position = { x0,y0, 0 };
-            vertices[1].position = { x1,y1, 0 };
-            vertices[2].position = { x2,y2, 0 };
-            vertices[3].position = { x3,y3, 0 };
-            vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { r,g,b,a };
+            vertices[0].position = { x0, y0, 0 };
+            vertices[1].position = { x1, y1, 0 };
+            vertices[2].position = { x2, y2, 0 };
+            vertices[3].position = { x3, y3, 0 };
+            vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = color;
 
-            //テクスチャ座標からUV座標へ変換
-            vertices[0].texcoord = { sx / static_cast<float>(texture2dDesc.Width),sy / static_cast<float>(texture2dDesc.Width) };
-            vertices[1].texcoord = { (sw + sx) / static_cast<float>(texture2dDesc.Width),sy / static_cast<float>(texture2dDesc.Height) };
-            vertices[2].texcoord = { sx / static_cast<float>(texture2dDesc.Width),(sy + sh) / static_cast<float>(texture2dDesc.Height) };
-            vertices[3].texcoord = { (sx + sw) / static_cast<float>(texture2dDesc.Width),(sy + sh) / static_cast<float>(texture2dDesc.Height) };
+            vertices[0].texcoord = { texPos.x / texture2dDesc.Width, texPos.y / texture2dDesc.Height };
+            vertices[1].texcoord = { (texPos.x + texSize.x) / texture2dDesc.Width, texPos.y / texture2dDesc.Height };
+            vertices[2].texcoord = { texPos.x / texture2dDesc.Width, (texPos.y + texSize.y) / texture2dDesc.Height };
+            vertices[3].texcoord = { (texPos.x + texSize.x) / texture2dDesc.Width, (texPos.y + texSize.y) / texture2dDesc.Height };
         }
-        immediateContext->Unmap(vertexBuffer.Get(), 0);
+        deviceContext->Unmap(vertexBuffer.Get(), 0);
 
-        //頂点バッファーバインド
         UINT stride{ sizeof(Vertex) };
         UINT offset{ 0 };
-        immediateContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
 
-        //プリミティブタイプおよびデータの順序に関する情報のバインド
-        immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+        deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        deviceContext->IASetInputLayout(inputLayout.Get());
 
-        //入力レイアウトオブジェクトのバインド
-        immediateContext->IASetInputLayout(inputLayout.Get());
+        deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
+        deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
-        //シェーダーのバインド
-        immediateContext->VSSetShader(vertexShader.Get(), nullptr, 0);
-        immediateContext->PSSetShader(pixelShader.Get(), nullptr, 0);
+        deviceContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
 
-        //シェーダーリソースのバインド
-        immediateContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
-
-        //プリミティブの描画
-        immediateContext->Draw(4, 0);
+        deviceContext->Draw(4, 0);
+        //---これより下に何かいても意味ない---//
     }
 
-    void Sprite::Textout(ID3D11DeviceContext* immediateContext, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
+    void Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, const float totalAnimationFrame, const bool animationVertical)
+    {
+        animationTime += frameSpeed * elapsedTime;
+
+        const int frame = static_cast<int>(animationTime); // 小数点切り捨て
+        animationFrame = static_cast<float>(frame);
+
+        if (animationFrame > totalAnimationFrame)
+        {
+            animationFrame = 0.0f;
+            animationTime = 0.0f;
+        }
+
+        DirectX::XMFLOAT2 texPos = spriteTransform.GetTexPos();
+        const DirectX::XMFLOAT2 texSize = spriteTransform.GetTexSize();
+
+        if (animationVertical) texPos.y = texSize.y * animationFrame;
+        else                   texPos.x = texSize.x * animationFrame;
+
+        spriteTransform.SetTexPos(texPos);
+    }
+
+    DirectX::XMFLOAT2 Sprite::ConvertToScreenPos(const DirectX::XMFLOAT3 worldPos)
+    {
+        auto* dc = Regal::Graphics::Graphics::Instance().GetDeviceContext();
+        //ビューポート
+        D3D11_VIEWPORT viewport;
+        UINT numViewports = 1;
+        dc->RSGetViewports(&numViewports, &viewport);
+
+        DirectX::XMMATRIX View = Regal::Game::Camera::Instance().CalcViewMatrix();
+        DirectX::XMMATRIX Projection = Regal::Game::Camera::Instance().CalcProjectionMatrix();
+        DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+        DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&worldPos);
+
+        DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+            WorldPosition,
+            viewport.TopLeftX, viewport.TopLeftY,
+            viewport.Width, viewport.Height,
+            viewport.MinDepth, viewport.MaxDepth,
+            Projection, View, World
+        );
+
+        DirectX::XMFLOAT2 screenPosition;
+        DirectX::XMStoreFloat2(&screenPosition, ScreenPosition);
+
+        const float screenPositionZ = DirectX::XMVectorGetZ(ScreenPosition);
+
+        return screenPosition;
+    }
+
+    /*void Sprite::Textout(ID3D11DeviceContext* immediateContext, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
     {
         float sw = static_cast<float>(texture2dDesc.Width / 16);
         float sh = static_cast<float>(texture2dDesc.Height / 16);
@@ -222,20 +298,36 @@ namespace Regal::Resource
                 sw * (c & 0x0F), sh * (c >> 4), sw, sh);
             carriage += w;
         }
-    }
+    }*/
 
     void Sprite::DrawDebug()
     {
 #ifdef USE_IMGUI
 
-        if (ImGui::BeginMenu("Sprite"))
+        std::string n = name + "_" + std::to_string(myNum);
+        if (ImGui::BeginMenu(n.c_str()))
         {
-            ImGui::ColorEdit4("Color", &color[0]);
+            ImGui::ColorEdit4("color", &color.x, ImGuiColorEditFlags_PickerHueWheel);
+
+            spriteTransform.DrawDebug();
 
             ImGui::EndMenu();
         }
 
 
 #endif
+    }
+    void Sprite::SpriteTransform::DrawDebug()
+    {
+        if (ImGui::TreeNode("spriteTransform"))
+        {
+            ImGui::DragFloat2("pos", &pos.x);
+            ImGui::DragFloat2("scale", &scale.x);
+
+            ImGui::DragFloat("angle", &angle);
+            ImGui::DragFloat2("texPos", &texPos.x);
+            ImGui::DragFloat2("texSize", &texSize.x);
+            ImGui::TreePop();
+        }
     }
 }

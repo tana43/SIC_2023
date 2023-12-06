@@ -117,10 +117,8 @@ void GameManager::Render()
     if (!gameClear)
     {
         auto& graphics{ Regal::Graphics::Graphics::Instance() };
-        float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
         graphics.Set2DStates();
-        sStageLevel->Render(graphics.GetDeviceContext(), 0, 0,
-            graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+        sStageLevel->Render();
 
         number->Render();
         graphics.Set3DStates();
@@ -131,9 +129,7 @@ void GameManager::GameClearRender()
 {
     if (gameClear)
     {
-        auto& graphics{ Regal::Graphics::Graphics::Instance() };
-        sGameClear->Render(graphics.GetDeviceContext(), 0, 0,
-            graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+        sGameClear->Render();
 
         number->Render();
     }

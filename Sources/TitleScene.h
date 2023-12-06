@@ -23,16 +23,18 @@ public:
     //タイトル画面とメインメニュー画面の切り替え処理
     void MenuUpdate(float elapsedTime);
 
-    enum SubScene
+    void MainMenuUpdate(float elapsedTime);
+
+    enum class SubScene
     {
         TITLE,
         MAIN_MENU
     };
 
-    enum SelectMenu
+    enum class SelectMenu
     {
         PLAY,
-        TUTORIAL,
+        PRACTICE,
         EXIT,
     };
 
@@ -47,12 +49,15 @@ private:
 
     std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_1;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_play;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_practice;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_backToTitle;
     std::unique_ptr<Regal::Resource::Sprite> sCursor;
     std::unique_ptr<Regal::Resource::Sprite> sTutrial;
     DirectX::XMFLOAT2 sCursorPos{512, 405};
     //DirectX::XMFLOAT2 sPos;
 
-    int cursorState{PLAY};
+    int cursorState{ static_cast<int>(SelectMenu::PLAY)};
 
     std::unique_ptr<Regal::Graphics::Particles> BGParticles;
     std::unique_ptr<PopEffect> popEffect;
@@ -62,5 +67,10 @@ private:
     bool openTutrial{ false };
 
     int state;
+
+    float timer;
+
+    float slideParameter;//0~1の値で管理し、各メニュー文字のスライドをさせる
+
 };
 

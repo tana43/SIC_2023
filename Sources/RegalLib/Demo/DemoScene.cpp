@@ -90,8 +90,7 @@ namespace Regal::Demo
 		{
 			graphics.Set2DStates();
 
-			sTitle_0->Render(graphics.GetDeviceContext(), 0, 0,
-				graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+			sTitle_0->Render();
 		}
 
 		//パーティクル

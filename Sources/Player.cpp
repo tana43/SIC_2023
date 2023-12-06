@@ -148,13 +148,12 @@ void Player::Render()
 
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
 
-    float screenCorrection{ graphics.GetScreenWidth() / 1280.0f };
     graphics.Set2DStates();
-    hpGauge->_Render(graphics.GetDeviceContext(),
-        spritePos.x * screenCorrection, spritePos.y * screenCorrection,
-        300.0f * (static_cast<float>(hp) / static_cast<float>(maxHp)), 
-        10.0f, 0, 0,
-        300.0f, 10, 0);
+
+
+    hpGauge->GetSpriteTransform().SetPos(spritePos);
+    hpGauge->GetSpriteTransform().SetScaleX(static_cast<float>(hp) / static_cast<float>(maxHp));
+    hpGauge->Render();
     graphics.Set3DStates();
 }
 

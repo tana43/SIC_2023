@@ -2,14 +2,6 @@
 
 #include "Framework.h"
 
-#if 0
-CONST LONG SCREEN_WIDTH{ 1280 };
-CONST LONG SCREEN_HEIGHT{ 720 };
-#else
-CONST LONG SCREEN_WIDTH{ 1920 };
-CONST LONG SCREEN_HEIGHT{ 1080 };
-#endif // 1
-
 CONST LPCWSTR APPLICATION_NAME{ L"Regal Library" };
 
 LRESULT CALLBACK window_procedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)

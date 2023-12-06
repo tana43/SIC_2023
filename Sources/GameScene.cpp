@@ -175,15 +175,12 @@ void GameScene::Render(const float& elapsedTime)
 		graphics.Set2DStates();
 
 #if _DEBUG
-		sTitle_0->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+		sTitle_0->Render();
 #endif // _DEBUG
 
-		sHealth->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+		sHealth->Render();
 
-		sEnemy->Render(graphics.GetDeviceContext(), 0, 0,
-			graphics.GetScreenWidth(), graphics.GetScreenHeight(), 0);
+		sEnemy->Render();
 
 		//Fade::Instance().Render(immediateContext);
 

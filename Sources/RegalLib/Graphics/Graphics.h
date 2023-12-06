@@ -11,6 +11,14 @@
 
 #include "../Resource/Shader.h"
 
+#if 0
+CONST LONG SCREEN_WIDTH{ 1280 };
+CONST LONG SCREEN_HEIGHT{ 720 };
+#else
+CONST LONG SCREEN_WIDTH{ 1920 };
+CONST LONG SCREEN_HEIGHT{ 1080 };
+#endif // 1
+
 namespace Regal::Graphics
 {
 	enum DEPTH_STATE { ZT_ON_ZW_ON, ZT_OFF_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_OFF };
@@ -122,7 +130,7 @@ namespace Regal::Graphics
 		
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
-		ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[ZT_ON_ZW_ON].Get() };
+		ID3D11DepthStencilState* setting2DDepthStencilState{ depthStencilStates[ZT_OFF_ZW_OFF].Get() };
 		ID3D11DepthStencilState* setting3DDepthStencilState{ depthStencilStates[ZT_ON_ZW_ON].Get() };
 
 		Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];

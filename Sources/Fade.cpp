@@ -22,7 +22,7 @@ void Fade::Update(float elapsedTime)
         {
             //フェードイン
             alpha -= elapsedTime * fadeSpeed;
-            sTitle_0->color[4] = alpha;
+            sTitle_0->SetAlpha(alpha);
 
             if (alpha <= 0)
             {
@@ -35,7 +35,7 @@ void Fade::Update(float elapsedTime)
         {
             //フェードアウト
             alpha += elapsedTime * fadeSpeed;
-            sTitle_0->color[4] = alpha;
+            sTitle_0->SetAlpha(alpha);
 
             if (alpha >= 1)
             {
@@ -48,9 +48,7 @@ void Fade::Update(float elapsedTime)
 
 void Fade::Render(ID3D11DeviceContext* immediateContext)
 {
-    sTitle_0->Render(immediateContext, 0, 0,
-        Regal::Graphics::Graphics::Instance().GetScreenWidth(), 
-        Regal::Graphics::Graphics::Instance().GetScreenHeight(), 0);
+    sTitle_0->Render();
 }
 
 bool Fade::FadeIn(float elapsedTime)
@@ -58,7 +56,7 @@ bool Fade::FadeIn(float elapsedTime)
     if (!hideScereen)return true;
 
     alpha -= elapsedTime * fadeSpeed;
-    sTitle_0->color[4] = alpha;
+    sTitle_0->SetAlpha(alpha);
 
     if (alpha <= 0)
     {
@@ -74,7 +72,7 @@ bool Fade::FadeOut(float elapsedTime)
     if (hideScereen)return true;
 
     alpha += elapsedTime * fadeSpeed;
-    sTitle_0->color[4] = alpha;
+    sTitle_0->SetAlpha(alpha);
 
     if (alpha >= 1)
     {
