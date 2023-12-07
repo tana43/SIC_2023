@@ -4,6 +4,7 @@
 #include "Fade.h"
 #include "Player.h"
 #include "AudioManager.h"
+#include "RegalLib/Helper/LerpHelper.h"
 
 void TitleScene::CreateResource()
 {
@@ -21,10 +22,10 @@ void TitleScene::CreateResource()
 
 	//sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
 	sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/title.png");
-	sTitle_1 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_1.png");
-	sTitle_play = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_play.png");
-	sTitle_practice = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_practice.png");
-	sTitle_backToTitle = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_backToTitle.png");
+	sTitle_A = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_A.png");
+	sTitle_play = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_play.png","Play");
+	sTitle_practice = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_practice.png","Practice");
+	sTitle_backToTitle = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_backToTitle.png","Back");
 	sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
 	sTutrial = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial.png");
 
@@ -38,7 +39,7 @@ void TitleScene::Initialize()
 	//sprite->SetColor(0, 1, 0.5f, 1);
 	auto color = BaseColorController::GetRundomBrightColor();
 	sTitle_0->SetColor(color.x,color.y,color.z,color.w);
-	sTitle_1->SetColor(color);
+	sTitle_A->SetColor(color);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;
 
@@ -53,6 +54,15 @@ void TitleScene::Initialize()
 
 	state = 0;
 
+	sTitle_play->GetSpriteTransform().SetPos(170, 133);
+	sTitle_play->SetVisibility(false);
+
+	sTitle_practice->GetSpriteTransform().SetPos(170,233);
+	sTitle_practice->SetVisibility(false);
+
+	sTitle_backToTitle->GetSpriteTransform().SetPos(170,343);
+	sTitle_backToTitle->SetVisibility(false);
+	
 }
 
 void TitleScene::Finalize()
@@ -112,7 +122,10 @@ void TitleScene::Render(const float& elapsedTime)
 		graphics.Set2DStates();
 
 		sTitle_0->Render();
-		sTitle_1->Render();
+		sTitle_A->Render();
+		sTitle_backToTitle->Render();
+		sTitle_play->Render();
+		sTitle_practice->Render();
 
 		sCursor->GetSpriteTransform().SetScale(1.0f);
 		sCursor->Render();
@@ -163,6 +176,10 @@ void TitleScene::DrawDebug()
 
 	sTitle_0->DrawDebug();
 
+	sTitle_backToTitle->DrawDebug();
+	sTitle_play->DrawDebug();
+	sTitle_practice->DrawDebug();
+
 	ImGui::DragFloat2("Cursor Pos", &sCursorPos.x);
 }
 
@@ -179,23 +196,49 @@ void TitleScene::MenuUpdate(float elapsedTime)
 	{
 	case static_cast<int>(SubScene::TITLE):
 	{
-		if (Player::SelectButton())
+		//ボタン入力後
+		if (isChangeTime)
 		{
-			popEffect->Play(DirectX::XMFLOAT3(2.4f,20,-7.3f));
+			bool isFadeFinished = sTitle_0->FadeOut(0, elapsedTime);
+			if (sTitle_A->FadeOut(0, elapsedTime) && isFadeFinished)
+			{
+				TransitionMainMenuState();
+				isChangeTime = false;
+			}
 		}
-		float alpha = std::fabsf(cosf(timer) * 0.7f) + 0.3f;
-		sTitle_1->SetAlpha(alpha);
+		else
+		{
+			//ボタン入力前
+			if (Player::SelectButton())
+			{
+				isChangeTime = true;
+				popEffect->Play(DirectX::XMFLOAT3(2.4f, 20, -7.3f));
+			}
+			float alpha = std::fabsf(cosf(timer)) * 0.7f + 0.3f;
+			sTitle_A->SetAlpha(alpha);
+		}
 
 		break;
 	}
 	case static_cast<int>(SubScene::MAIN_MENU):
-		MainMenuUpdate(elapsedTime);
+
+		if (
+			sTitle_play->FadeIn(1, elapsedTime) &&
+			sTitle_practice->FadeIn(1, elapsedTime) &&
+			sTitle_backToTitle->FadeIn(1,elapsedTime)
+			)
+		{
+			MainMenuUpdate(elapsedTime);
+		}
+		
 		break;
 	}
 }
 
 void TitleScene::MainMenuUpdate(float elapsedTime)
 {
+	
+
 	if (!isDecide)
 	{
 		switch (cursorState)
@@ -284,4 +327,20 @@ void TitleScene::MainMenuUpdate(float elapsedTime)
 	{
 		Regal::Scene::SceneManager::Instance().ChangeScene(new GameScene);
 	}
+}
+
+void TitleScene::TransitionMainMenuState()
+{
+	sTitle_A->SetVisibility(false);
+	sTitle_0->SetVisibility(false);
+
+	sTitle_backToTitle->SetVisibility(true);
+	sTitle_play->SetVisibility(true);
+	sTitle_practice->SetVisibility(true);
+
+	sTitle_backToTitle->SetColorA(0);
+	sTitle_play->SetColorA(0);
+	sTitle_practice->SetColorA(0);
+
+	state = static_cast<int>(SubScene::MAIN_MENU);
 }

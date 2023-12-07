@@ -137,6 +137,8 @@ namespace Regal::Resource
 
     void Sprite::Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle, DirectX::XMFLOAT2 texPos, DirectX::XMFLOAT2 texSize)
     {
+        if (!visibility)return;
+
         HRESULT hr{ S_OK };
 
         // スクリーン（ビューポート）のサイズを取得する
@@ -235,6 +237,30 @@ namespace Regal::Resource
         //---これより下に何かいても意味ない---//
     }
 
+    bool Sprite::FadeIn(float alpha, float changeSpeed)
+    {
+        if (color.w >= alpha)
+        {
+            color.w = alpha;
+            return true;
+        }
+
+        color.w += changeSpeed;
+        return false;
+    }
+
+    bool Sprite::FadeOut(float alpha, float changeSpeed)
+    {
+        if (color.w <= alpha)
+        {
+            color.w = alpha;
+            return true;
+        }
+
+        color.w -= changeSpeed;
+        return false;
+    }
+
     void Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, const float totalAnimationFrame, const bool animationVertical)
     {
         animationTime += frameSpeed * elapsedTime;
@@ -307,10 +333,12 @@ namespace Regal::Resource
         std::string n = name + "_" + std::to_string(myNum);
         if (ImGui::BeginMenu(n.c_str()))
         {
+            ImGui::Begin(n.c_str());
             ImGui::ColorEdit4("color", &color.x, ImGuiColorEditFlags_PickerHueWheel);
 
             spriteTransform.DrawDebug();
 
+            ImGui::End();
             ImGui::EndMenu();
         }
 

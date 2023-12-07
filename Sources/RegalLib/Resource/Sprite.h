@@ -29,6 +29,7 @@ namespace Regal::Resource
             void DrawDebug();
 
             void SetPos(const DirectX::XMFLOAT2 p) { pos = p; }
+            void SetPos(const float x, const float y) { pos.x = x; pos.y = y; }
             void SetPosX(const float posX) { pos.x = posX; }
             void SetPosY(const float posY) { pos.y = posY; }
             // 引数の位置を画像の中心として、画像の位置を設定する
@@ -90,6 +91,10 @@ namespace Regal::Resource
         void Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle/*degree*/);
         void Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle/*degree*/, DirectX::XMFLOAT2 texPos, DirectX::XMFLOAT2 texSize); // 本体
 
+        //引数alphaの値へフェードイン・アウトする
+        bool FadeIn(float alpha,float changeSpeed);
+        bool FadeOut(float alpha, float changeSpeed);
+
         //改良する
        /* void Textout(ID3D11DeviceContext* immediateContext,
             std::string s,
@@ -133,6 +138,9 @@ namespace Regal::Resource
         float GetColorA() { return color.w; }
         float GetAlpha() { return color.w; }
 
+        void SetVisibility(const bool newVisibility) { visibility = newVisibility; }
+        const bool GetVisibility() { return visibility; }
+
     public:
         //シェーダーリソースビュー取得
         const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return shaderResourceView; }
@@ -166,5 +174,7 @@ namespace Regal::Resource
 
         std::string name;
         int myNum;
+
+        bool visibility = true;//可視性
     };
 };

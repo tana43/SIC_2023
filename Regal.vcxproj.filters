@@ -223,6 +223,12 @@
     <ClCompile Include="Sources\RegalLib\Input\GamePad.cpp">
       <Filter>RegalLib\Input</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Helper\LerpHelper.cpp">
+      <Filter>RegalLib\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\RegalLib\Demo\DemoEffect.cpp">
+      <Filter>RegalLib\Demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -399,6 +405,12 @@
     <ClInclude Include="Sources\RegalLib\Input\GamePad.h">
       <Filter>RegalLib\Input</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Helper\LerpHelper.h">
+      <Filter>RegalLib\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\RegalLib\Demo\DemoEffect.h">
+      <Filter>RegalLib\Demo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">
@@ -521,6 +533,12 @@
       <Filter>Shaders\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\PopParticleInitializerCS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\DemoParticleCS.hlsl">
+      <Filter>Shaders\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\DemoParticleInitializerCS.hlsl">
       <Filter>Shaders\Particle</Filter>
     </FxCompile>
   </ItemGroup>

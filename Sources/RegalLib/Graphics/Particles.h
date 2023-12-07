@@ -30,7 +30,8 @@ namespace Regal::Graphics
             DirectX::XMFLOAT4 color;
             float time{};
             float deltaTime{};
-            float something[2];
+            float pad[2];
+            float other[4];//各シェーダーによって役割の変わる値
 
         };
         ParticleConstants particleData;
@@ -80,4 +81,14 @@ namespace Regal::Graphics
                 "./Resources/Shader/PopParticleCS.cso",
                 "./Resources/Shader/PopParticleInitializerCS.cso") {}
     };
+
+    class TestParticles : public Particles
+    {
+    public:
+        TestParticles(ID3D11Device* device, size_t particleCount) :
+            Particles(device, particleCount,
+                "./Resources/Shader/DemoParticleCS.cso",
+                "./Resources/Shader/DemoParticleInitializerCS.cso") {}
+    };
+        
 }

@@ -233,6 +233,7 @@
     <ClCompile Include="Sources\PuzzleFrame.cpp" />
     <ClCompile Include="Sources\RegalLib\audio.cpp" />
     <ClCompile Include="Sources\RegalLib\Demo\DemoScene.cpp" />
+    <ClCompile Include="Sources\RegalLib\Demo\DemoEffect.cpp" />
     <ClCompile Include="Sources\RegalLib\Game\Camera.cpp" />
     <ClCompile Include="Sources\RegalLib\Game\Transform.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Bloom.cpp" />
@@ -241,6 +242,7 @@
     <ClCompile Include="Sources\RegalLib\Graphics\Graphics.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\Particles.cpp" />
     <ClCompile Include="Sources\RegalLib\Graphics\SkyBox.cpp" />
+    <ClCompile Include="Sources\RegalLib\Helper\LerpHelper.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\GamePad.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\Input.cpp" />
     <ClCompile Include="Sources\RegalLib\Input\Keyboard.cpp" />
@@ -287,6 +289,7 @@
     <ClInclude Include="Sources\PuzzleFrame.h" />
     <ClInclude Include="Sources\RegalLib\audio.h" />
     <ClInclude Include="Sources\RegalLib\Demo\DemoScene.h" />
+    <ClInclude Include="Sources\RegalLib\Demo\DemoEffect.h" />
     <ClInclude Include="Sources\RegalLib\Game\Camera.h" />
     <ClInclude Include="Sources\RegalLib\Game\GameObject.h" />
     <ClInclude Include="Sources\RegalLib\Game\Transform.h" />
@@ -296,6 +299,7 @@
     <ClInclude Include="Sources\RegalLib\Graphics\Graphics.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\Particles.h" />
     <ClInclude Include="Sources\RegalLib\Graphics\SkyBox.h" />
+    <ClInclude Include="Sources\RegalLib\Helper\LerpHelper.h" />
     <ClInclude Include="Sources\RegalLib\Helper\MathHelper.h" />
     <ClInclude Include="Sources\RegalLib\Input\GamePad.h" />
     <ClInclude Include="Sources\RegalLib\Input\Input.h" />
@@ -468,6 +472,26 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Sources\Shaders\PopParticleInitializerCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\DemoParticleCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Sources\Shaders\DemoParticleInitializerCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>

@@ -5,6 +5,10 @@ cbuffer PARTICLE_CONSTANTS : register(b9)
     float4 color;
     float time;
     float deltaTime;
+    
+    float pad[2];
+    
+    float other[4];
 };
 
 cbuffer SCENE_CONSTANT_BUFFER : register(b1)

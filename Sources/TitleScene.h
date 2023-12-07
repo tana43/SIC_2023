@@ -25,6 +25,8 @@ public:
 
     void MainMenuUpdate(float elapsedTime);
 
+    void TransitionMainMenuState();
+
     enum class SubScene
     {
         TITLE,
@@ -48,7 +50,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> LEPixelShader;
 
     std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
-    std::unique_ptr<Regal::Resource::Sprite> sTitle_1;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_A;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_play;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_practice;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_backToTitle;
@@ -72,5 +74,7 @@ private:
 
     float slideParameter;//0~1の値で管理し、各メニュー文字のスライドをさせる
 
+    bool isChangeTime;//透明度とか変更中
+    bool isMenuProceed;//選択された項目へ進んでいいタイミングか？
 };
 

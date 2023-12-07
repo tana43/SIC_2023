@@ -29,6 +29,8 @@ namespace Regal::Demo
 		}*/
 
 		sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Demo.png");
+
+		demoEffect = std::make_unique<DemoEffect>(size_t(1000));
     }
 
     void DemoScene::Initialize()
@@ -54,6 +56,8 @@ namespace Regal::Demo
 		}
 
 		particles->Integrate(Regal::Graphics::Graphics::Instance().GetDeviceContext(),elapsedTime);
+
+		demoEffect->Update(elapsedTime);
     }
 
     void DemoScene::End()
@@ -91,12 +95,15 @@ namespace Regal::Demo
 			graphics.Set2DStates();
 
 			sTitle_0->Render();
+
 		}
 
 		//パーティクル
 		graphics.SetStates(Graphics::ZT_ON_ZW_ON, Graphics::CULL_NONE, Graphics::ALPHA);
 		immediateContext->GSSetConstantBuffers(1, 1, graphics.GetShader()->GetSceneConstanceBuffer().GetAddressOf());
 		particles->Render(immediateContext);
+
+			demoEffect->Render();
 
 		//3D
 		{
@@ -189,6 +196,8 @@ namespace Regal::Demo
 		model->DrawDebug();
 
 		sTitle_0->DrawDebug();
+
+		demoEffect->DrawDebug();
     }
 
 	void DemoScene::PostEffectDrawDebug()

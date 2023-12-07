@@ -10,7 +10,7 @@ using namespace Regal::Resource;
 
 namespace Regal::Graphics
 {
-    Particles::Particles(ID3D11Device* device, size_t particleCount,const char* cs,const char* initializeCs) : maxParticleCount(particleCount)
+    Particles::Particles(ID3D11Device* device, size_t particleCount,const char* cs,const char* initializerCs) : maxParticleCount(particleCount)
     {
         HRESULT hr{ S_OK };
         D3D11_BUFFER_DESC bufferDesc{};
@@ -54,7 +54,7 @@ namespace Regal::Graphics
         Shader::CreateGSFromCso(device, "./Resources/Shader/ParticleGS.cso", particleGS.ReleaseAndGetAddressOf());
         //Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleCS.cso", particleCS.ReleaseAndGetAddressOf());
         //Shader::CreateCSFromCso(device, "./Resources/Shader/ParticleInitializerCS.cso", particleInitializerCS.ReleaseAndGetAddressOf());
-        SetComputeShader(device, cs,initializeCs);
+        SetComputeShader(device, cs,initializerCs);
     }
 
     UINT Align(UINT num, UINT alignment)
@@ -89,6 +89,8 @@ namespace Regal::Graphics
     void Particles::Initialize(ID3D11DeviceContext* immediateContext, float deltaTime)
     {
         immediateContext->CSSetUnorderedAccessViews(0, 1, particleBufferUav.GetAddressOf(), NULL);
+
+        
 
         particleData.time += deltaTime;
         particleData.deltaTime = deltaTime;

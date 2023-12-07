@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Regal.h"
+#include "DemoEffect.h"
 
 namespace Regal::Demo
 {
@@ -40,5 +41,7 @@ namespace Regal::Demo
         //std::unique_ptr<Regal::Model::StaticModel> hexagons[500];
 
         std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
+
+        std::unique_ptr<DemoEffect> demoEffect;
     };
 }
