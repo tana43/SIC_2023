@@ -41,6 +41,9 @@ void GameManager::Initialize()
     sAlpha = 0;
 
     gameClear = false;
+
+    sStageLevel->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(180,90));
+    sStageLevel->GetSpriteTransform().SetScale(1.3f);
 }
 
 void GameManager::Update(float elapsedTime)
@@ -90,8 +93,11 @@ void GameManager::DrawDebug()
 
         ImGui::DragFloat("nBlock Interval", &nBlockInterval, 0.1f);
         ImGui::DragFloat3("nBlock Positoin", &nBlockPos.x, 0.1f);
-
+        
         number->DrawDebug();
+
+        sStageLevel->DrawDebug();
+        sGameClear->DrawDebug();
 
         //スクロール可能なリスト
         ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);

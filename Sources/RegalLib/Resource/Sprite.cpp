@@ -366,7 +366,7 @@ namespace Regal::Resource
         if (ImGui::TreeNode("spriteTransform"))
         {
             ImGui::DragFloat2("pos", &pos.x);
-            ImGui::DragFloat2("scale", &scale.x);
+            ImGui::DragFloat2("scale", &scale.x,0.05f);
 
             ImGui::DragFloat("angle", &angle);
             ImGui::DragFloat2("texPos", &texPos.x);
