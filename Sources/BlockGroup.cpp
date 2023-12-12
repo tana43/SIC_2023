@@ -59,16 +59,16 @@ void BlockGroup::Update(float elapsedTime)
 
 		static float root2 = sqrtf(2.0f);
 		auto blockPos = position;
-		blocks[0]->GetTransform()->SetPosition(blockPos);
+		blocks[0]->GetTransform().SetPosition(blockPos);
 
 		blockPos = { position.x + Block::blockInterval / root2 ,position.y + Block::blockInterval / root2,position.z };
-		blocks[1]->GetTransform()->SetPosition(blockPos);
+		blocks[1]->GetTransform().SetPosition(blockPos);
 
 		blockPos = { position.x,position.y + Block::blockInterval * root2,position.z};
-		blocks[2]->GetTransform()->SetPosition(blockPos);
+		blocks[2]->GetTransform().SetPosition(blockPos);
 
 		blockPos = { position.x - Block::blockInterval / root2 ,position.y + Block::blockInterval / root2,position.z };
-		blocks[3]->GetTransform()->SetPosition(blockPos);
+		blocks[3]->GetTransform().SetPosition(blockPos);
 	}
 }
 

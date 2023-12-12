@@ -30,9 +30,9 @@ void Player::Initialize()
     autoSetTime = 0.5f;
     autoSetTimer = 0;
 
-    model->GetTransform()->SetPositionX(-45.0f);
-    model->GetTransform()->SetPositionY(72.0f);
-    model->GetTransform()->SetScaleFactor(2.3f);
+    model->GetTransform().SetPositionX(-45.0f);
+    model->GetTransform().SetPositionY(72.0f);
+    model->GetTransform().SetScaleFactor(2.3f);
 
     inputTimer[0] = 0.0f;
     inputTimer[1] = 0.0f;
@@ -66,8 +66,8 @@ void Player::Update(float elapsedTime)
 {
     //useBlockGroup->Update(elapsedTime);
 
-    model->GetTransform()->AddRotationY(-0.1f * elapsedTime);
-    model->GetTransform()->AddRotationX(0.1f * elapsedTime);
+    model->GetTransform().AddRotationY(-0.1f * elapsedTime);
+    model->GetTransform().AddRotationX(0.1f * elapsedTime);
 
     //全攻撃中は処理を止める
     if (!PuzzleFrame::Instance().GetIsFrameAttack())
@@ -84,12 +84,12 @@ void Player::Update(float elapsedTime)
     {
         float intensity{ sinf(blinkTimer) * (static_cast<float>(hp) / static_cast<float>(maxHp)) * 2.5f };
         if (intensity < 0)intensity = -intensity;
-        model->GetSkinnedMesh()->SetEmissiveIntensity(intensity);
+        model->SetEmissiveIntensity(intensity);
         blinkTimer += elapsedTime;
     }
     else
     {
-        model->GetSkinnedMesh()->SetEmissiveIntensity(0);
+        model->SetEmissiveIntensity(0);
     }
 
     //クールダウンと攻撃
@@ -151,7 +151,7 @@ void Player::Render()
     graphics.Set2DStates();
 
 
-    hpGauge->GetSpriteTransform().SetPos(spritePos);
+    hpGauge->GetSpriteTransform().SetPosition(spritePos);
     hpGauge->GetSpriteTransform().SetScaleX(static_cast<float>(hp) / static_cast<float>(maxHp));
     hpGauge->Render();
     graphics.Set3DStates();
@@ -351,38 +351,38 @@ void Player::Projectile::CreateResource()
 
 void Player::Projectile::Initialize()
 {
-    auto pos = owner->model->GetTransform()->GetPosition();
+    auto pos = owner->model->GetTransform().GetPosition();
     pos.x += 8;
-    model->GetTransform()->SetPosition(pos);
-    model->GetTransform()->SetScaleFactor(0);
+    model->GetTransform().SetPosition(pos);
+    model->GetTransform().SetScaleFactor(0);
 
     chargeTimer = 0;
 
     switch (type)
     {
     case Block::RED:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
         break;
     case Block::CYAN:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f));
         break;
     case Block::GREEN:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.4f, 1.0f, 0.0f, 1.0f));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(0.4f, 1.0f, 0.0f, 1.0f));
         break;
     case Block::PURPLE:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
         break;
     }
 }
 
 void Player::Projectile::Update(float elapsedTime)
 {
-    model->GetTransform()->AddRotation(DirectX::XMFLOAT3(
+    model->GetTransform().AddRotation(DirectX::XMFLOAT3(
         spinSpeed * elapsedTime, spinSpeed * elapsedTime, 0));
 
     if (completeCharge)
     {
-        model->GetTransform()->AddPosition(DirectX::XMFLOAT3(speed * elapsedTime, 0, 0));
+        model->GetTransform().AddPosition(DirectX::XMFLOAT3(speed * elapsedTime, 0, 0));
     }
     else
     {
@@ -397,13 +397,13 @@ void Player::Projectile::Update(float elapsedTime)
             chargeTimer = 0;
         }
 
-        model->GetTransform()->SetScaleFactor(scale);
+        model->GetTransform().SetScaleFactor(scale);
         chargeTimer += elapsedTime;
     }
 
     //判定処理
-    auto enemyPosX{ EnemyManager::Instance().GetEnemy()->GetTransform()->GetPosition().x };
-    if (model->GetTransform()->GetPosition().x > enemyPosX - 9.0f)
+    auto enemyPosX{ EnemyManager::Instance().GetEnemy()->GetTransform().GetPosition().x };
+    if (model->GetTransform().GetPosition().x > enemyPosX - 9.0f)
     {
         Hit();
     }
@@ -427,7 +427,7 @@ void Player::Projectile::Hit()
     EnemyManager::Instance().GetEnemy()->ApplyDamage(power);
 
     owner->GetProjectilePopEffect(type)->SetScale(1.2f + power * 0.03f);
-    owner->GetProjectilePopEffect(type)->Play(model->GetTransform()->GetPosition());
+    owner->GetProjectilePopEffect(type)->Play(model->GetTransform().GetPosition());
 
     
 

@@ -78,7 +78,7 @@ public:
 
     PopEffect* GetPopEffect() { return projectilePopEffect.get(); }
 
-    Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
+    Regal::Game::Transform& GetTransform() { return model->GetTransform(); }
 
     const int GetType() const { return type; }
 

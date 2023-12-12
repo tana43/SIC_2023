@@ -244,7 +244,6 @@ namespace Regal::Resource
         Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
 
         DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
-        DirectX::XMFLOAT4 emissiveColor{ 1, 1, 1, 1 };
 
     public:
         SkinnedMesh(ID3D11Device* device, const char* fbxFilename, bool triangulate = false, float samplingRate = 0);
@@ -260,7 +259,7 @@ namespace Regal::Resource
 
         //スタティックモデル用に作ったけど、課題とほぼ変わらん
         //現在はアニメーション非対応
-        void _Render(ID3D11DeviceContext* immediateContext,Regal::Game::Transform* transform);
+        void _Render(ID3D11DeviceContext* immediateContext, Regal::Game::Transform& transform, const float emissiveIntencity = 3.0f, const DirectX::XMFLOAT4 emissiveColor = {1,1,1,1});
 
         void DrawDebug();
 
@@ -270,14 +269,11 @@ namespace Regal::Resource
 
         void BlendAnimations(const Animation::Keyframe* keyframes[2], float factor, Animation::Keyframe& keyframe);
 
-        void SetEmissiveColor(const DirectX::XMFLOAT4 col) { emissiveColor = col; }
-        const DirectX::XMFLOAT4 GetEmissiveColor() const { return emissiveColor; }
+        
 
         void SetColor(const DirectX::XMFLOAT4 col) { color = col; }
         const DirectX::XMFLOAT4 GetColor() const { return color; }
 
-        void SetEmissiveIntensity(const float intensity) { emissiveIntencity = intensity; }
-        const float GetEmissiveIntensity() const { return emissiveIntencity; }
 
     protected:
         Scene sceneView;
@@ -285,8 +281,6 @@ namespace Regal::Resource
         bool renderActive{ true };
 
         float scaleFactor{ 1.0f };
-
-        float emissiveIntencity = 3.0f;
 
         void FetchMeshes(FbxScene* fbxScene, std::vector<Mesh>& meshes);
         void FetchMaterials(FbxScene* fbxScene, std::unordered_map<uint64_t, Material>& materials);

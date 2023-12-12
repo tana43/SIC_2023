@@ -68,6 +68,9 @@ void GameScene::Initialize()
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
 #endif // ENABLE_PARTICLE
 
+	sHealth->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(5, 280));
+	sEnemy->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(60, -19));
+	sEnemy->GetSpriteTransform().SetScale(1.6f);
 
 }
 
@@ -231,6 +234,9 @@ void GameScene::DrawDebug()
 #endif // ENABLE_PARTICLE
 
 	EnemyManager::Instance().DrawDebug();
+
+	sHealth->DrawDebug();
+	sEnemy->DrawDebug();
 }
 
 void GameScene::PostEffectDrawDebug()

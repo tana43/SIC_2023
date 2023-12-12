@@ -40,6 +40,13 @@ public:
         EXIT,
     };
 
+public:
+    Regal::Resource::Sprite* GetSprite_Play() { return sTitle_play.get(); }
+    Regal::Resource::Sprite* GetSprite_Practice() { return sTitle_practice.get(); }
+    Regal::Resource::Sprite* GetSprite_BackToTitle() { return sTitle_backToTitle.get(); }
+
+    const float GetFadeColorTimer() const { return fadeColorTimer; }
+
 private:
     float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
     std::unique_ptr<Regal::Graphics::Framebuffer> framebuffer;
@@ -54,10 +61,12 @@ private:
     std::unique_ptr<Regal::Resource::Sprite> sTitle_play;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_practice;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_backToTitle;
-    std::unique_ptr<Regal::Resource::Sprite> sCursor;
+    //std::unique_ptr<Regal::Resource::Sprite> sCursor;
     std::unique_ptr<Regal::Resource::Sprite> sTutrial;
     DirectX::XMFLOAT2 sCursorPos{512, 405};
     //DirectX::XMFLOAT2 sPos;
+
+    DirectX::XMFLOAT4 rundomColor;//初期化毎にランダムで生成されるカラー
 
     int cursorState{ static_cast<int>(SelectMenu::PLAY)};
 
@@ -76,5 +85,7 @@ private:
 
     bool isChangeTime;//透明度とか変更中
     bool isMenuProceed;//選択された項目へ進んでいいタイミングか？
+
+    float fadeColorTimer;
 };
 

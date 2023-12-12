@@ -26,7 +26,7 @@ void TitleScene::CreateResource()
 	sTitle_play = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_play.png","Play");
 	sTitle_practice = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_practice.png","Practice");
 	sTitle_backToTitle = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_backToTitle.png","Back");
-	sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
+	//sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
 	sTutrial = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial.png");
 
 	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
@@ -37,30 +37,31 @@ void TitleScene::CreateResource()
 void TitleScene::Initialize()
 {
 	//sprite->SetColor(0, 1, 0.5f, 1);
-	auto color = BaseColorController::GetRundomBrightColor();
-	sTitle_0->SetColor(color.x,color.y,color.z,color.w);
-	sTitle_A->SetColor(color);
+	rundomColor = BaseColorController::GetRundomBrightColor();
+	sTitle_0->SetColor(rundomColor.x,rundomColor.y,rundomColor.z,rundomColor.w);
+	sTitle_A->SetColor(rundomColor);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;
 
-	BGParticles->color = color;
+	BGParticles->color = rundomColor;
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(), 0);
-	sCursor->SetColor(color);
+	//sCursor->SetColor(rundomColor);
 
-	popEffect->SetColor(color);
+	popEffect->SetColor(rundomColor);
 
 	Regal::Game::Camera::Instance().GetTransform()->SetPosition(DirectX::XMFLOAT3(2, 44, -88));
 	//2 44 -88
 
 	state = 0;
 
-	sTitle_play->GetSpriteTransform().SetPos(170, 133);
+
+	sTitle_play->GetSpriteTransform().SetPosition(170, 133);
 	sTitle_play->SetVisibility(false);
 
-	sTitle_practice->GetSpriteTransform().SetPos(170,233);
+	sTitle_practice->GetSpriteTransform().SetPosition(170,233);
 	sTitle_practice->SetVisibility(false);
 
-	sTitle_backToTitle->GetSpriteTransform().SetPos(170,343);
+	sTitle_backToTitle->GetSpriteTransform().SetPosition(170,343);
 	sTitle_backToTitle->SetVisibility(false);
 	
 }
@@ -127,8 +128,8 @@ void TitleScene::Render(const float& elapsedTime)
 		sTitle_play->Render();
 		sTitle_practice->Render();
 
-		sCursor->GetSpriteTransform().SetScale(1.0f);
-		sCursor->Render();
+		//sCursor->GetSpriteTransform().SetScale(1.0f);
+		//sCursor->Render();
 
 		if (openTutrial)
 		{
@@ -223,9 +224,9 @@ void TitleScene::MenuUpdate(float elapsedTime)
 	case static_cast<int>(SubScene::MAIN_MENU):
 
 		if (
-			sTitle_play->FadeIn(1, elapsedTime) &&
-			sTitle_practice->FadeIn(1, elapsedTime) &&
-			sTitle_backToTitle->FadeIn(1,elapsedTime)
+			sTitle_play->FadeIn(1, elapsedTime*2) &&
+			sTitle_practice->FadeIn(1, elapsedTime*2) &&
+			sTitle_backToTitle->FadeIn(1,elapsedTime*2)
 			)
 		{
 			MainMenuUpdate(elapsedTime);
@@ -235,37 +236,74 @@ void TitleScene::MenuUpdate(float elapsedTime)
 	}
 }
 
+inline void BundleColorChange(TitleScene& title, DirectX::XMFLOAT4 color, int selectIndex/*0:play 1:practice 2:BackToTitle*/)
+{
+	DirectX::XMFLOAT4 white = { 1,1,1,1};
+	const float maxTime = 1.0f;
+	switch (selectIndex)
+	{
+		case 0:
+		title.GetSprite_Play()->FadeColor(color, title.GetFadeColorTimer(), maxTime);
+		title.GetSprite_Practice()->FadeColor(white, title.GetFadeColorTimer(), maxTime);
+		title.GetSprite_BackToTitle()->FadeColor(white, title.GetFadeColorTimer(), maxTime);
+	break;
+		case 1:
+		title.GetSprite_Play()->FadeColor(white, title.GetFadeColorTimer(), maxTime);
+		title.GetSprite_Practice()->FadeColor(color, title.GetFadeColorTimer(), maxTime);
+		title.GetSprite_BackToTitle()->FadeColor(white, title.GetFadeColorTimer(), maxTime);
+	break;
+		case 2:
+		title.GetSprite_Play()->FadeColor(white, title.GetFadeColorTimer(), maxTime);
+		title.GetSprite_Practice()->FadeColor(white, title.GetFadeColorTimer(), maxTime);
+		title.GetSprite_BackToTitle()->FadeColor(color, title.GetFadeColorTimer(), maxTime);
+	break;
+	}
+}
 void TitleScene::MainMenuUpdate(float elapsedTime)
 {
-	
+	//選択されている項目の色を変更
+	fadeColorTimer += elapsedTime;
+	BundleColorChange(*this, rundomColor, cursorState);
 
 	if (!isDecide)
 	{
 		switch (cursorState)
 		{
 		case static_cast<int>(SelectMenu::PLAY):
+			//カーソル移動
 			if (Player::MoveDownButton())
 			{
 				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				fadeColorTimer = 0;
 				cursorState++;
 			}
+			
+
 			break;
 		case static_cast<int>(SelectMenu::PRACTICE):
+			//カーソル移動
 			if (Player::MoveDownButton())
 			{
 				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				fadeColorTimer = 0;
+
 				cursorState++;
 			}
 			if (Player::MoveUpButton())
 			{
 				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				fadeColorTimer = 0;
+
 				cursorState--;
 			}
 			break;
 		case static_cast<int>(SelectMenu::EXIT):
+			//カーソル移動
 			if (Player::MoveUpButton())
 			{
 				AudioManager::Instance().Play(AudioManager::CURSOR_MOVE);
+				fadeColorTimer = 0;
+
 				cursorState--;
 			}
 			break;

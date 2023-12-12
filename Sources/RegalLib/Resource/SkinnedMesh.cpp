@@ -711,7 +711,6 @@ namespace Regal::Resource
             //immediateContext->PSSetShaderResources(0, 1, materials.cbegin()->second.shaderResourceViews[0].GetAddressOf());
 
             Constants data;
-            data.emissiveIntensity = emissiveIntencity;
             if (keyframe && keyframe->nodes.size() > 0)
             {
                 //メッシュのglobalTransformが時間軸で変化しているので、その行列をキーフレームから取得する
@@ -766,9 +765,9 @@ namespace Regal::Resource
         }
     }
 
-    void SkinnedMesh::_Render(ID3D11DeviceContext* immediateContext, Regal::Game::Transform* transform)
+    void SkinnedMesh::_Render(ID3D11DeviceContext* immediateContext, Regal::Game::Transform& transform, const float emissiveIntencity, const DirectX::XMFLOAT4 emissiveColor)
     {
-        auto World{ transform->CalcWorldMatrix() };
+        auto World{ transform.CalcWorldMatrix() };
         DirectX::XMFLOAT4X4 world;
         DirectX::XMStoreFloat4x4(&world, World);
         
@@ -835,8 +834,7 @@ namespace Regal::Resource
             //transform.DrawDebug();
 
             ImGui::ColorEdit4("Color", &color.x);
-            ImGui::ColorEdit4("Emissive Color", &emissiveColor.x);
-            ImGui::SliderFloat("Emissive Intencity", &emissiveIntencity, 0.0f, 10.0f);
+            
 
             /*if (ImGui::TreeNode("Material"))
             {

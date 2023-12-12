@@ -10,9 +10,11 @@ EnemyManager::~EnemyManager()
 void EnemyManager::Initialize()
 {
 	hpGauge = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
-		L"./Resources/Images/HpGauge.png");
+		L"./Resources/Images/HpGauge.png","BossHP");
 	popEffect = std::make_unique<PopEffect>(300);
 	Clear();
+
+	hpGauge->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(40, 50));
 }
 
 void EnemyManager::Update(float elapsedTime)
@@ -56,8 +58,8 @@ void EnemyManager::Render()
 
 	graphics.Set2DStates();
 
-	hpGauge->GetSpriteTransform().SetPos(spritePos);
-	hpGauge->GetSpriteTransform().SetScaleX(3.0f * (static_cast<float>(curEnemy->GetHp()) / static_cast<float>(curEnemy->GetMaxHp())));
+	//hpGauge->GetSpriteTransform().SetPos(spritePos);
+	hpGauge->GetSpriteTransform().SetScaleX(1.9f * (static_cast<float>(curEnemy->GetHp()) / static_cast<float>(curEnemy->GetMaxHp())));
 	hpGauge->Render();
 	graphics.Set3DStates();
 }
@@ -84,7 +86,7 @@ void EnemyManager::DrawDebug()
 		}
 		ImGui::EndChild();
 
-		ImGui::DragFloat2("Sprite Pos", &spritePos.x);
+		hpGauge->DrawDebug();
 
 		ImGui::EndMenu();
 	}
@@ -130,6 +132,6 @@ void EnemyManager::Change()
 
 void EnemyManager::EffectPlay(Enemy* enemy)
 {
-	popEffect->SetColor(enemy->GetModel()->GetSkinnedMesh()->GetEmissiveColor());
-	popEffect->Play(enemy->GetTransform()->GetPosition());
+	popEffect->SetColor(enemy->GetModel()->GetEmissiveColor());
+	popEffect->Play(enemy->GetTransform().GetPosition());
 }

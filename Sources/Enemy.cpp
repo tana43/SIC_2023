@@ -22,19 +22,19 @@ void Enemy::Initialize()
     switch (type)
     {
     case BLUE:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0,0,1,1));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(0,0,1,1));
         break;
     case ORANGE:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1,0.4f,0,1));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(1,0.4f,0,1));
         break;
     case PURPLE:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.5f,0,1,1));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(0.5f,0,1,1));
         break;
     case RED:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1,0,1,1));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(1,0,1,1));
         break;
     case YELLOW:
-        model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1,1,0,1));
+        model->SetEmissiveColor(DirectX::XMFLOAT4(1,1,0,1));
         break;
     }
     hp = 1000 + 500 * GameManager::Instance().GetStageLevel();
@@ -45,29 +45,29 @@ void Enemy::Initialize()
     attackCoolTime = 8.0f;
 
     model->GetSkinnedMesh()->SetColor(DirectX::XMFLOAT4(0, 0, 0, 1));
-    model->GetSkinnedMesh()->SetEmissiveIntensity(0);
+    model->SetEmissiveIntensity(0);
 
-    model->GetTransform()->SetScaleFactor(8.0f);
-    model->GetTransform()->SetPositionX(51.0f);
-    model->GetTransform()->SetPositionY(73.0f);
+    model->GetTransform().SetScaleFactor(8.0f);
+    model->GetTransform().SetPositionX(51.0f);
+    model->GetTransform().SetPositionY(73.0f);
 
     state = IDLE;
 
     projectilePopEffect->SetColor(DirectX::XMFLOAT4(1, 0.3f, 0.3f, 0.5f));
     projectilePopEffect->SetScale(1.5f);
 
-    EnemyManager::Instance().SetSpriteColor(model->GetSkinnedMesh()->GetEmissiveColor());
+    EnemyManager::Instance().SetSpriteColor(model->GetEmissiveColor());
 
-    BaseColorController::Instance().ChangeColorBGParticle(model->GetSkinnedMesh()->GetEmissiveColor());
+    BaseColorController::Instance().ChangeColorBGParticle(model->GetEmissiveColor());
 }
 
 void Enemy::Update(float elapsedTime)
 {
-    model->GetTransform()->AddRotationY(0.1f * elapsedTime);
+    model->GetTransform().AddRotationY(0.1f * elapsedTime);
 
     if (timer < 2.0f)
     {
-        model->GetSkinnedMesh()->SetEmissiveIntensity(timer * eIntensity);
+        model->SetEmissiveIntensity(timer * eIntensity);
     }
 
     switch (state)
@@ -89,7 +89,7 @@ void Enemy::Update(float elapsedTime)
         break;
     case DIE:
 
-        model->GetSkinnedMesh()->SetEmissiveIntensity(eIntensity * (1.0f - deadTimer));
+        model->SetEmissiveIntensity(eIntensity * (1.0f - deadTimer));
 
         if (deadTimer > 1.0f)
         {
@@ -230,24 +230,24 @@ void Enemy::Projectile::CreateResource()
 
 void Enemy::Projectile::Initialize()
 {
-    auto pos = owner->model->GetTransform()->GetPosition();
+    auto pos = owner->model->GetTransform().GetPosition();
     pos.x -= 13;
-    model->GetTransform()->SetPosition(pos);
-    model->GetTransform()->SetScaleFactor(0);
+    model->GetTransform().SetPosition(pos);
+    model->GetTransform().SetScaleFactor(0);
 
     chargeTimer = 0;
 
-    model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1, 0, 0, 1));
+    model->SetEmissiveColor(DirectX::XMFLOAT4(1, 0, 0, 1));
 }
 
 void Enemy::Projectile::Update(float elapsedTime)
 {
-    model->GetTransform()->AddRotation(DirectX::XMFLOAT3(
+    model->GetTransform().AddRotation(DirectX::XMFLOAT3(
         spinSpeed * elapsedTime,spinSpeed * elapsedTime,0));
 
     if (completeCharge)
     {
-        model->GetTransform()->AddPosition(DirectX::XMFLOAT3(-speed * elapsedTime,0,0));
+        model->GetTransform().AddPosition(DirectX::XMFLOAT3(-speed * elapsedTime,0,0));
     }
     else
     {
@@ -262,13 +262,13 @@ void Enemy::Projectile::Update(float elapsedTime)
             chargeTimer = 0;
         }
 
-        model->GetTransform()->SetScaleFactor(scaleFactor);
+        model->GetTransform().SetScaleFactor(scaleFactor);
         chargeTimer += elapsedTime;
     }
 
     //”»’èˆ—
-    auto playerPosX{ GameManager::Instance().GetPlayer().GetTransform()->GetPosition().x };
-    if (model->GetTransform()->GetPosition().x < playerPosX + 6.0f)
+    auto playerPosX{ GameManager::Instance().GetPlayer().GetTransform().GetPosition().x };
+    if (model->GetTransform().GetPosition().x < playerPosX + 6.0f)
     {
         Hit();
     }
@@ -290,9 +290,9 @@ void Enemy::Projectile::DrawDebug()
 void Enemy::Projectile::Hit()
 {    
     GameManager::GetPlayer().ApplyDamage(owner->power);
-    GameManager::GetPlayer().GetModel()->GetSkinnedMesh()->SetEmissiveIntensity(10.0f);
+    GameManager::GetPlayer().GetModel()->SetEmissiveIntensity(10.0f);
 
-    owner->GetPopEffect()->Play(model->GetTransform()->GetPosition());
+    owner->GetPopEffect()->Play(model->GetTransform().GetPosition());
 
     Remove(this);
 }

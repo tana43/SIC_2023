@@ -250,6 +250,7 @@
     <ClCompile Include="Sources\RegalLib\Model\StaticModel.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GeometricPrimitive.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\GltfModel.cpp" />
+    <ClCompile Include="Sources\RegalLib\Resource\ResourceManager.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Shader.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\SkinnedMesh.cpp" />
     <ClCompile Include="Sources\RegalLib\Resource\Sprite.cpp" />
@@ -311,6 +312,7 @@
     <ClInclude Include="Sources\RegalLib\Regal.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GeometricPrimitive.h" />
     <ClInclude Include="Sources\RegalLib\Resource\GltfModel.h" />
+    <ClInclude Include="Sources\RegalLib\Resource\ResourceManager.h" />
     <ClInclude Include="Sources\RegalLib\Resource\Shader.h" />
     <ClInclude Include="Sources\RegalLib\Resource\SkinnedMesh.h" />
     <ClInclude Include="Sources\RegalLib\Resource\Sprite.h" />

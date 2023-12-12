@@ -19,6 +19,6 @@ namespace Regal::Model
     protected:
         Regal::Game::TransformEuler transform;
 
-        std::unique_ptr<Regal::Resource::SkinnedMesh> skinnedMesh;
+        std::shared_ptr<Regal::Resource::SkinnedMesh> skinnedMesh;
     };
 }

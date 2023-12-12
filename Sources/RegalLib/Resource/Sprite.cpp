@@ -4,6 +4,9 @@
 #include "../Graphics/Graphics.h"
 #include <WICTextureLoader.h>
 #include "../Game/Camera.h"
+#include <algorithm>
+
+#include "../../Easing.h"
 
 #ifdef  USE_IMGUI
 #include "../../../External/imgui/imgui.h"
@@ -261,6 +264,19 @@ namespace Regal::Resource
         return false;
     }
 
+    bool Sprite::FadeColor(DirectX::XMFLOAT4 newColor, float Timer, float maxTime)
+    {
+        std::clamp(Timer,0.0f,maxTime);
+        float alpha = Timer / maxTime;
+        DirectX::XMVECTOR result = DirectX::XMVectorLerp(DirectX::XMLoadFloat4(&color), DirectX::XMLoadFloat4(&newColor), alpha);
+        DirectX::XMStoreFloat4(&color, result);
+
+        if (Timer == maxTime)return true;
+
+        return false;
+    }
+
+    
     void Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, const float totalAnimationFrame, const bool animationVertical)
     {
         animationTime += frameSpeed * elapsedTime;

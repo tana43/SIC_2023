@@ -57,9 +57,9 @@ public:
 
     void Heal(int value);
 
-    Regal::Game::Transform* GetTransform() { return model->GetTransform(); }
+    Regal::Game::Transform& GetTransform() { return model->GetTransform(); }
 
-    void SetColor(const DirectX::XMFLOAT4 color) { model->GetSkinnedMesh()->SetEmissiveColor(color); }
+    void SetColor(const DirectX::XMFLOAT4 color) { model->SetEmissiveColor(color); }
 
     void Shot(int type);
 
@@ -296,6 +296,6 @@ private:
     std::unique_ptr<PopEffect> projectilePopEffects[Block::BlockType::END];
 
     std::unique_ptr<Regal::Resource::Sprite> hpGauge;
-    DirectX::XMFLOAT2 spritePos{34,670};
+    DirectX::XMFLOAT2 spritePos{45,810};
 };
 

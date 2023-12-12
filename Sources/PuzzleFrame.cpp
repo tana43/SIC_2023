@@ -16,28 +16,28 @@ void PuzzleFrame::Initialize()
     Clear();
 
     //Transform各項目設定
-    auto* transform{ frameModel->GetTransform() };
+    auto& transform{ frameModel->GetTransform() };
     //transform->SetRotationY(DirectX::XMConvertToRadians(90));
-    transform->SetScaleFactor(0.75f);
+    transform.SetScaleFactor(0.75f);
     //transform->SetScale(DirectX::XMFLOAT3(0.5f, 1, 0.8f));
-    transform->SetPosition(DirectX::XMFLOAT3(2.1f,1.2f,0));
+    transform.SetPosition(DirectX::XMFLOAT3(2.1f,1.2f,0));
 
     //カメラ位置を設定
     {
-        auto* transform{ frameModel->GetTransform() };
+        auto& transform{ frameModel->GetTransform() };
         auto* cTransform{ Regal::Game::Camera::Instance().GetTransform() };
 
         DirectX::XMFLOAT3 eyePos;
-        eyePos = transform->GetPosition();
+        eyePos = transform.GetPosition();
         eyePos.y += 43.0f;
         eyePos.z -= 88.0f;
         cTransform->SetPosition(eyePos);
     }
 
     //侵入禁止エリアバー
-    keepOutBarModel->GetTransform()->SetPosition(DirectX::XMFLOAT3(2.2f,46,3));
-    keepOutBarModel->GetTransform()->SetScale(DirectX::XMFLOAT3(22.0f,1,1));
-    keepOutBarModel->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1, 0, 0, 1));
+    keepOutBarModel->GetTransform().SetPosition(DirectX::XMFLOAT3(2.2f,46,3));
+    keepOutBarModel->GetTransform().SetScale(DirectX::XMFLOAT3(22.0f,1,1));
+    keepOutBarModel->SetEmissiveColor(DirectX::XMFLOAT4(1, 0, 0, 1));
 }
 
 void PuzzleFrame::Update(float elapsedTime)
@@ -455,7 +455,7 @@ void PuzzleFrame::ChainAbility::Render(DirectX::XMFLOAT2 pos)
     }
 
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
-    chainSprite->GetSpriteTransform().SetPos(pos);
+    chainSprite->GetSpriteTransform().SetPosition(pos);
     chainSprite->GetSpriteTransform().SetScale(0.5f);
     chainSprite->Render();
 

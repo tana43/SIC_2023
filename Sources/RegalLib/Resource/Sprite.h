@@ -28,10 +28,10 @@ namespace Regal::Resource
         public:
             void DrawDebug();
 
-            void SetPos(const DirectX::XMFLOAT2 p) { pos = p; }
-            void SetPos(const float x, const float y) { pos.x = x; pos.y = y; }
-            void SetPosX(const float posX) { pos.x = posX; }
-            void SetPosY(const float posY) { pos.y = posY; }
+            void SetPosition(const DirectX::XMFLOAT2 p) { pos = p; }
+            void SetPosition(const float x, const float y) { pos.x = x; pos.y = y; }
+            void SetPositionX(const float posX) { pos.x = posX; }
+            void SetPositionY(const float posY) { pos.y = posY; }
             // 引数の位置を画像の中心として、画像の位置を設定する
             void SetSpriteCenterPos(DirectX::XMFLOAT2 p)
             {
@@ -94,6 +94,9 @@ namespace Regal::Resource
         //引数alphaの値へフェードイン・アウトする
         bool FadeIn(float alpha,float changeSpeed);
         bool FadeOut(float alpha, float changeSpeed);
+
+        //線形補間の関数を使っているが実際の値の変化はすこし違う
+        bool FadeColor(DirectX::XMFLOAT4 newColor, float Timer,float maxTime);
 
         //改良する
        /* void Textout(ID3D11DeviceContext* immediateContext,

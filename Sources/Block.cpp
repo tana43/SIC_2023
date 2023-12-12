@@ -22,29 +22,29 @@ void Block::CreateResource()
 
 void Block::Initialize()
 {
-	model->GetTransform()->SetRotationX(DirectX::XMConvertToRadians(45));
-	model->GetTransform()->SetRotationY(DirectX::XMConvertToRadians(90));
-	model->GetTransform()->SetScale(DirectX::XMFLOAT3(0.8f,1,1));
+	model->GetTransform().SetRotationX(DirectX::XMConvertToRadians(45));
+	model->GetTransform().SetRotationY(DirectX::XMConvertToRadians(90));
+	model->GetTransform().SetScale(DirectX::XMFLOAT3(0.8f,1,1));
 
-	model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f);
+	model->SetEmissiveIntensity(1.5f);
 
 	switch (type)
 	{
 	case BlockType::RED:
-		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f));
+		model->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f));
 		break;
 	case BlockType::CYAN:
-		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.0f,1.0f,1.0f,1.0f));
+		model->SetEmissiveColor(DirectX::XMFLOAT4(0.0f,1.0f,1.0f,1.0f));
 		break;
 	case BlockType::GREEN:
-		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(0.4f,1.0f,0.0f,1.0f));
+		model->SetEmissiveColor(DirectX::XMFLOAT4(0.4f,1.0f,0.0f,1.0f));
 		break;
 	case BlockType::PURPLE:
-		model->GetSkinnedMesh()->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f));
+		model->SetEmissiveColor(DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f));
 		break;
 	}
 
-	projectilePopEffect->SetColor(model->GetSkinnedMesh()->GetEmissiveColor());
+	projectilePopEffect->SetColor(model->GetEmissiveColor());
 }
 
 void Block::Update(float elapsedTime)
@@ -58,7 +58,7 @@ void Block::Update(float elapsedTime)
 			{
 				if (ability->chain >= 4)
 				{
-					model->GetSkinnedMesh()->SetEmissiveIntensity(1.5f + ability->chain * 0.2f);
+					model->SetEmissiveIntensity(1.5f + ability->chain * 0.2f);
 				}
 			}
 		}
@@ -82,11 +82,11 @@ void Block::Update(float elapsedTime)
 		if (type == GREEN)
 		{
 			float spinSpeed{ elapsedTime * 15 };
-			model->GetTransform()->AddRotation(DirectX::XMFLOAT3(spinSpeed, spinSpeed, 0));
+			model->GetTransform().AddRotation(DirectX::XMFLOAT3(spinSpeed, spinSpeed, 0));
 
 			auto& target{ GameManager::GetPlayer() };
-			auto myPos{ model->GetTransform()->GetPosition() };
-			auto targetPos{ target.GetTransform()->GetPosition() };
+			auto myPos{ model->GetTransform().GetPosition() };
+			auto targetPos{ target.GetTransform().GetPosition() };
 			DirectX::XMFLOAT3 vec;
 			DirectX::XMVECTOR Vec = {
 				DirectX::XMVectorSubtract(
@@ -96,7 +96,7 @@ void Block::Update(float elapsedTime)
 			DirectX::XMFLOAT3 velocity;
 			DirectX::XMStoreFloat3(&velocity, DirectX::XMVectorScale(VecNormal, 50.0f * elapsedTime));
 
-			model->GetTransform()->AddPosition(velocity);
+			model->GetTransform().AddPosition(velocity);
 
 			//”»’èˆ—
 			float length{ DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec)) };
@@ -112,11 +112,11 @@ void Block::Update(float elapsedTime)
 		else
 		{
 			float spinSpeed{ elapsedTime * 15 };
-			model->GetTransform()->AddRotation(DirectX::XMFLOAT3(spinSpeed, spinSpeed, 0));
+			model->GetTransform().AddRotation(DirectX::XMFLOAT3(spinSpeed, spinSpeed, 0));
 
 			auto* target{ EnemyManager::Instance().GetEnemy() };
-			auto myPos{ model->GetTransform()->GetPosition() };
-			auto targetPos{ target->GetTransform()->GetPosition() };
+			auto myPos{ model->GetTransform().GetPosition() };
+			auto targetPos{ target->GetTransform().GetPosition() };
 			DirectX::XMFLOAT3 vec;
 			DirectX::XMVECTOR Vec = {
 				DirectX::XMVectorSubtract(
@@ -126,7 +126,7 @@ void Block::Update(float elapsedTime)
 			DirectX::XMFLOAT3 velocity;
 			DirectX::XMStoreFloat3(&velocity, DirectX::XMVectorScale(VecNormal, 50.0f * elapsedTime));
 
-			model->GetTransform()->AddPosition(velocity);
+			model->GetTransform().AddPosition(velocity);
 
 			//”»’èˆ—
 			float length{ DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec)) };
@@ -185,8 +185,8 @@ void Block::ConvertToWorldPos()
 	float y = STARTING_POS.y + gridPos.y * blockInterval;
 	DirectX::XMFLOAT2 moveX{x* cosf(DirectX::XMConvertToRadians(45)), x * sinf(DirectX::XMConvertToRadians(45))};
 	DirectX::XMFLOAT2 moveY{y* cosf(DirectX::XMConvertToRadians(135)), y * sinf(DirectX::XMConvertToRadians(135))};
-	model->GetTransform()->SetPositionX(moveX.x + moveY.x);
-	model->GetTransform()->SetPositionY(moveX.y + moveY.y);
+	model->GetTransform().SetPositionX(moveX.x + moveY.x);
+	model->GetTransform().SetPositionY(moveX.y + moveY.y);
 }
 
 bool Block::CanMoveDown(int moveDistance)
@@ -296,9 +296,10 @@ void Block::MoveBottomLeft(int moveDistance)
 
 void Block::Destroy()
 {
+	if (isDestroy)return;
 	//BlockManager::Instance().Remove(this);
 	isDestroy = true;
-	projectilePopEffect->Play(GetTransform()->GetPosition());
+	projectilePopEffect->Play(GetTransform().GetPosition());
 	if(isPlaced)PuzzleFrame::Instance().SetBlockOnGrid(nullptr, gridPos.x, gridPos.y);
 }
 
@@ -311,13 +312,13 @@ void Block::SpinUpdate(float elapsedTime)
 {
 	if (isSpin)
 	{
-		GetTransform()->SetRotationY(
+		GetTransform().SetRotationY(
 			Easing::InOutCubic(spinTimer, 0.6f, DirectX::XM_PIDIV2 + DirectX::XM_PI * 2, DirectX::XM_PIDIV2)
 		);
 
 		if (spinTimer > 0.6f)
 		{
-			GetTransform()->SetRotationY(DirectX::XM_PIDIV2);
+			GetTransform().SetRotationY(DirectX::XM_PIDIV2);
 			isSpin = false;
 			spinTimer = 0;
 		}
