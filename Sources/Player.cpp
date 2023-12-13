@@ -66,6 +66,8 @@ void Player::Update(float elapsedTime)
 {
     //useBlockGroup->Update(elapsedTime);
 
+    hpGauge->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
+
     model->GetTransform().AddRotationY(-0.1f * elapsedTime);
     model->GetTransform().AddRotationX(0.1f * elapsedTime);
 
@@ -309,6 +311,7 @@ void Player::OnDamaged()
 {
     AudioManager::Instance().Play(AudioManager::DAMAGED);
     Regal::Game::Camera::Instance().ScreenVibrate(0.08f,0.7f);
+    hpGauge->SetColor(DirectX::XMFLOAT4(1, 0, 0, 1));
 }
 
 void Player::OnDead()

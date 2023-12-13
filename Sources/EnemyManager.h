@@ -44,6 +44,7 @@ private:
     std::vector<Enemy*> removes;
 
     std::unique_ptr<Regal::Resource::Sprite> hpGauge;
+    std::unique_ptr<Regal::Resource::Sprite> hpGaugeRest;
     DirectX::XMFLOAT2 spritePos{150,40};
 
     std::unique_ptr<PopEffect> popEffect;

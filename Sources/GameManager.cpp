@@ -34,8 +34,8 @@ void GameManager::Initialize()
 
     stageLevel = 0;
     number->SetNumbers(stageLevel);
-    number->SetPosition(DirectX::XMFLOAT2(1215, 633));
-    number->SetScale(0.9f);
+    number->SetPosition(DirectX::XMFLOAT2(1420.0f, 720.0f));
+    number->SetScale(1.3f);
     number->SetBetweenNum(32);
 
     sAlpha = 0;

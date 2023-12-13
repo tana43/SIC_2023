@@ -229,7 +229,9 @@
     <ClCompile Include="Sources\RegalLib\Demo\DemoEffect.cpp">
       <Filter>RegalLib\Demo</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\RegalLib\Resource\ResourceManager.cpp" />
+    <ClCompile Include="Sources\RegalLib\Resource\ResourceManager.cpp">
+      <Filter>RegalLib\Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\RegalLib\Graphics\Bloom.h">
@@ -412,7 +414,9 @@
     <ClInclude Include="Sources\RegalLib\Demo\DemoEffect.h">
       <Filter>RegalLib\Demo</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\RegalLib\Resource\ResourceManager.h" />
+    <ClInclude Include="Sources\RegalLib\Resource\ResourceManager.h">
+      <Filter>RegalLib\Resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\Shaders\Sprite.hlsli">

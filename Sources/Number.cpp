@@ -2,7 +2,7 @@
 
 Number::Number()
 {
-    sTitle_0 = std::make_unique<Regal::Resource::Sprite>(
+    numSprite = std::make_unique<Regal::Resource::Sprite>(
         Regal::Graphics::Graphics::Instance().GetDevice()
         , L"./Resources/Images/numbers.png");
 }
@@ -11,11 +11,13 @@ void Number::Render()
 {
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
 
-    sTitle_0->GetSpriteTransform().SetScale(scale);
-    sTitle_0->GetSpriteTransform().SetTexPos(trimmingPos);
-    sTitle_0->GetSpriteTransform().SetTexSize(DirectX::XMFLOAT2(iWidth,iHeight));
+
+    numSprite->GetSpriteTransform().SetPosition(pos);
+    numSprite->GetSpriteTransform().SetScale(scale);
+    numSprite->GetSpriteTransform().SetTexPos(trimmingPos);
+    numSprite->GetSpriteTransform().SetTexSize(DirectX::XMFLOAT2(iWidth,iHeight));
     
-    sTitle_0->Render();
+    numSprite->Render();
 }
 
 void Number::SetNumber(int n)
