@@ -242,7 +242,7 @@ namespace Regal::Resource
 
     bool Sprite::FadeIn(float alpha, float changeSpeed)
     {
-        if (color.w >= alpha)
+        if (color.w + changeSpeed >= alpha)
         {
             color.w = alpha;
             return true;
@@ -254,7 +254,7 @@ namespace Regal::Resource
 
     bool Sprite::FadeOut(float alpha, float changeSpeed)
     {
-        if (color.w <= alpha)
+        if (color.w - changeSpeed <= alpha)
         {
             color.w = alpha;
             return true;

@@ -15,7 +15,9 @@ void Player::CreateResource()
     }
 
     hpGauge = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
-        L"./Resources/Images/PlayerHpGauge.png");
+        L"./Resources/Images/PlayerHpGauge.png","HPGauge");
+    hpHealGauge = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
+        L"./Resources/Images/PlayerHpGauge.png","HPHealGauge");
 }
 
 void Player::Initialize()
@@ -60,13 +62,23 @@ void Player::Initialize()
         }
     }
     
+    hpGauge->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(265,250));
+    hpGauge->GetSpriteTransform().SetScaleY(1.9f);
+
+    hpHealGauge->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(265, 250));
+    hpHealGauge->GetSpriteTransform().SetScaleY(1.9f);
+    hpHealGauge->SetColor(DirectX::XMFLOAT4(0, 1, 0, 1));
+
+    //落下地点を示したガイド表示用のブロック
+    guideBlock = std::make_unique<BlockGroup>();
+    guideBlock->CreateResource();
+    guideBlock->Initialize();
 }
 
 void Player::Update(float elapsedTime)
 {
     //useBlockGroup->Update(elapsedTime);
-
-    hpGauge->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
+    
 
     model->GetTransform().AddRotationY(-0.1f * elapsedTime);
     model->GetTransform().AddRotationX(0.1f * elapsedTime);
@@ -133,6 +145,56 @@ void Player::Update(float elapsedTime)
         delete projectile;
     }
     removes.clear();
+
+    //ダメージを喰らった際に赤くなったゲージが徐々に白に戻る
+    hpGauge->FadeColor(DirectX::XMFLOAT4(1, 1, 1, hpGauge->GetAlpha()), hpGaugeDamageTimer, 1);
+    hpGaugeDamageTimer += elapsedTime;
+
+    //自機が瀕死状態のときにHPゲージの点滅
+    if (hp < maxHp / 4)
+    {
+        static bool isFadeIn = false;
+        if (isFadeIn)
+        {
+            if (hpGauge->FadeIn(1.0f, elapsedTime * 3))isFadeIn = false;
+        }
+        else
+        {
+            if (hpGauge->FadeOut(0.3f, elapsedTime * 3))isFadeIn = true;
+        }
+    }
+    else
+    {
+        //通常の表示
+        hpGauge->FadeIn(1.0f, elapsedTime * 3);
+    }
+
+    //回復後タイマー更新
+    healedTimer += elapsedTime;
+
+    //回復タイマーが2秒以上経過していなければHPゲージの更新を止め,
+    //2~3秒の間なら回復ゲージに追いつくように本体のゲージを伸ばしていく
+    if (healedTimer > 4)
+    {
+        hpGauge->GetSpriteTransform().SetScaleX(static_cast<float>(hp) / static_cast<float>(maxHp));
+        //if(hpHealGauge->GetSpriteTransform().GetScaleX())
+    }
+    else if(healedTimer < 2)
+    {
+        hpHealGauge->GetSpriteTransform().SetScaleX(static_cast<float>(hp) / static_cast<float>(maxHp));
+    }
+    else
+    {
+        //2~4秒の間
+        const float alpha = (healedTimer - 2) / 2;
+        hpGauge->GetSpriteTransform().SetScaleX(
+            hpGauge->GetSpriteTransform().GetScaleX() +
+            (hpHealGauge->GetSpriteTransform().GetScaleX() - 
+                hpGauge->GetSpriteTransform().GetScaleX()) * alpha);
+    }
+
+    //ガイドブロック更新
+    GuideUpdate();
 }
 
 void Player::Render()
@@ -150,12 +212,27 @@ void Player::Render()
 
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
 
+    if (useBlockGroup)
+    {
+        graphics.SetRSState(Regal::Graphics::RASTER_STATE::WIREFRAME);
+        for (int i = 0; i < 4; i++)
+        {
+            guideBlock->GetBlocks(i).Render();
+        }
+    }
+
     graphics.Set2DStates();
+    
 
+    if (healedTimer < 4)
+    {
+        hpHealGauge->Render();
+    }
 
-    hpGauge->GetSpriteTransform().SetPosition(spritePos);
-    hpGauge->GetSpriteTransform().SetScaleX(static_cast<float>(hp) / static_cast<float>(maxHp));
     hpGauge->Render();
+
+    
+
     graphics.Set3DStates();
 }
 
@@ -172,7 +249,15 @@ void Player::DrawDebug()
 
     ImGui::SliderInt("HP", &hp, 0, maxHp);
 
-    ImGui::DragFloat2("Sprite Pos", &spritePos.x);
+    hpGauge->DrawDebug();
+
+    hpHealGauge->DrawDebug();
+
+    if (ImGui::BeginMenu("Guide"))
+    {
+        guideBlock->DrawDebug();
+        ImGui::EndMenu();
+    }
 
     ImGui::End();
     
@@ -312,6 +397,7 @@ void Player::OnDamaged()
     AudioManager::Instance().Play(AudioManager::DAMAGED);
     Regal::Game::Camera::Instance().ScreenVibrate(0.08f,0.7f);
     hpGauge->SetColor(DirectX::XMFLOAT4(1, 0, 0, 1));
+    hpGaugeDamageTimer = 0.0f;
 }
 
 void Player::OnDead()
@@ -321,9 +407,51 @@ void Player::OnDead()
     GameManager::Instance().GameClear();
 }
 
-void Player::Heal(int value)
+void Player::OnHealed()
+{
+    hpGauge->SetColor(DirectX::XMFLOAT4(0, 1, 0, 1));
+
+    //回復専用のHPゲージのみ伸ばすための処理
+    healedTimer = 0.0f;
+
+    hpGaugeDamageTimer = 0.0f;
+}
+
+void Player::GuideUpdate()
+{
+    if (!useBlockGroup)return;
+    
+    for (int i = 0; i < 4; i++)
+    {
+        auto color = Block::GetTypeColor(useBlockGroup->GetBlocks(i).GetType());
+        
+        guideBlock->GetBlocks(i).GetModel()->SetEmissiveColor(color);
+
+        guideBlock->GetBlocks(i).ConvertToWorldPos();
+    }
+
+    //設置可能な最低の位置に移動
+    while (guideBlock->MoveDown(1));
+    
+    if (useBlockGroup->GetPosition)
+    {
+
+    }
+}
+
+void Player::ApplyHeal(int value)
 {
     if (hp <= 0)return;
+
+    //HPが最大値を越える場合は回復しない
+    if (hp + value > maxHp)
+    {
+        hp = maxHp;
+        return;
+    }
+
+    OnHealed();
+
     hp += value;
 }
 
@@ -418,6 +546,8 @@ void Player::Projectile::Render()
     Regal::Graphics::Graphics::Instance().SetRSState(Regal::Graphics::WIREFRAME_CULL_NONE);
     model->Render();
     Regal::Graphics::Graphics::Instance().Set3DStates();
+
+    
 }
 
 void Player::Projectile::DrawDebug()

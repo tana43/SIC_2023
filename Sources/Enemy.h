@@ -106,5 +106,8 @@ private:
     std::vector<Projectile*> removes;
 
     std::unique_ptr<PopEffect> projectilePopEffect;
+
+public:
+    bool isDead{ false };
 };
 

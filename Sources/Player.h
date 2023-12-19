@@ -51,11 +51,14 @@ public:
     void ChangeUseBG();
 
     bool ApplyDamage(int damage);
+    void ApplyHeal(int value);
 
-    void OnDamaged();
-    void OnDead();
+    void OnDamaged();//ダメージを受けたときに呼ばれる
+    void OnDead();//死んだときに呼ばれる
+    void OnHealed();//回復された時に呼ばれる
 
-    void Heal(int value);
+    void GuideUpdate();
+
 
     Regal::Game::Transform& GetTransform() { return model->GetTransform(); }
 
@@ -296,6 +299,12 @@ private:
     std::unique_ptr<PopEffect> projectilePopEffects[Block::BlockType::END];
 
     std::unique_ptr<Regal::Resource::Sprite> hpGauge;
-    DirectX::XMFLOAT2 spritePos{45,810};
+    std::unique_ptr<Regal::Resource::Sprite> hpHealGauge;//回復されたときに先に回復分の合計量を分かりやすくするゲージ
+
+    float healedTimer = 10;//回復されてから何秒経過したかのタイマー(０にすると最初の数秒,緑のゲージが出てしまうので適当な値を入れとく)
+
+    float hpGaugeDamageTimer = 1;
+
+    std::unique_ptr<BlockGroup> guideBlock;
 };
 

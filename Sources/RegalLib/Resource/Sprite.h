@@ -91,7 +91,7 @@ namespace Regal::Resource
         void Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle/*degree*/);
         void Render(ID3D11DeviceContext* deviceContext, DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 size, DirectX::XMFLOAT4 color, float angle/*degree*/, DirectX::XMFLOAT2 texPos, DirectX::XMFLOAT2 texSize); // 本体
 
-        //引数alphaの値へフェードイン・アウトする
+        //引数alphaの値へフェードイン・アウトする フェード完了時にTrueを返す
         bool FadeIn(float alpha,float changeSpeed);
         bool FadeOut(float alpha, float changeSpeed);
 

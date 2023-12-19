@@ -104,7 +104,7 @@ void Block::Update(float elapsedTime)
 			if (length < 6.0f)
 			{
 				AudioManager::Instance().Play(AudioManager::BLOCK_ASSAULT);
-				target.Heal(1);
+				target.ApplyHeal(1);
 				isAssault = false;
 				Destroy();
 			}
@@ -292,6 +292,27 @@ void Block::MoveBottomLeft(int moveDistance)
 	moveGridPos.y = std::clamp(moveGridPos.y, 0, PuzzleFrame::MAX_FRAME_HEIGHT);
 
 	gridPos = moveGridPos;
+}
+
+const DirectX::XMFLOAT4 Block::GetTypeColor(const int& type)
+{
+	switch (type)
+	{
+	case BlockType::RED:
+		return DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+		break;
+	case BlockType::CYAN:
+		return DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f);
+		break;
+	case BlockType::GREEN:
+		return DirectX::XMFLOAT4(0.4f, 1.0f, 0.0f, 1.0f);
+		break;
+	case BlockType::PURPLE:
+		return DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
+		break;
+	}
+
+	return DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void Block::Destroy()

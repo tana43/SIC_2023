@@ -50,6 +50,8 @@ public:
     //ã‚Ì§ŒÀƒ‰ƒCƒ“‚ğ‰z‚¦‚½‚Æ‚«‚Ìˆ—
     void OutFrame();
 
+    Block& GetBlocks(int index) { return *blocks[index]; }
+
 private:
     Block* blocks[4];
 

@@ -221,6 +221,8 @@ void Enemy::OnDead()
     AudioManager::Instance().Play(AudioManager::ENEMY_DIE);
     Regal::Game::Camera::Instance().ScreenVibrate(0.3f, 5.0f);
     state = DIE;
+
+    isDead = true;
 }
 
 void Enemy::Projectile::CreateResource()

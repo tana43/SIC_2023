@@ -44,8 +44,8 @@ private:
     std::vector<Enemy*> removes;
 
     std::unique_ptr<Regal::Resource::Sprite> hpGauge;
-    std::unique_ptr<Regal::Resource::Sprite> hpGaugeRest;
-    DirectX::XMFLOAT2 spritePos{150,40};
+    std::unique_ptr<Regal::Resource::Sprite> hpGaugeRest;//ダメージを喰らった際に後から減っていくHPゲージ
+    float  hpGaugeRestSpeed = 0.2f;//上のゲージの減るスピード
 
     std::unique_ptr<PopEffect> popEffect;
 };

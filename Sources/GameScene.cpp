@@ -27,7 +27,7 @@ void GameScene::CreateResource()
 #if _DEBUG
 	sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game.png");
 #endif // _DEBUG
-	sHealth = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Health.png");
+	sHealth = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Health.png","Health");
 	sEnemy = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Enemy.png");
 
 	PuzzleFrame::Instance().CreateResource();
@@ -68,7 +68,7 @@ void GameScene::Initialize()
 	BGParticles->Initialize(Regal::Graphics::Graphics::Instance().GetDeviceContext(),0);
 #endif // ENABLE_PARTICLE
 
-	sHealth->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(5, 280));
+	sHealth->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(151, -260));
 	sEnemy->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(60, -19));
 	sEnemy->GetSpriteTransform().SetScale(1.6f);
 

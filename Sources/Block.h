@@ -68,6 +68,8 @@ public:
 
     const int GetType() const { return type; }
 
+    static const DirectX::XMFLOAT4 GetTypeColor(const int& type);
+
     void SetOnGrid(const bool og) { onGrid = og; }
     
     void SetAbility(PuzzleFrame::ChainAbility* ca) { ability = ca; }

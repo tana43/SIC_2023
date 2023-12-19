@@ -11,10 +11,18 @@ void EnemyManager::Initialize()
 {
 	hpGauge = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
 		L"./Resources/Images/HpGauge.png","BossHP");
+	hpGaugeRest = std::make_unique<Regal::Resource::Sprite>(Regal::Graphics::Graphics::Instance().GetDevice(),
+		L"./Resources/Images/HpGauge.png", "BossHPDamage");
 	popEffect = std::make_unique<PopEffect>(300);
 	Clear();
 
 	hpGauge->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(40, 50));
+	hpGaugeRest->GetSpriteTransform().SetPosition(DirectX::XMFLOAT2(40, 50));
+
+	hpGauge->GetSpriteTransform().SetScaleX(10);
+	hpGaugeRest->GetSpriteTransform().SetScaleX(1);
+
+	hpGaugeRest->SetColor(DirectX::XMFLOAT4(1, 1, 1, 3));
 }
 
 void EnemyManager::Update(float elapsedTime)
@@ -43,6 +51,31 @@ void EnemyManager::Update(float elapsedTime)
 	}
 	//破棄リストクリア
 	removes.clear();
+
+	//HPゲージ
+	hpGauge->GetSpriteTransform().SetScaleX(1.9f * (static_cast<float>(curEnemy->GetHp()) / static_cast<float>(curEnemy->GetMaxHp())));
+
+	//HPの減少部分の可視化処理
+	if (hpGaugeRest->GetSpriteTransform().GetScaleX() > hpGauge->GetSpriteTransform().GetScaleX())
+	{
+		hpGaugeRest->GetSpriteTransform().SetScaleX(hpGaugeRest->GetSpriteTransform().GetScaleX() - (hpGaugeRestSpeed * elapsedTime));
+	}
+	else
+	{
+		hpGaugeRest->GetSpriteTransform().SetScaleX(hpGauge->GetSpriteTransform().GetScaleX());
+	}
+
+	//敵が死んだときにHPゲージをフェードアウトする
+	if (curEnemy->isDead)
+	{
+		hpGauge->FadeOut(0, elapsedTime * 3);
+		hpGaugeRest->FadeOut(0, elapsedTime * 3);
+	}
+	else
+	{
+		hpGauge->FadeIn(1, elapsedTime * 5);
+		hpGaugeRest->FadeIn(1, elapsedTime * 5);
+	}
 }
 
 void EnemyManager::Render()
@@ -59,7 +92,10 @@ void EnemyManager::Render()
 	graphics.Set2DStates();
 
 	//hpGauge->GetSpriteTransform().SetPos(spritePos);
-	hpGauge->GetSpriteTransform().SetScaleX(1.9f * (static_cast<float>(curEnemy->GetHp()) / static_cast<float>(curEnemy->GetMaxHp())));
+	
+
+	
+	hpGaugeRest->Render();
 	hpGauge->Render();
 	graphics.Set3DStates();
 }
@@ -87,6 +123,8 @@ void EnemyManager::DrawDebug()
 		ImGui::EndChild();
 
 		hpGauge->DrawDebug();
+
+		hpGaugeRest->DrawDebug();
 
 		ImGui::EndMenu();
 	}
