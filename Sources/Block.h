@@ -88,6 +88,8 @@ public:
 
     const bool GetIsAssault() const { return isAssault; }
 
+    void SetVisibility(const bool& vis) { visibility = vis; }
+
 private:
     void SpinUpdate(float elapsedTime);
 
@@ -126,5 +128,7 @@ private:
     bool isDestroy{ false };
 
     bool isAssault{ false };
+
+    bool visibility = true;//‰Â‹«
 };
 

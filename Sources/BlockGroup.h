@@ -30,6 +30,9 @@ public:
     DirectX::XMFLOAT3 GetPosition() const { return position; }
     void SetPosition(const DirectX::XMFLOAT3 pos) { position = pos; }
 
+    const Block::GridPosition& GetGridPosition() const { return gridPos; }
+    void SetGridPosition(const Block::GridPosition gridPosition) { gridPos = gridPosition; }
+
     void SetOnGrid(const bool og)
     {
         onGrid = og;
@@ -52,6 +55,9 @@ public:
 
     Block& GetBlocks(int index) { return *blocks[index]; }
 
+    //現在のブロックグループの座標を４つの各ブロックに反映させる
+    void ReflectionGridPosition();
+
 private:
     Block* blocks[4];
 
@@ -61,5 +67,7 @@ private:
     DirectX::XMFLOAT3 position;
 
     bool onGrid;
+
+
 };
 

@@ -73,6 +73,11 @@ void Player::Initialize()
     guideBlock = std::make_unique<BlockGroup>();
     guideBlock->CreateResource();
     guideBlock->Initialize();
+    for (int i = 0; i < 4; i++)
+    {
+        guideBlock->GetBlocks(i).GetModel()->SetEmissiveIntensity(0.6f);
+    }
+    
 }
 
 void Player::Update(float elapsedTime)
@@ -211,13 +216,36 @@ void Player::Render()
     }
 
     auto& graphics{ Regal::Graphics::Graphics::Instance() };
-
+    
+    //ガイドブロックの表示 非表示
     if (useBlockGroup)
     {
-        graphics.SetRSState(Regal::Graphics::RASTER_STATE::WIREFRAME);
+        const auto& gPos = guideBlock->GetGridPosition();
+        const auto& uPos = useBlockGroup->GetGridPosition();
+        const int posDifX = gPos.x - uPos.x;
+        const int posDifY = gPos.y - uPos.y;
+        const int lengthSq = posDifX * posDifX + posDifY * posDifY;
+
         for (int i = 0; i < 4; i++)
         {
-            guideBlock->GetBlocks(i).Render();
+            guideBlock->GetBlocks(i).GetModel()->SetEmissiveIntensity();
+        }
+
+        if (lengthSq > 9)
+        {
+            graphics.SetRSState(Regal::Graphics::RASTER_STATE::WIREFRAME);
+
+            for (int i = 0; i < 4; i++)
+            {
+                guideBlock->GetBlocks(i).SetVisibility(true);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                guideBlock->GetBlocks(i).SetVisibility(false);
+            }
         }
     }
 
@@ -285,6 +313,9 @@ void Player::UseBlocksMove(float elapsedTime)
 
             //自動設置時間リセット
             autoSetTimer = 0;
+
+            guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+            guideBlock->ReflectionGridPosition();
         }
     }
     else if (MoveBottomLeftButton() || FastMoveBottomLeftButton(elapsedTime))
@@ -296,6 +327,9 @@ void Player::UseBlocksMove(float elapsedTime)
 
             //自動設置時間リセット
             autoSetTimer = 0;
+
+            guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+            guideBlock->ReflectionGridPosition();
         }
     }
     else if (MoveDownButton() || FastMoveDownButton(elapsedTime))
@@ -309,10 +343,16 @@ void Player::UseBlocksMove(float elapsedTime)
     else if (MoveRightButton() || FastMoveRightButton(elapsedTime) && !Regal::Input::Keyboard::GetKeyState().LeftShift)
     {
         useBlockGroup->MoveRight(1);
+
+        guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+        guideBlock->ReflectionGridPosition();
     }
     else if (MoveLeftButton() || FastMoveLeftButton(elapsedTime) && !Regal::Input::Keyboard::GetKeyState().LeftShift)
     {
         useBlockGroup->MoveLeft(1);
+
+        guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+        guideBlock->ReflectionGridPosition();
     }
    
 
@@ -359,6 +399,10 @@ void Player::AutoSetBlock(float elapsedTime)
         autoSetTimer = 0;
 
         ChangeUseBG();
+
+        //ガイド表示のブロック位置リセット
+        guideBlock->SetGridPosition(Block::GridPosition(BlockGroup::GenerationPosX, BlockGroup::GenerationPosY));
+        guideBlock->ReflectionGridPosition();
 
         //ブロックが制限ラインに達しているなら盤面を全てリセット
         bg->OutFrame();
@@ -432,11 +476,6 @@ void Player::GuideUpdate()
 
     //設置可能な最低の位置に移動
     while (guideBlock->MoveDown(1));
-    
-    if (useBlockGroup->GetPosition)
-    {
-
-    }
 }
 
 void Player::ApplyHeal(int value)

@@ -304,3 +304,18 @@ void BlockGroup::OutFrame()
 		}
 	}
 }
+
+void BlockGroup::ReflectionGridPosition()
+{
+	auto blockGridPos = gridPos;
+	blocks[0]->SetGridPos(blockGridPos);
+
+	blockGridPos = { gridPos.x + 1,gridPos.y };
+	blocks[1]->SetGridPos(blockGridPos);
+
+	blockGridPos = { gridPos.x + 1, gridPos.y + 1 };
+	blocks[2]->SetGridPos(blockGridPos);
+
+	blockGridPos = { gridPos.x, gridPos.y + 1 };
+	blocks[3]->SetGridPos(blockGridPos);
+}

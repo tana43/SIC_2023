@@ -146,6 +146,8 @@ void Block::Update(float elapsedTime)
 
 void Block::Render()
 {
+	if (!visibility)return;
+
 	if (!isDestroy)
 	{
 		model->Render();
