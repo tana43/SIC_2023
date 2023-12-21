@@ -72,7 +72,12 @@ public:
 			else
 			{
 				tictoc.tick();
+#if _DEBUG
 				CalculateFrameStats();
+#else
+				SetWindowTextW(hwnd, L"BLOCK CONNECTOR");
+#endif // !_DEBUG
+
 				Update(tictoc.time_interval());
 				Render(tictoc.time_interval());
 			}

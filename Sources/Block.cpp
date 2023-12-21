@@ -178,6 +178,9 @@ void Block::PutOnGrid()
 {
 	PuzzleFrame::Instance().SetBlockOnGrid(this);
 
+	ConvertToWorldPos();
+	projectilePopEffect->Play(GetTransform().GetPosition());
+
 	isPlaced = true;
 }
 

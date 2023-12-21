@@ -31,7 +31,7 @@ public:
     void SetPosition(const DirectX::XMFLOAT3 pos) { position = pos; }
 
     const Block::GridPosition& GetGridPosition() const { return gridPos; }
-    void SetGridPosition(const Block::GridPosition gridPosition) { gridPos = gridPosition; }
+    void SetGridPosition(const int gridPositionX,const int gridPositionY) { gridPos.x = gridPositionX;gridPos.y = gridPositionY; }
 
     void SetOnGrid(const bool og)
     {

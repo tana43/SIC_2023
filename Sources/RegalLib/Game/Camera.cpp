@@ -161,4 +161,9 @@ namespace Regal::Game
 
 		vibrationTimer -= elapsedTime;
 	}
+
+	void Camera::VerticalCameraShake(float volume, float effectTime)
+	{
+		
+	}
 }

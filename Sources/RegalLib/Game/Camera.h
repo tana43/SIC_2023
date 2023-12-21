@@ -51,6 +51,9 @@ namespace Regal::Game
         void ScreenVibrate(float volume/*U“®—Ê*/, float effectTime/*U“®ŠÔ*/);
         void ScreenVibrationUpdate(float elapsedTime);
 
+        //cU“®
+        void VerticalCameraShake(float volume, float effectTime);
+
     private:
         DirectX::XMMATRIX ViewProjection{};
 
@@ -62,5 +65,8 @@ namespace Regal::Game
         float vibrationVolume;//U“®—Ê
         float vibrationTime;//U“®ŠÔ
         float vibrationTimer;//U“®ŠÔ‚ğ‘ª‚é‚½‚ß‚Ìƒ^ƒCƒ}[
+
+        float verticalShakeVolume;//U“®—Ê
+        float verticalShakeTimer;
     };
 }

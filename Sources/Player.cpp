@@ -220,15 +220,18 @@ void Player::Render()
     //ガイドブロックの表示 非表示
     if (useBlockGroup)
     {
+        //グリッド上の距離を算出
         const auto& gPos = guideBlock->GetGridPosition();
         const auto& uPos = useBlockGroup->GetGridPosition();
         const int posDifX = gPos.x - uPos.x;
         const int posDifY = gPos.y - uPos.y;
         const int lengthSq = posDifX * posDifX + posDifY * posDifY;
 
+        float intensity = (lengthSq / 81.0f) * 0.5f;
+        intensity = std::clamp(intensity, 0.01f, 0.5f);
         for (int i = 0; i < 4; i++)
         {
-            guideBlock->GetBlocks(i).GetModel()->SetEmissiveIntensity();
+            guideBlock->GetBlocks(i).GetModel()->SetEmissiveIntensity(intensity);
         }
 
         if (lengthSq > 9)
@@ -314,7 +317,7 @@ void Player::UseBlocksMove(float elapsedTime)
             //自動設置時間リセット
             autoSetTimer = 0;
 
-            guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+            guideBlock->SetGridPosition(useBlockGroup->GetGridPosition().x, useBlockGroup->GetGridPosition().y);
             guideBlock->ReflectionGridPosition();
         }
     }
@@ -328,7 +331,7 @@ void Player::UseBlocksMove(float elapsedTime)
             //自動設置時間リセット
             autoSetTimer = 0;
 
-            guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+            guideBlock->SetGridPosition(useBlockGroup->GetGridPosition().x, useBlockGroup->GetGridPosition().y);
             guideBlock->ReflectionGridPosition();
         }
     }
@@ -344,14 +347,14 @@ void Player::UseBlocksMove(float elapsedTime)
     {
         useBlockGroup->MoveRight(1);
 
-        guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+        guideBlock->SetGridPosition(useBlockGroup->GetGridPosition().x,useBlockGroup->GetGridPosition().y);
         guideBlock->ReflectionGridPosition();
     }
     else if (MoveLeftButton() || FastMoveLeftButton(elapsedTime) && !Regal::Input::Keyboard::GetKeyState().LeftShift)
     {
         useBlockGroup->MoveLeft(1);
 
-        guideBlock->SetGridPosition(useBlockGroup->GetGridPosition());
+        guideBlock->SetGridPosition(useBlockGroup->GetGridPosition().x, useBlockGroup->GetGridPosition().y);
         guideBlock->ReflectionGridPosition();
     }
    
@@ -401,7 +404,7 @@ void Player::AutoSetBlock(float elapsedTime)
         ChangeUseBG();
 
         //ガイド表示のブロック位置リセット
-        guideBlock->SetGridPosition(Block::GridPosition(BlockGroup::GenerationPosX, BlockGroup::GenerationPosY));
+        guideBlock->SetGridPosition(BlockGroup::GenerationPosX, BlockGroup::GenerationPosY);
         guideBlock->ReflectionGridPosition();
 
         //ブロックが制限ラインに達しているなら盤面を全てリセット
