@@ -37,6 +37,8 @@ private:
     std::unique_ptr<Regal::Resource::Sprite> sHealth;
     std::unique_ptr<Regal::Resource::Sprite> sEnemy;
 
+    std::unique_ptr<Regal::Resource::Sprite> sPause;
+
     BlockGroup blockGroup;
 
     //Hexagon hexagon;
@@ -46,5 +48,7 @@ private:
 
 
     float particleTimer{ 0 };
+
+    bool pause = false;
 };
 

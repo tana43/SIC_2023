@@ -23,11 +23,13 @@ void TitleScene::CreateResource()
 	//sprite = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/GameTitle.png");
 	sTitle_0 = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/title.png");
 	sTitle_A = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_A.png");
+	sTitle_Enter = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_Enter.png");
 	sTitle_play = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_play.png","Play");
 	sTitle_practice = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_practice.png","Practice");
 	sTitle_backToTitle = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/titleUi_backToTitle.png","Back");
 	//sCursor = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Cursor.png");
-	sTutrial = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial.png");
+	sTutrialGamePad = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial_GamePad.png");
+	sTutrialKeyboard = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Tutrial_Keyboard.png");
 
 	BGParticles = std::make_unique<Regal::Graphics::Particles>(graphics.GetDevice(), 2000);
 	popEffect = std::make_unique<PopEffect>(200);
@@ -40,6 +42,7 @@ void TitleScene::Initialize()
 	rundomColor = BaseColorController::GetRundomBrightColor();
 	sTitle_0->SetColor(rundomColor.x,rundomColor.y,rundomColor.z,rundomColor.w);
 	sTitle_A->SetColor(rundomColor);
+	sTitle_Enter->SetColor(rundomColor);
 	bloomer->bloomExtractionThreshold = 0;
 	bloomer->bloomIntensity = 0.5f;
 
@@ -123,7 +126,9 @@ void TitleScene::Render(const float& elapsedTime)
 		graphics.Set2DStates();
 
 		sTitle_0->Render();
-		sTitle_A->Render();
+		if (Input::Input::Instance().GetUseDevice() == Input::Input::GAMEPAD)sTitle_A->Render();
+		else sTitle_Enter->Render();
+
 		sTitle_backToTitle->Render();
 		sTitle_play->Render();
 		sTitle_practice->Render();
@@ -133,7 +138,14 @@ void TitleScene::Render(const float& elapsedTime)
 
 		if (openTutrial)
 		{
-			sTutrial->Render();
+			if (Input::Input::Instance().GetUseDevice() == Input::Input::GAMEPAD)
+			{
+				sTutrialGamePad->Render();
+			}
+			else
+			{
+				sTutrialKeyboard->Render();
+			}
 		}
 		//Fade::Instance().Render(immediateContext);
 
@@ -201,7 +213,7 @@ void TitleScene::MenuUpdate(float elapsedTime)
 		if (isChangeTime)
 		{
 			bool isFadeFinished = sTitle_0->FadeOut(0, elapsedTime);
-			if (sTitle_A->FadeOut(0, elapsedTime) && isFadeFinished)
+			if ((sTitle_A->FadeOut(0, elapsedTime) || sTitle_Enter->FadeOut(0,elapsedTime)) && isFadeFinished)
 			{
 				TransitionMainMenuState();
 				isChangeTime = false;
@@ -217,6 +229,7 @@ void TitleScene::MenuUpdate(float elapsedTime)
 			}
 			float alpha = std::fabsf(cosf(timer)) * 0.7f + 0.3f;
 			sTitle_A->SetAlpha(alpha);
+			sTitle_Enter->SetAlpha(alpha);
 		}
 
 		break;
@@ -316,11 +329,11 @@ void TitleScene::MainMenuUpdate(float elapsedTime)
 			switch (cursorState)
 			{
 			case static_cast<int>(SelectMenu::PLAY):
-				popEffect->Play(DirectX::XMFLOAT3(-12.3f, 33.4f, 0));
+				//popEffect->Play(DirectX::XMFLOAT3(-12.3f, 33.4f, 0));
 				break;
 			case static_cast<int>(SelectMenu::PRACTICE):
 				//27.7 20.6
-				popEffect->Play(DirectX::XMFLOAT3(-27.7f, 20.6f, 0));
+				//popEffect->Play(DirectX::XMFLOAT3(-27.7f, 20.6f, 0));
 				break;
 			}
 		}
@@ -336,7 +349,7 @@ void TitleScene::MainMenuUpdate(float elapsedTime)
 			break;
 		case static_cast<int>(SelectMenu::PRACTICE):
 			openTutrial = true;
-			if (Player::SelectButton())
+			if (Player::BackButton())
 			{
 				openTutrial = false;
 				isDecide = false;

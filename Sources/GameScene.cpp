@@ -30,6 +30,8 @@ void GameScene::CreateResource()
 	sHealth = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Health.png","Health");
 	sEnemy = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Enemy.png");
 
+	sPause = std::make_unique<Regal::Resource::Sprite>(graphics.GetDevice(), L"./Resources/Images/Game/UI/pause.png");
+
 	PuzzleFrame::Instance().CreateResource();
 
 
@@ -88,10 +90,20 @@ void GameScene::Begin()
 
 void GameScene::Update(const float& elapsedTime)
 {
+#if _DEBUG
 	if (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::F1))
 	{
 		Regal::Scene::SceneManager::Instance().ChangeScene(new TitleScene);
 	}
+#endif // _DEBUG
+
+	//ポーズ画面
+	if (!GameManager::Instance().GetGameClear() && Player::PauseButton())
+	{
+		pause = !pause;
+	}
+	
+	if (pause)return;
 
 	BlockGroupManager::Instance().Update(elapsedTime);
 
@@ -186,6 +198,12 @@ void GameScene::Render(const float& elapsedTime)
 		sEnemy->Render();
 
 		//Fade::Instance().Render(immediateContext);
+		
+		//ポーズ画面
+		if (!GameManager::Instance().GetGameClear() && pause)
+		{
+			sPause->Render();
+		}
 
 		GameManager::Instance().GameClearRender();
 	}

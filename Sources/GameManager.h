@@ -38,6 +38,8 @@ public:
 
     void GameClear();
 
+    const bool GetGameClear() const { return gameClear; }
+
 private:
     int score;
     int highScore;

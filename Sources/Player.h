@@ -72,11 +72,18 @@ public:
 
     //----------------------------INPUT-------------------------------------
     
+
     //決定ボタン
     static const bool SelectButton()
     {
         return (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Enter) ||
             (GamePad::BTN_A & Regal::Input::Input::GetGamePad().GetButtonDown()));
+    }
+    //キャンセルボタン
+    static const bool BackButton()
+    {
+        return (Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Escape) ||
+            (GamePad::BTN_B & Regal::Input::Input::GetGamePad().GetButtonDown()));
     }
 
     //左右上下移動
@@ -244,6 +251,11 @@ public:
         return Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Space);
     }
 
+    static const bool PauseButton()
+    {
+        return Regal::Input::Keyboard::GetKeyDown(DirectX::Keyboard::Escape) ||
+            (GamePad::BTN_START & Regal::Input::Input::GetGamePad().GetButtonDown());
+    }
     //----------------------------------------------------------------------
 
     void SetUseBlockGroup(BlockGroup* blockGroup) 
@@ -256,6 +268,7 @@ public:
     Regal::Model::StaticModel* GetModel() { return model.get(); }
 
     PopEffect* GetProjectilePopEffect(int type) { return projectilePopEffects[type].get(); }
+    
 
     void SetPower(const int power,const char t) { this->power[t] = power; }
     const int GetPower(const char type) const { return power[type]; }

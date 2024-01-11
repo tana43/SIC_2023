@@ -125,7 +125,7 @@ public:
 		case WM_SYSKEYUP:
 			if (wparam == VK_ESCAPE)
 			{
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				//PostMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 
 			DirectX::Keyboard::ProcessMessage(msg, wparam, lparam);

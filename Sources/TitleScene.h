@@ -58,11 +58,13 @@ private:
 
     std::unique_ptr<Regal::Resource::Sprite> sTitle_0;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_A;
+    std::unique_ptr<Regal::Resource::Sprite> sTitle_Enter;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_play;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_practice;
     std::unique_ptr<Regal::Resource::Sprite> sTitle_backToTitle;
     //std::unique_ptr<Regal::Resource::Sprite> sCursor;
-    std::unique_ptr<Regal::Resource::Sprite> sTutrial;
+    std::unique_ptr<Regal::Resource::Sprite> sTutrialGamePad;
+    std::unique_ptr<Regal::Resource::Sprite> sTutrialKeyboard;
     DirectX::XMFLOAT2 sCursorPos{512, 405};
     //DirectX::XMFLOAT2 sPos;
 
